@@ -14,6 +14,8 @@ npm run dev
 
 Buka http://127.0.0.1:8080. PHP 8.3 atau lebih baru dapat menjalankan frontend; target produksi tetap PHP 8.4 sesuai arsitektur. MySQL dan Composer belum diperlukan untuk melihat dashboard.
 
+Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Simpan Draft menyimpan data di browser perangkat yang sama dan memuatnya kembali saat halaman dibuka; pengiriman ke server serta riwayat laporan masih menunggu integrasi backend.
+
 Perintah `npm run dev` menjalankan server PHP lokal. Hentikan dengan Ctrl+C. Untuk menjalankan tanpa npm, gunakan `php -S 127.0.0.1:8080 -t public public/index.php`.
 
 CSS Tailwind dan font sudah tersedia di `public/assets/`, sehingga dashboard tidak bergantung pada CDN maupun Node.js saat dijalankan. Inter dan Playfair Display disajikan secara lokal beserta lisensinya.
@@ -36,6 +38,10 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 | `routes/web.php` | Route aplikasi |
 | `app/Controllers/HomeController.php` | Data dashboard dan pengelompokan menu |
 | `app/Views/home/index.php` | Dashboard portal |
+| `app/Controllers/Forms/HardwareServerController.php` | Data halaman pemeriksaan hardware server |
+| `app/Views/forms/hardware-server/` | Form pemeriksaan dan komponen pilihan kondisi |
+| `config/hardware-server.php` | Lokasi, periode, pilihan rak, dan teks pemeriksaan |
+| `public/assets/js/hardware-server.js` | Interaksi form, validasi, dan draft lokal |
 | `app/Views/components/` | Navbar, kartu, footer, dan dialog |
 | `config/portal.php` | Daftar 15 kartu, kategori, target, serta urutannya |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal sebelum integrasi backend |
@@ -53,7 +59,7 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 - Proporsi kartu berangkat dari `code.html`, lalu disesuaikan berdasarkan arahan pengguna: judul 11.7 px, deskripsi 10.8 px, badge 9 px, padding 16 px, dan ikon 48 px. Grid enam/tujuh kolom aktif mulai lebar 1024 px.
 - Halaman memakai alur vertikal alami, tanpa tinggi tetap 100vh atau pemadatan kartu berdasarkan tinggi layar. Semua kartu kembali vertikal dengan ikon 48 px. Container desktop memakai lebar 90%, maksimal 1440 px, agar margin kiri dan kanan lebih lapang. Navbar, banner, dan hero tetap ringkas; bagian Sistem berada setelah Monitoring & Laporan dan dapat dijangkau dengan scroll.
 - Semua kartu memakai `justify-start`, padding atas yang sama, dan kotak ikon 48 px yang tidak menyusut. Hover tidak menggeser kartu atau memperbesar ikon, sehingga posisi ikon tetap sejajar meskipun panjang judul berbeda.
-- Kartu internal berlabel `Segera`; klik menampilkan keterangan modul. Tidak ada pengisian atau penyimpanan data pada tahap ini.
+- Kartu hardware server berlabel `Form` dan membuka halaman pengisian. Kartu internal lainnya masih berlabel `Segera` dan menampilkan keterangan modul. Properti `available=true` digunakan hanya setelah route dan halamannya tersedia.
 - Kartu eksternal berlabel `Atur URL` sampai target dikonfigurasi di `config/portal.php`. URL HTTPS yang valid dibuka di tab baru dengan `noopener noreferrer`.
 - Password, Users, dan Logout menampilkan penjelasan bahwa autentikasi belum tersedia. Tidak ada password atau data akun yang dikumpulkan.
 - Badge `Portal aktif` merujuk pada halaman portal, bukan uptime sistem eksternal.
@@ -65,7 +71,7 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 
 Autentikasi Delight PHP-Auth, middleware, pengelolaan pengguna, database operasional, migrasi, formulir resmi, dan perhitungan progres adalah tahap berikutnya. Tidak ada SQL migrasi asumsi atau autentikasi tiruan yang dipasang. `composer.json` menyiapkan autoload PSR-4; tambahkan dependensi auth dan kunci `composer.lock` ketika implementasi backend dimulai.
 
-Dashboard saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, beranda mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
+Dashboard dan form hardware server saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, kedua halaman mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
 
 Pada Apache, arahkan document root ke `public/` dan aktifkan `mod_rewrite`. `APP_URL` dapat diatur menjadi origin portal tanpa trailing slash. `.env` tidak dibaca otomatis. Struktur saat ini menggunakan path absolut dari origin dan ditujukan untuk root domain atau virtual host, bukan subfolder URL.
 

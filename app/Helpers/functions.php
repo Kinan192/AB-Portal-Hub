@@ -49,6 +49,16 @@ function icon(string $name, string $class = 'size-5'): string
         'clock' => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
         'close' => '<path d="m6 6 12 12M6 18 18 6"/>',
         'info' => '<circle cx="12" cy="12" r="9"/><path d="M12 11v6m0-10h.01"/>',
+        'home' => '<path d="m3 10 9-7 9 7v11H3Zm6 11v-8h6v8"/>',
+        'network' => '<rect x="8" y="3" width="8" height="5" rx="1"/><rect x="2" y="16" width="6" height="5" rx="1"/><rect x="16" y="16" width="6" height="5" rx="1"/><path d="M12 8v4M5 16v-4h14v4"/>',
+        'clipboard' => '<rect x="5" y="5" width="14" height="16" rx="2"/><rect x="9" y="3" width="6" height="4" rx="1"/><circle cx="12" cy="12" r="2"/><path d="M9 18v-1a3 3 0 0 1 6 0v1"/>',
+        'location' => '<path d="M20 10c0 6-8 11-8 11S4 16 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2"/>',
+        'check-circle' => '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+        'cube' => '<path d="m12 3 9 5v9l-9 5-9-5V8Zm0 10v9M3 8l9 5 9-5M7.5 5.5l9 5V15"/>',
+        'warning' => '<path d="m12 3 10 18H2Zm0 6v5m0 3h.01"/>',
+        'arrow-left' => '<path d="m10 5-7 7 7 7M3 12h18"/>',
+        'bookmark' => '<path d="M6 3h12v18l-6-4-6 4Z"/>',
+        'send' => '<path d="m22 2-7 20-4-9-9-4Zm0 0L11 13"/>',
     ];
     return '<svg class="' . e($class) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($paths[$name] ?? $paths['info']) . '</svg>';
 }

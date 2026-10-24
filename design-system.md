@@ -20,7 +20,7 @@ Dokumen arsitektur awal diberikan sebagai berkas terpisah bernama `architecture 
 
 Project ini adalah frontend aplikasi yang sedang dikembangkan langsung. Gunakan bahasa operasional seperti “Riwayat pemeriksaan”, “Simpan draft”, dan “Informasi portal”. Fitur yang belum tersedia harus dijelaskan sesuai kondisinya, tanpa mengklaim sudah tersambung ke backend.
 
-Controller, View, router GET statis, konfigurasi, dan helper sudah digunakan. Model operasional, autentikasi, middleware, serta penyimpanan form belum diimplementasikan. Angka progres 5/6 (83%) saat ini berasal dari konfigurasi frontend dan akan diganti sumbernya saat integrasi backend.
+Controller, View, router GET statis, konfigurasi, dan helper sudah digunakan. Form hardware server memiliki draft lokal di browser. Model operasional, autentikasi, middleware, serta penyimpanan form ke server belum diimplementasikan. Angka progres 5/6 (83%) saat ini berasal dari konfigurasi frontend dan akan diganti sumbernya saat integrasi backend.
 
 ## 2. Menjalankan hasil clone
 
@@ -214,7 +214,7 @@ Helper ikon:
 <?= icon('server', 'size-6') ?>
 ```
 
-Nama yang tersedia: `server`, `user-check`, `thermometer`, `video`, `monitor`, `ticket`, `globe`, `dashboard`, `hospital`, `file`, `mail`, `target`, `bot`, `shield`, `calendar`, `chart`, `lock`, `users`, `logout`, `clock`, `close`, dan `info`. Nama yang tidak dikenal menghasilkan ikon `info`.
+Nama yang tersedia: `server`, `user-check`, `thermometer`, `video`, `monitor`, `ticket`, `globe`, `dashboard`, `hospital`, `file`, `mail`, `target`, `bot`, `shield`, `calendar`, `chart`, `lock`, `users`, `logout`, `clock`, `close`, `info`, `home`, `network`, `clipboard`, `location`, `check-circle`, `cube`, `warning`, `arrow-left`, `bookmark`, dan `send`. Nama yang tidak dikenal menghasilkan ikon `info`.
 
 Tambah kartu melalui `config/portal.php`, bukan HTML dashboard yang disalin. Ikuti bentuk data berikut; `sort_order` disesuaikan dengan urutan kategori.
 
@@ -236,7 +236,7 @@ Tambah kartu melalui `config/portal.php`, bukan HTML dashboard yang disalin. Iku
 
 Kategori yang ada: `daily`, `monitoring`, dan `systems`. Setiap `key` harus unik. Kartu eksternal memakai `type=external`, `form_slug=null`, dan target URL HTTPS yang dikelola pengembang. Kartu dengan `enabled=false` tidak ditampilkan.
 
-Perilaku saat ini: URL eksternal HTTPS yang valid menjadi tautan tab baru dengan `noopener noreferrer`. Target eksternal kosong menampilkan dialog keterangan. Seluruh kartu internal masih menampilkan dialog modul belum tersedia; menambah route saja belum otomatis mengubah perilaku kartu. Saat modul internal sudah dibuat, tambahkan pemetaan kesiapan modul dan ubah komponen secara terpusat agar kartu tersebut menuju route yang benar. Hindari mengubah semua kartu internal sekaligus menjadi tautan jika modulenya belum tersedia.
+Perilaku saat ini: URL eksternal HTTPS yang valid menjadi tautan tab baru dengan `noopener noreferrer`. Target eksternal kosong menampilkan dialog keterangan. Kartu internal dengan `available=true` menjadi tautan dalam tab yang sama dan berlabel `Form`; saat ini hanya hardware server yang tersedia. Kartu internal tanpa properti tersebut tetap berlabel `Segera` dan membuka dialog. Tambahkan `available=true` pada konfigurasi kartu setelah route dan view modul selesai.
 
 ### 8.5 Banner dan panel informasi
 
@@ -269,7 +269,7 @@ Pemicu yang sudah ditangani JavaScript adalah `[data-module]` dan `[data-account
 
 ## 9. Pola form dan tabel untuk halaman baru
 
-Komponen form dan tabel bersama belum dibuat. Resep di bagian ini adalah pola awal agar halaman baru selaras, bukan API komponen yang sudah tersedia.
+Form hardware server tersedia sebagai acuan implementasi. Komponen tabel bersama belum dibuat. Resep umum di bawah tetap berlaku untuk halaman berikutnya.
 
 - Susun input dalam satu kolom pada mobile, maksimal dua kolom pada desktop untuk kelompok input yang berkaitan.
 - Gunakan label yang terhubung ke `id` input. Placeholder tidak menggantikan label.
@@ -294,9 +294,25 @@ Gunakan tombol utama teal untuk tindakan seperti “Simpan draft” atau “Kiri
 
 Tampilkan keadaan kosong jika daftar belum berisi data. Jika ada pengambilan data asynchronous, tampilkan status memuat dan error yang bisa dicoba ulang. Dashboard saat ini dirender langsung oleh PHP dan tidak memerlukan indikator loading buatan.
 
+### 9.1 Form hardware server yang sudah tersedia
+
+Source: `app/Views/forms/hardware-server/index.php`, `condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
+
+- Route: `/forms/hardware-server`; controller: `App\Controllers\Forms\HardwareServerController`.
+- `navbarVariant=form` memilih navbar dengan breadcrumb. Komponen brand, profil, jam, ikon, dan dialog akun tetap memakai sumber bersama.
+- `.inspection-shell` membatasi isi ke 1024 px, dengan padding horizontal 20/24/32 px sesuai breakpoint. Ini mengikuti HTML referensi form; jangan menerapkannya pada dashboard.
+- `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
+- `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
+- Kelompok CPU/monitor memakai partial `condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
+- Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal serta menghapus draft setelah konfirmasi.
+- Simpan Draft menggunakan `localStorage` dengan versi format dan nama profil, lalu memuat draft pada pembukaan berikutnya di browser yang sama. Ini belum merupakan penyimpanan lintas akun/perangkat; sumber identitas dan penyimpanan harus diganti saat autentikasi/backend diintegrasikan.
+- Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Riwayat juga menjelaskan kondisi integrasinya. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
+- Script khusus halaman didaftarkan melalui array `pageScripts` di controller. Layout memuatnya dengan `defer` dan versi `filemtime`; jangan memasukkan script inline ke view.
+- Controller mempertahankan pembatasan `APP_ENV=local` sampai autentikasi tersedia.
+
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 
-Contoh berikut membuat halaman awal riwayat hardware server. Ini contoh penambahan file, belum merupakan route yang terpasang. Jangan menyalin navbar atau HTML dokumen ke dalamnya.
+Route `/forms/hardware-server`, controller, dan view yang disebut di bawah sudah dipakai oleh form pemeriksaan. Jangan menimpa file tersebut atau menggandakan route. Contoh ringkas ini menjelaskan pola MVC; gunakan nama modul dan path baru untuk halaman selanjutnya. Jangan menyalin navbar atau HTML dokumen ke dalam view.
 
 ### A. Buat controller
 
