@@ -1,0 +1,8 @@
+{
+  "name": "awalbros/portal-hub",
+  "description": "Portal internal RS Awal Bros Botania",
+  "type": "project",
+  "require": { "php": "^8.3", "ext-pdo": "*" },
+  "autoload": { "psr-4": { "App\\": "app/" }, "files": ["app/Helpers/functions.php"] },
+  "config": { "sort-packages": true }
+}

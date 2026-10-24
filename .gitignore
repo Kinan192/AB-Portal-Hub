@@ -1,0 +1,31 @@
+# Installed dependencies
+/node_modules/
+/vendor/
+
+# Environment secrets and Composer credentials
+.env
+.env.*
+!.env.example
+/auth.json
+
+# Runtime data; retain directory placeholders
+/storage/logs/*
+/storage/sessions/*
+!/storage/logs/.gitkeep
+!/storage/sessions/.gitkeep
+
+# Logs and editor temporary files
+*.log
+npm-debug.log*
+*.swp
+*.swo
+*~
+
+# Personal IDE workspaces and operating-system metadata
+/.idea/
+/*.code-workspace
+.DS_Store
+Thumbs.db
+[Dd]esktop.ini
+
+# Keep public assets, .htaccess, lockfiles, and SQL migrations in version control.
