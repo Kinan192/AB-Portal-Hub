@@ -59,6 +59,13 @@ function icon(string $name, string $class = 'size-5'): string
         'arrow-left' => '<path d="m10 5-7 7 7 7M3 12h18"/>',
         'bookmark' => '<path d="M6 3h12v18l-6-4-6 4Z"/>',
         'send' => '<path d="m22 2-7 20-4-9-9-4Zm0 0L11 13"/>',
+        'chart-search' => '<path d="m3 15 5-6 4 3 5-8m-4 0h4v4M3 21h8"/><circle cx="17" cy="17" r="4"/><path d="m20 20 2 2"/>',
+        'table' => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12m6-12v12M3 15h18"/>',
+        'printer' => '<path d="M6 9V3h12v6M6 17H3v-8h18v8h-3M6 14h12v7H6Zm11-2h.01"/>',
+        'search' => '<circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/>',
+        'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
+        'eye' => '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
+        'download' => '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
     ];
     return '<svg class="' . e($class) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($paths[$name] ?? $paths['info']) . '</svg>';
 }

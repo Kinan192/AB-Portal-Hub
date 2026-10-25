@@ -2,7 +2,7 @@
 
 Panduan frontend Portal Monitoring IT RS Awal Bros Botania untuk rekan pengembang yang melakukan clone repository dan membuat halaman baru.
 
-Dokumen ini mencatat implementasi terakhir pada 24 Oktober 2026. Ukuran di bawah mengikuti source project yang aktif, termasuk penyesuaian pengguna setelah referensi `code.html`. Jangan mengambil ukuran dari versi screenshot lama.
+Dokumen ini mencatat implementasi terakhir pada 25 Oktober 2026. Ukuran di bawah mengikuti source project yang aktif, termasuk penyesuaian pengguna setelah referensi `code.html`. Jangan mengambil ukuran dari versi screenshot lama.
 
 ## 1. Sumber acuan dan batas pengembangan
 
@@ -296,19 +296,49 @@ Tampilkan keadaan kosong jika daftar belum berisi data. Jika ada pengambilan dat
 
 ### 9.1 Form hardware server yang sudah tersedia
 
-Source: `app/Views/forms/hardware-server/index.php`, `condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
+Source: `app/Views/hardware-server/form/index.php`, `form/condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
+
+Pisahkan view pengisian dan laporan dalam setiap modul. Gunakan struktur berikut sebagai pola modul selanjutnya:
+
+```text
+app/Views/hardware-server/
+├── form/
+│   ├── index.php
+│   └── condition.php
+├── reports/
+│   └── index.php
+└── components/
+    └── hero.php
+```
+
+Tambahkan halaman pengisian berikutnya ke `form/`, halaman riwayat/rekap ke `reports/`, dan partial yang dipakai keduanya ke `components/`. Komponen global tetap di `app/Views/components/`. URL route tidak harus mengikuti lokasi fisik view.
 
 - Route: `/forms/hardware-server`; controller: `App\Controllers\Forms\HardwareServerController`.
 - `navbarVariant=form` memilih navbar dengan breadcrumb. Komponen brand, profil, jam, ikon, dan dialog akun tetap memakai sumber bersama.
-- `.inspection-shell` membatasi isi ke 1024 px, dengan padding horizontal 20/24/32 px sesuai breakpoint. Ini mengikuti HTML referensi form; jangan menerapkannya pada dashboard.
+- Form, laporan, dan isi hero memakai `.page-shell` yang sama dengan home dan navbar: lebar 90% mulai desktop, maksimal 1440 px, dengan padding mobile 20/32 px. Jangan menambahkan batas 1024 px pada halaman hardware server.
 - `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
 - `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
 - Kelompok CPU/monitor memakai partial `condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
 - Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal serta menghapus draft setelah konfirmasi.
 - Simpan Draft menggunakan `localStorage` dengan versi format dan nama profil, lalu memuat draft pada pembukaan berikutnya di browser yang sama. Ini belum merupakan penyimpanan lintas akun/perangkat; sumber identitas dan penyimpanan harus diganti saat autentikasi/backend diintegrasikan.
-- Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Riwayat juga menjelaskan kondisi integrasinya. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
+- Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Lihat Riwayat & Rekap Laporan mengarah ke `/forms/hardware-server/history`. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
 - Script khusus halaman didaftarkan melalui array `pageScripts` di controller. Layout memuatnya dengan `defer` dan versi `filemtime`; jangan memasukkan script inline ke view.
 - Controller mempertahankan pembatasan `APP_ENV=local` sampai autentikasi tersedia.
+
+### 9.2 Rekap bulanan hardware server
+
+Source: `app/Views/hardware-server/reports/index.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/forms/hardware-server/history` memakai method `history()` pada controller hardware yang sama. Navbar dan `components/hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Bulanan.
+
+- Pertahankan `.page-shell` yang sama dengan home (90% pada desktop, maksimal 1440 px), jarak antarpanel 24 px, radius 16 px. Heading rekap 18 px; isi tabel 12 px; header dan badge tabel 10–11 px, mengikuti HTML referensi.
+- Panel kontrol memakai satu kolom pada mobile, dua mulai `sm`, dan empat mulai `md`. Label terhubung ke setiap input. Kelompok tombol ekspor dapat membungkus ketika ruang menyempit.
+- Tabel memakai `scope=col`, caption, dan wrapper horizontal yang bisa difokuskan. Lebar minimum 1380 px menjaga delapan kolom terbaca; hanya tabel yang bergeser, bukan seluruh halaman. Catatan penuh tersedia pada dialog rincian, sehingga teks tabel boleh dipotong dengan ellipsis.
+- Filter bulan/rak/status dapat digabung dengan pencarian beberapa kata. Pencarian mencakup catatan, nama/NIK petugas, identitas laporan, rak, dan kondisi. Perubahan filter mengembalikan pagination ke halaman pertama; tujuh baris per halaman berasal dari konfigurasi. Total dan tombol halaman dihitung dari hasil yang sebenarnya, tanpa jumlah 31 atau halaman tambahan buatan.
+- Kondisi kosong menampilkan penjelasan dan Reset Filter. Tombol ekspor/cetak dinonaktifkan ketika tidak ada hasil.
+- Data awal adalah tujuh baris dari HTML referensi, dengan pemberitahuan sumber pada halaman. Ganti sumber controller dengan Model saat data operasional tersedia; jangan menganggap data referensi sebagai laporan pemeriksaan sungguhan.
+- Rincian memakai dialog native. Data JSON diserialisasi dengan opsi `JSON_HEX_*`; nilai dimasukkan ke DOM menggunakan `textContent`.
+- Cetak Rekap membuka dialog cetak browser. CSS cetak menampilkan semua hasil filter lintas halaman, identitas rumah sakit, dan ringkasan filter; navigasi, hero, tombol aksi, dan pagination tidak ikut dicetak. Tata letak cetak memakai A4 landscape.
+- Ekspor Excel/PDF dan unduh lembar membuka keterangan integrasi yang belum tersedia. Jangan membuat pesan unduhan berhasil atau file dengan ekstensi palsu. Ekspor operasional menunggu backend dan hak akses.
+- Ikon tambahan: `chart-search`, `table`, `printer`, `search`, `chevron-down`, `eye`, dan `download`, melalui helper `icon()` yang sama.
 
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 
@@ -330,7 +360,7 @@ final class HardwareServerController
 {
     public function index(): void
     {
-        View::render('forms/hardware-server/index', [
+        View::render('hardware-server/form/index', [
             'pageTitle' => 'Monitoring Hardware Server',
             'profile' => config('dashboard')['profile'],
         ]);
@@ -353,7 +383,7 @@ Router saat ini hanya mendukung `get(path, callable)` dengan path persis. Parame
 
 ### C. Buat view
 
-Lokasi: `app/Views/forms/hardware-server/index.php`.
+Lokasi: `app/Views/hardware-server/form/index.php`.
 
 ```php
 <main id="main-content" class="page-shell flex-1 space-y-5 py-4">

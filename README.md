@@ -2,7 +2,7 @@
 
 Frontend portal IT RS Awal Bros Botania. Root project adalah folder ini. Struktur mengikuti `architecture.md`: PHP native, controller, view, router, konfigurasi menu, dan koneksi PDO yang dibuat hanya ketika diperlukan.
 
-Panduan untuk rekan yang melakukan clone dan menambah halaman: [Design System](design-system.md). Gunakan dokumen tersebut sebagai acuan ukuran, komponen, serta pola penambahan controller, route, dan view.
+Panduan untuk rekan yang melakukan clone dan menambah halaman: [Design System](docs/design-system.md). Gunakan dokumen tersebut sebagai acuan ukuran, komponen, serta pola penambahan controller, route, dan view.
 
 ## Menjalankan dashboard
 
@@ -14,7 +14,9 @@ npm run dev
 
 Buka http://127.0.0.1:8080. PHP 8.3 atau lebih baru dapat menjalankan frontend; target produksi tetap PHP 8.4 sesuai arsitektur. MySQL dan Composer belum diperlukan untuk melihat dashboard.
 
-Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Simpan Draft menyimpan data di browser perangkat yang sama dan memuatnya kembali saat halaman dibuka; pengiriman ke server serta riwayat laporan masih menunggu integrasi backend.
+Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Simpan Draft menyimpan data di browser perangkat yang sama dan memuatnya kembali saat halaman dibuka; pengiriman ke server masih menunggu integrasi backend.
+
+Halaman rekap bulanan tersedia di http://127.0.0.1:8080/forms/hardware-server/history, juga melalui tombol Lihat Riwayat & Rekap Laporan pada form. Filter bulan/rak/status, pencarian, rincian laporan, pagination, serta Cetak Rekap sudah berfungsi di frontend. Tujuh baris awal berasal dari HTML referensi dan ditandai sebagai data referensi di halaman. Jumlah hasil dihitung dari data yang tersedia. Ekspor Excel/PDF dan unduh lembar menjelaskan bahwa integrasi laporan server belum tersedia; tidak ada unduhan atau persetujuan operasional yang diklaim berasal dari backend.
 
 Perintah `npm run dev` menjalankan server PHP lokal. Hentikan dengan Ctrl+C. Untuk menjalankan tanpa npm, gunakan `php -S 127.0.0.1:8080 -t public public/index.php`.
 
@@ -39,9 +41,13 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 | `app/Controllers/HomeController.php` | Data dashboard dan pengelompokan menu |
 | `app/Views/home/index.php` | Dashboard portal |
 | `app/Controllers/Forms/HardwareServerController.php` | Data halaman pemeriksaan hardware server |
-| `app/Views/forms/hardware-server/` | Form pemeriksaan dan komponen pilihan kondisi |
+| `app/Views/hardware-server/form/` | Form pemeriksaan dan komponen pilihan kondisi |
 | `config/hardware-server.php` | Lokasi, periode, pilihan rak, dan teks pemeriksaan |
 | `public/assets/js/hardware-server.js` | Interaksi form, validasi, dan draft lokal |
+| `app/Views/hardware-server/reports/index.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
+| `app/Views/hardware-server/components/hero.php` | Hero bersama untuk form dan rekap |
+| `config/hardware-server-reports.php` | Data referensi dan periode halaman rekap |
+| `public/assets/js/hardware-server-history.js` | Filter, pencarian, pagination, rincian, dan cetak |
 | `app/Views/components/` | Navbar, kartu, footer, dan dialog |
 | `config/portal.php` | Daftar 15 kartu, kategori, target, serta urutannya |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal sebelum integrasi backend |
@@ -71,7 +77,7 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 
 Autentikasi Delight PHP-Auth, middleware, pengelolaan pengguna, database operasional, migrasi, formulir resmi, dan perhitungan progres adalah tahap berikutnya. Tidak ada SQL migrasi asumsi atau autentikasi tiruan yang dipasang. `composer.json` menyiapkan autoload PSR-4; tambahkan dependensi auth dan kunci `composer.lock` ketika implementasi backend dimulai.
 
-Dashboard dan form hardware server saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, kedua halaman mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
+Dashboard, form hardware server, dan halaman rekap saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, halaman tersebut mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
 
 Pada Apache, arahkan document root ke `public/` dan aktifkan `mod_rewrite`. `APP_URL` dapat diatur menjadi origin portal tanpa trailing slash. `.env` tidak dibaca otomatis. Struktur saat ini menggunakan path absolut dari origin dan ditujukan untuk root domain atau virtual host, bukan subfolder URL.
 

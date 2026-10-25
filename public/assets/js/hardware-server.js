@@ -126,13 +126,6 @@
   });
   document.querySelector('[data-new-inspection]').addEventListener('click', () => form.reset());
 
-  document.querySelector('[data-inspection-history]').addEventListener('click', () => {
-    const dialog = document.getElementById('portal-dialog');
-    document.getElementById('dialog-title').textContent = 'Riwayat & Rekap Laporan';
-    document.getElementById('dialog-description').textContent = 'Riwayat pemeriksaan akan tersedia setelah penyimpanan laporan terhubung ke server. Draft saat ini tersimpan hanya di browser perangkat ini.';
-    dialog.showModal();
-  });
-
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     updateOtherFields();

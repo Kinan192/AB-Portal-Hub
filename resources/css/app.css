@@ -84,7 +84,6 @@
   .tone-rose { @apply bg-rose-50 text-rose-700; }
   .tone-purple { @apply bg-purple-50 text-purple-700; }
   .tone-orange { @apply bg-orange-50 text-orange-700; }
-  .inspection-shell { @apply mx-auto w-full max-w-5xl px-5 sm:px-6 lg:px-8; }
   .inspection-panel { @apply min-w-0 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm md:p-8; }
   .inspection-section-heading { @apply flex items-start gap-3 border-b border-slate-100 pb-4; }
   .inspection-step { @apply mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-teal-600 text-xs font-black text-white; }
@@ -103,6 +102,39 @@
   .inspection-condition-badge { @apply ml-8 shrink-0 rounded-full border px-3 py-1 text-[11px] font-medium sm:ml-auto; }
   .inspection-input { @apply min-h-10 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3.5 py-2.5 text-[13px] text-slate-700 placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500; }
   .inspection-button { @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-xl border px-4 py-2.5 text-xs font-semibold transition-colors; }
+  .report-export-button { @apply inline-flex min-h-10 items-center justify-center gap-1.5 rounded-xl px-3.5 py-2 text-[11px] font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50; }
+  .report-filter-label { @apply block text-[10px] font-bold tracking-wide text-slate-500 uppercase; }
+  .report-filter-input { @apply min-h-10 w-full min-w-0 rounded-xl border border-transparent bg-slate-50 px-3.5 py-2 text-xs text-slate-700 transition-colors placeholder:text-slate-400 hover:bg-slate-100/80 focus:border-teal-300 focus:bg-white; }
+  .report-table th { @apply px-4 py-3.5; }
+  .report-table td { @apply px-4 py-3; }
+  .report-page-button { @apply inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-600 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-white; }
+  .report-page-button[aria-current="page"] { @apply border-teal-700 bg-teal-700 font-semibold text-white hover:bg-teal-800; }
+}
+
+.report-page-hidden { display: none; }
+
+@page hardware-report { size: A4 landscape; margin: 12mm; }
+@media print {
+  body:has(.hardware-history) > :not(.hardware-history) { display: none !important; }
+  .hardware-history { page: hardware-report; background: white !important; }
+  .hardware-history .inspection-hero,
+  .hardware-history .report-export-actions,
+  .hardware-history #report-filters,
+  .hardware-history .report-pagination,
+  .hardware-history .report-row-actions { display: none !important; }
+  .hardware-history .report-content { width: 100%; max-width: none; margin: 0; padding: 0; }
+  .hardware-history .report-toolbar { margin-bottom: 12px; padding: 0; border: 0; box-shadow: none; }
+  .hardware-history #report-print-filter { display: block; }
+  .hardware-history .report-print-brand { display: block; }
+  .hardware-history .report-table-panel { border-radius: 0; box-shadow: none; }
+  .hardware-history .report-table-scroll { overflow: visible; }
+  .hardware-history .report-table { min-width: 0; table-layout: fixed; }
+  .hardware-history .report-table th, .hardware-history .report-table td { padding: 7px 5px; font-size: 8px; overflow-wrap: anywhere; }
+  .hardware-history .report-table * { min-width: 0; max-width: none; font-size: 8px; white-space: normal; }
+  .hardware-history .report-table p { overflow: visible; text-overflow: clip; }
+  .hardware-history .report-table thead { display: table-header-group; }
+  .hardware-history .report-table tr { break-inside: avoid; }
+  .hardware-history .report-page-hidden:not([hidden]) { display: table-row; }
 }
 
 @media (min-width: 1024px) {

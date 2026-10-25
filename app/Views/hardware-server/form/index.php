@@ -1,22 +1,7 @@
 <main id="main-content" class="flex-1 bg-slate-100">
-    <section class="relative bg-[#0a382c] pb-9 pt-8 text-white" aria-labelledby="inspection-title">
-        <div class="inspection-shell relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
-            <div class="min-w-0">
-                <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-teal-200"><?= icon('server', 'size-3.5') ?>Checklist Inspeksi Ruang Server • Unit <?= e($inspection['unit']) ?></p>
-                <h1 id="inspection-title" class="font-serif text-2xl font-bold tracking-tight lg:text-3xl">Form Monitoring Hardware Server IT</h1>
-                <p class="mt-1 max-w-2xl text-sm leading-relaxed text-teal-100/80">Pencatatan kondisi fisik dan operasional hardware server, rak, konsol CPU, display central, serta perangkat pendukung IT secara harian dan berkala.</p>
-            </div>
-            <div class="flex shrink-0 flex-wrap items-center gap-3">
-                <div class="flex min-h-12 items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-2">
-                    <span class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-teal-400/30 bg-teal-500/20 text-teal-300"><?= icon('calendar', 'size-4') ?></span>
-                    <span class="flex flex-col"><span class="text-[10px] font-bold tracking-wide text-teal-200/80 uppercase">Periode Laporan</span><span class="text-xs font-bold"><?= e($inspection['period']) ?></span></span>
-                </div>
-                <button type="button" data-new-inspection class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-emerald-600"><?= icon('check-circle', 'size-4') ?>Input Form Baru</button>
-            </div>
-        </div>
-    </section>
+    <?php require dirname(__DIR__) . '/components/hero.php'; ?>
 
-    <div class="inspection-shell relative -mt-4 pb-16">
+    <div class="page-shell relative -mt-4 pb-16">
         <form id="hardware-monitoring-form" method="post" class="space-y-6" data-inspector="<?= e($profile['name']) ?>">
             <input type="hidden" name="recorded_at" value="<?= e($recordedAt) ?>">
             <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -89,7 +74,7 @@
                 <div class="flex flex-wrap items-center gap-3 lg:contents">
                     <a href="/" class="inspection-button border-slate-300 text-slate-700 hover:bg-slate-100"><?= icon('arrow-left', 'size-4 shrink-0') ?><span>Kembali ke Portal Terpadu</span></a>
                     <button type="reset" class="min-h-11 rounded-lg px-3 py-2.5 text-xs font-semibold text-slate-500 hover:bg-slate-50 hover:text-slate-800">Reset Form</button>
-                    <button type="button" data-inspection-history class="inspection-button border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100" aria-haspopup="dialog"><?= icon('file', 'size-4 shrink-0') ?><span>Lihat Riwayat &amp; Rekap Laporan</span></button>
+                    <a href="/forms/hardware-server/history" class="inspection-button border-teal-200 bg-teal-50 text-teal-700 hover:bg-teal-100"><?= icon('file', 'size-4 shrink-0') ?><span>Lihat Riwayat &amp; Rekap Laporan</span></a>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row lg:contents">
                     <button type="button" data-save-inspection class="inspection-button border-teal-600 text-teal-700 hover:bg-teal-50"><?= icon('bookmark', 'size-4 shrink-0') ?>Simpan Draft</button>

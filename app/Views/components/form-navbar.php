@@ -13,7 +13,13 @@
                 <li aria-hidden="true" class="text-slate-300">›</li>
                 <li><a href="/#section-daily" class="text-slate-500 hover:text-teal-700">Monitoring Harian</a></li>
                 <li aria-hidden="true" class="text-slate-300">›</li>
+                <?php if (($hardwarePage ?? '') === 'history'): ?>
+                <li><a href="/forms/hardware-server" class="text-slate-500 hover:text-teal-700">Hardware Server IT</a></li>
+                <li aria-hidden="true" class="text-slate-300">›</li>
+                <li aria-current="page" class="rounded-full border border-teal-200/60 bg-teal-50 px-2.5 py-1 font-medium text-teal-700">Rekap Bulanan</li>
+                <?php else: ?>
                 <li aria-current="page" class="rounded-full border border-teal-200/60 bg-teal-50 px-2.5 py-1 font-medium text-teal-700">Hardware Server IT</li>
+                <?php endif; ?>
             </ol>
         </nav>
         <div class="flex flex-wrap items-center gap-3">
