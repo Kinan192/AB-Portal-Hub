@@ -1,3 +1,7 @@
+<?php
+/** @var array{unit: string, period: string} $inspection */
+/** @var string|null $hardwarePage */
+?>
 <section class="inspection-hero relative bg-[#0a382c] pb-9 pt-8 text-white" aria-labelledby="inspection-title">
     <div class="page-shell relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
         <div class="min-w-0">

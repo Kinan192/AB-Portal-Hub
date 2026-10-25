@@ -1,3 +1,11 @@
+<?php
+/** @var array{name: string, initials: string, subtitle: string} $profile */
+/** @var string|null $hardwarePage */
+?>
+<?php
+/** @var array{name: string, initials: string, subtitle: string} $profile */
+/** @var string|null $hardwarePage */
+?>
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white">
     <div class="page-shell flex flex-wrap items-center justify-between gap-x-5 gap-y-3 py-3">
         <a href="/" class="flex flex-wrap items-center gap-4" aria-label="Beranda Portal RS Awal Bros Botania">
@@ -7,7 +15,7 @@
                 <span class="text-[10.8px] text-slate-500">RS Awal Bros Group • IT Division</span>
             </span>
         </a>
-        <nav aria-label="Breadcrumb" class="order-last w-full border-t border-slate-100 pt-2 text-[11px] 2xl:order-none 2xl:w-auto 2xl:border-0 2xl:pt-0">
+        <nav aria-label="Breadcrumb" class="order-last w-full border-t border-slate-100 pt-2 text-[11px] 2xl:order-0 2xl:w-auto 2xl:border-0 2xl:pt-0">
             <ol class="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <li><a href="/" class="inline-flex items-center gap-1 text-slate-500 hover:text-teal-700"><?= icon('home', 'size-3.5') ?>Dashboard</a></li>
                 <li aria-hidden="true" class="text-slate-300">›</li>

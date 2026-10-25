@@ -1,4 +1,19 @@
-<?php $key = $condition['key']; ?>
+<?php
+/**
+ * @var array{
+ *     key: string,
+ *     number: int,
+ *     title: string,
+ *     description: string,
+ *     good: string,
+ *     bad: string,
+ *     good_badge: string,
+ *     bad_badge: string,
+ *     placeholder: string
+ * } $condition
+ */
+$key = $condition['key'];
+?>
 <fieldset class="inspection-panel" aria-describedby="<?= e($key) ?>-help">
     <legend class="sr-only"><?= e($condition['title']) ?>, wajib diisi</legend>
     <div class="inspection-section-heading">
@@ -11,16 +26,22 @@
     </div>
     <div class="mt-6 space-y-3">
         <?php foreach (['good' => 'BAIK', 'bad' => 'TIDAK BAIK'] as $state => $label): ?>
+        <?php
+        $dotClass = $state === 'good' ? 'bg-emerald-500' : 'bg-rose-500';
+        $badgeClass = $state === 'good'
+            ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+            : 'border-rose-200 bg-rose-50 text-rose-600';
+        ?>
         <div class="inspection-choice">
             <input class="inspection-radio sr-only" type="radio" id="<?= e($key . '-' . $state) ?>" name="kondisi_<?= e($key) ?>" value="<?= e($label) ?>" required <?= $state === 'good' ? 'checked' : '' ?>>
             <label for="<?= e($key . '-' . $state) ?>" class="inspection-choice-label">
                 <span class="inspection-radio-indicator" aria-hidden="true"></span>
                 <span class="flex min-w-0 flex-1 flex-wrap items-center gap-x-2.5 gap-y-1">
-                    <span class="size-2.5 shrink-0 rounded-full <?= $state === 'good' ? 'bg-emerald-500' : 'bg-rose-500' ?>" aria-hidden="true"></span>
+                    <span class="size-2.5 shrink-0 rounded-full <?= e($dotClass) ?>" aria-hidden="true"></span>
                     <span class="text-sm font-bold text-slate-800"><?= e($label) ?></span>
                     <span class="text-xs leading-relaxed text-slate-500">(<?= e($condition[$state]) ?>)</span>
                 </span>
-                <span class="inspection-condition-badge <?= $state === 'good' ? 'border-emerald-200 bg-emerald-50 text-emerald-700' : 'border-rose-200 bg-rose-50 text-rose-600' ?>"><?= e($condition[$state . '_badge']) ?></span>
+                <span class="inspection-condition-badge <?= e($badgeClass) ?>"><?= e($condition[$state . '_badge']) ?></span>
             </label>
         </div>
         <?php endforeach; ?>

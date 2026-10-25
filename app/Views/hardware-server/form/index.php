@@ -1,3 +1,17 @@
+<?php
+/** @var array{name: string, initials: string, subtitle: string} $profile */
+/** @var string $recordedAt */
+/**
+ * @var array{
+ *     unit: string,
+ *     location: string,
+ *     period: string,
+ *     racks: list<array{value: string, description: string, icon: string, detail: string}>,
+ *     conditions: list<array<string, int|string>>,
+ *     quick_notes: list<array{label: string, text: string}>
+ * } $inspection
+ */
+?>
 <main id="main-content" class="flex-1 bg-slate-100">
     <?php require dirname(__DIR__) . '/components/hero.php'; ?>
 

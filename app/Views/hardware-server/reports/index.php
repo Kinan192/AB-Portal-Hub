@@ -1,3 +1,30 @@
+<?php
+/**
+ * @var array{
+ *     source: string,
+ *     default_period: string,
+ *     per_page: int,
+ *     periods: array<string, string>
+ * } $report
+ */
+/**
+ * @var list<array{
+ *     id: string,
+ *     at: string,
+ *     shift: string,
+ *     rack: string,
+ *     status: string,
+ *     cpu: string,
+ *     monitor: string,
+ *     environment: string,
+ *     notes: string,
+ *     inspector: string,
+ *     initials: string,
+ *     nik: string,
+ *     verification: string
+ * }> $records
+ */
+?>
 <main id="main-content" class="hardware-history flex-1 bg-slate-100">
     <?php require dirname(__DIR__) . '/components/hero.php'; ?>
     <div class="page-shell report-content relative -mt-4 pb-16">
@@ -50,7 +77,7 @@
 
         <section class="report-table-panel overflow-hidden rounded-2xl border border-slate-200/60 bg-white shadow-sm" aria-labelledby="report-title">
             <div class="report-table-scroll overflow-x-auto" tabindex="0" role="region" aria-label="Tabel rekap laporan; geser untuk melihat seluruh kolom">
-                <table id="hardware-report-table" class="report-table w-full min-w-[1380px] text-left text-xs text-slate-600">
+                <table id="hardware-report-table" class="report-table w-full min-w-345 text-left text-xs text-slate-600">
                     <caption class="sr-only">Log pemeriksaan hardware server, kondisi perangkat, catatan, petugas, dan verifikasi</caption>
                     <thead class="bg-slate-50/80 text-[11px] font-bold tracking-wide text-slate-500 uppercase">
                         <tr><th scope="col">Waktu Inspeksi</th><th scope="col">Rak Server</th><th scope="col">Kondisi CPU</th><th scope="col">Monitor Console</th><th scope="col">Parameter Lingkungan &amp; Catatan</th><th scope="col">Petugas</th><th scope="col">Verifikasi</th><th scope="col" class="report-row-actions text-center">Aksi</th></tr>
