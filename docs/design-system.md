@@ -108,8 +108,8 @@ Ukuran desimal merupakan hasil kalibrasi terakhir pengguna. Pertahankan angka in
 | Elemen yang sudah ada | Ukuran | Class atau aturan |
 | --- | --- | --- |
 | Logo teks sementara | 24 px, bobot 900 | `text-2xl font-black whitespace-nowrap` |
-| Judul kartu | 11.7 px, bold | `text-[11.7px] font-bold leading-snug` |
-| Deskripsi kartu | 10.8 px, medium | `text-[10.8px] font-medium leading-normal` |
+| Judul kartu | 11.7 px, bold 700, uppercase | `.portal-card-title` |
+| Deskripsi kartu | 10.8 px, medium 500 | `.portal-card-description` |
 | Judul kategori, banner, teks utama navbar | 11.7 px | `text-[11.7px]` |
 | Subjudul navbar | 10.8 px | `text-[10.8px]` |
 | Keterangan profil | 9.9 px | `text-[9.9px]` |
@@ -178,6 +178,24 @@ Layout menambahkan class `portal-page` ketika data `$groups` tersedia pada dashb
 
 ID `main-content` harus ada satu kali pada setiap halaman agar skip link berfungsi. Judul dokumen berasal dari `$pageTitle`.
 
+### 8.1.1 Breadcrumb bersama
+
+Source: `app/Views/components/breadcrumbs.php`. Semua form dan laporan mengirim array `breadcrumbs` dari controller. Layout `main.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding atas 16 px dan bawah 12 px. Jangan membuat breadcrumb lagi di navbar atau view halaman. View yang memakai container `.page-shell` menggunakan padding bawah tanpa padding atas agar hero dimulai setelah jarak bersama tersebut.
+
+Komponen menambahkan Portal Monitoring Terpadu dengan tautan `/`. Controller memberikan trail sesudah home. Monitoring Harian berupa label kategori tanpa `href`, sehingga tidak mengulang tujuan home. Elemen terakhir selalu menjadi teks aktif dengan `aria-current=page` dan latar emerald-50; elemen tengah hanya menjadi tautan jika memiliki `href` route internal yang valid. Pada laporan, nama modul menaut ke form induk. Home dan halaman error tidak mengirim breadcrumb dan tidak menampilkannya.
+
+Contoh data halaman laporan:
+
+```php
+'breadcrumbs' => [
+    ['label' => 'Monitoring Harian'],
+    ['label' => 'Kesesuaian User', 'href' => '/forms/kesesuaian-user'],
+    ['label' => 'Rekap Kesesuaian User (HIS)'],
+],
+```
+
+Untuk form, cukup kategori dan nama halaman aktif. Nama aktif laporan harus menyebut modul: `Rekap Monitoring Hardware Server IT`, `Rekap Kesesuaian User (HIS)`, dan `Rekap Monitoring Antrian Online BPJS`. Hindari label generik seperti `Rekap Hasil Inputan` tanpa nama modul. Jika halaman khusus kategori dibuat nanti, kategori boleh diberi tautan ke halaman tersebut; jangan mengarahkannya kembali ke `/` atau `/#section-daily`. Breadcrumb memakai font 12 px, separator `›` yang disembunyikan dari pembaca layar, dukungan wrap, dan focus ring dari style global. Komponen berada di luar `<main>` sehingga aturan cetak laporan menyembunyikannya bersama header.
+
 ### 8.2 Navbar
 
 Source: `app/Views/layouts/header.php` dan `header-form.php`. Layout `main.php` memanggil `header.php`; file ini memilih varian header sesuai `navbarVariant`. Footer beserta wrapper tampilannya berada di `app/Views/layouts/footer.php`.
@@ -203,12 +221,16 @@ Logo SVG ditampilkan pada tinggi 32 px, lebar otomatis, maksimum 220 px, `object
 Source: `app/Views/components/portal-card.php`.
 
 - Gunakan `.portal-card`, `.card-icon`, dan `.card-badge` bersama.
-- Konten kartu dimulai dari atas melalui `justify-start`.
+- Semua judul memakai `.portal-card-title` dengan ukuran, ketebalan, line-height, dan huruf kapital yang sama. Jangan memberi pengecualian pada modul/kategori tertentu. Deskripsi memakai `.portal-card-description`.
+- Kartu memakai grid dengan tiga baris bersama (`grid-template-rows: subgrid`, `grid-row: span 3`): ikon, judul, dan deskripsi. Setiap kartu dalam satu baris mengikuti tinggi track yang sama, sehingga awal deskripsi sejajar walaupun judul membungkus berbeda. `row-gap: 0` menjaga jarak internal mengikuti margin komponen, sementara grid luar mempertahankan gap antarkartu.
 - Padding kartu 16 px, margin atas kotak ikon 4 px, margin bawah ikon 12 px.
 - Kotak ikon 48 × 48 px dengan `shrink-0`; SVG di dalamnya 24 × 24 px.
 - Ikon berada sebelum judul dan deskripsi, sehingga panjang judul tidak mengubah posisi awal ikon.
+- Area judul mengikuti tinggi konten, tanpa minimum dua baris. Judul diratakan ke atas dengan `self-start`, sehingga baris pertamanya sejajar dengan kartu lain di baris yang sama. Track subgrid mengikuti judul terpanjang pada baris tersebut dan menjaga awal deskripsi sejajar. Margin atas deskripsi 2 px (`mt-0.5`); ruang tersisa di bawah judul pendek memang diperlukan agar judul dan deskripsi sama-sama sejajar. Jangan memakai line-clamp atau tinggi tetap yang memotong teks.
 - Tinggi kartu mengikuti isi; kartu dalam satu baris mengikuti tinggi baris grid.
 - Jangan menambahkan tinggi minimum besar, pemusatan vertikal, atau padding berbeda pada kartu tertentu.
+
+Rujukan mekanisme perataan: [CSS subgrid (MDN)](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Grid_layout/Subgrid).
 
 Helper ikon:
 
@@ -238,7 +260,7 @@ Tambah kartu melalui `config/portal.php`, bukan HTML dashboard yang disalin. Iku
 
 Kategori yang ada: `daily`, `monitoring`, dan `systems`. Setiap `key` harus unik. Kartu eksternal memakai `type=external`, `form_slug=null`, dan target URL HTTPS yang dikelola pengembang. Kartu dengan `enabled=false` tidak ditampilkan.
 
-Perilaku saat ini: URL eksternal HTTPS yang valid menjadi tautan tab baru dengan `noopener noreferrer`. Target eksternal kosong menampilkan dialog keterangan. Kartu internal dengan `available=true` menjadi tautan dalam tab yang sama dan berlabel `Form`; saat ini hanya hardware server yang tersedia. Kartu internal tanpa properti tersebut tetap berlabel `Segera` dan membuka dialog. Tambahkan `available=true` pada konfigurasi kartu setelah route dan view modul selesai.
+Perilaku saat ini: URL eksternal HTTPS yang valid menjadi tautan tab baru dengan `noopener noreferrer`. Target eksternal kosong menampilkan dialog keterangan. Kartu internal dengan `available=true` menjadi tautan dalam tab yang sama dan berlabel `Form`; saat ini Hardware Server, Kesesuaian User, dan Antrian Online sudah tersedia. Kartu internal tanpa properti tersebut tetap berlabel `Segera` dan membuka dialog. Tambahkan `available=true` pada konfigurasi kartu setelah route dan view modul selesai.
 
 ### 8.5 Banner dan panel informasi
 
@@ -292,7 +314,19 @@ Contoh field:
 </div>
 ```
 
-Gunakan tombol utama teal untuk tindakan seperti “Simpan draft” atau “Kirim pemeriksaan”, tombol sekunder putih berborder untuk “Kembali”, dan merah hanya untuk tindakan yang memang membatalkan atau menghapus. Tombol baru harus memiliki tindakan yang tersedia. Perubahan data melalui POST dan token CSRF baru diaktifkan setelah dukungan router dan backend dibuat.
+Warna aksi form memakai class bersama di `resources/css/app.css`. Pasangkan varian warna berikut dengan `.inspection-button` untuk tombol standar, atau class ukuran kontrol yang sudah ada untuk tombol kecil/hero. Jangan menambah utility warna lain pada tombol atau ikonnya agar tidak menimpa varian bersama. Aturan ini juga berlaku pada dialog ringkasan.
+
+| Fungsi | Class warna | Tampilan |
+| --- | --- | --- |
+| Kirim laporan/verifikasi | `.button-primary` | Teal-700, teks putih; hover teal-800 |
+| Simpan Draft | `.button-secondary` | Putih, border teal-600, teks teal-700; hover teal-50 |
+| Kembali ke portal/form | `.button-neutral` | Putih, border slate-300, teks slate-700; hover slate-50 |
+| Riwayat/rekap, catatan cepat, Set Jam Sekarang | `.button-soft` | Teal-50, teks teal-800; hover teal-100 |
+| Reset/Clear Form dan tutup dialog | `.button-ghost` | Transparan, teks slate-500; hover slate-100 |
+| Aksi pada hero hijau tua | `.button-on-dark` | Putih, teks teal-800; hover teal-50 |
+| Hapus berkas | `.button-danger` | Transparan, teks red-700; hover red-50 |
+
+Warna hijau/merah pada pilihan kondisi atau status pengiriman tetap menunjukkan status, terpisah dari warna tombol aksi. Tombol baru harus memiliki tindakan yang tersedia. Perubahan data melalui POST dan token CSRF baru diaktifkan setelah dukungan router dan backend dibuat.
 
 Tampilkan keadaan kosong jika daftar belum berisi data. Jika ada pengambilan data asynchronous, tampilkan status memuat dan error yang bisa dicoba ulang. Dashboard saat ini dirender langsung oleh PHP dan tidak memerlukan indikator loading buatan.
 
@@ -305,9 +339,11 @@ Kelompokkan view berdasarkan fungsinya. Semua halaman pengisian berada di `forms
 ```text
 app/Views/
 ├── forms/
+│   ├── antrian-online.php
 │   ├── hardware-server.php
 │   └── kesesuaian-user.php
 ├── reports/
+│   ├── antrian-online.php
 │   ├── hardware-server.php
 │   └── kesesuaian-user.php
 ├── layouts/
@@ -317,6 +353,7 @@ app/Views/
 │   └── footer.php
 ├── components/
 │   ├── brand.php
+│   ├── breadcrumbs.php
 │   ├── hardware-condition.php
 │   ├── hardware-server-hero.php
 │   ├── portal-card.php
@@ -331,21 +368,23 @@ app/Views/
 
 Tambahkan file halaman pengisian berikutnya ke `forms/` dan halaman riwayat/rekap ke `reports/`. Jangan membuat ulang folder `form/`, `reports/`, atau `components/` di dalam folder bernama modul. `layouts/` hanya untuk kerangka dokumen dan struktur global seperti header serta footer. Bagian konten yang dipakai ulang seperti hero hardware, kartu, dialog, logo, atau pilihan kondisi masuk `components/`, meskipun ukurannya besar. Pembagian mengikuti fungsi, bukan ukuran atau jumlah baris. URL route tetap independen dari lokasi fisik view.
 
+Pola URL: pengisian `/forms/{nama-modul}`, laporan `/reports/{nama-modul}`. Ketiga laporan menggunakan `/reports/hardware-server`, `/reports/kesesuaian-user`, dan `/reports/antrian-online`. Daftarkan laporan hanya pada `/reports/...` dan arahkan semua tautan navigasi ke URL tersebut. Placeholder `{nama-modul}` adalah konvensi penamaan; router saat ini tetap mendaftarkan path statis secara eksplisit.
+
 - Route: `/forms/hardware-server`; controller: `App\Controllers\Forms\HardwareServerController`.
-- `navbarVariant=form` memilih navbar dengan breadcrumb. Komponen brand, profil, jam, ikon, dan dialog akun tetap memakai sumber bersama.
+- `navbarVariant=form` memilih varian header kompak. Breadcrumb tetap dirender oleh layout di bawah header, sama seperti form dan laporan lainnya. Komponen brand, profil, jam, ikon, dan dialog akun tetap memakai sumber bersama.
 - Form, laporan, dan isi hero memakai `.page-shell` yang sama dengan home dan navbar: lebar 90% mulai desktop, maksimal 1440 px, dengan padding mobile 20/32 px. Jangan menambahkan batas 1024 px pada halaman hardware server.
 - `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
 - `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
 - Kelompok CPU/monitor memakai partial `components/hardware-condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
 - Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal serta menghapus draft setelah konfirmasi.
 - Simpan Draft menggunakan `localStorage` dengan versi format dan nama profil, lalu memuat draft pada pembukaan berikutnya di browser yang sama. Ini belum merupakan penyimpanan lintas akun/perangkat; sumber identitas dan penyimpanan harus diganti saat autentikasi/backend diintegrasikan.
-- Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Lihat Riwayat & Rekap Laporan mengarah ke `/forms/hardware-server/history`. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
+- Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Lihat Riwayat & Rekap Laporan mengarah ke `/reports/hardware-server`. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
 - Script khusus halaman didaftarkan melalui array `pageScripts` di controller. Layout memuatnya dengan `defer` dan versi `filemtime`; jangan memasukkan script inline ke view.
 - Controller mempertahankan pembatasan `APP_ENV=local` sampai autentikasi tersedia.
 
 ### 9.2 Rekap bulanan hardware server
 
-Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/forms/hardware-server/history` memakai method `history()` pada controller hardware yang sama. Header dan `components/hardware-server-hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Bulanan.
+Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/reports/hardware-server` memakai method `history()` pada controller hardware yang sama. Header dan `components/hardware-server-hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Monitoring Hardware Server IT.
 
 - Pertahankan `.page-shell` yang sama dengan home (90% pada desktop, maksimal 1440 px), jarak antarpanel 24 px, radius 16 px. Heading rekap 18 px; isi tabel 12 px; header dan badge tabel 10–11 px, mengikuti HTML referensi.
 - Panel kontrol memakai satu kolom pada mobile, dua mulai `sm`, dan empat mulai `md`. Label terhubung ke setiap input. Kelompok tombol ekspor dapat membungkus ketika ruang menyempit.
@@ -362,18 +401,18 @@ Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports
 
 Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::index()` dan view `app/Views/forms/kesesuaian-user.php`. Halaman laporannya berada di `app/Views/reports/kesesuaian-user.php`, tanpa folder modul tambahan. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
 
-- Gunakan navbar global dan breadcrumb di dalam `.page-shell`, mengikuti referensi. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
+- Gunakan navbar global dan breadcrumb bersama dari layout; jangan menulis breadcrumb di view. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
 - Isi memakai satu kolom pada mobile dan grid 12 kolom mulai `lg`: form delapan kolom dan sampel terakhir empat kolom. Panel putih memakai radius 12 px, padding 24/32 px. Field 13 px dengan tinggi 48 px; label 14 px; deskripsi 12 px.
 - Pilihan kesesuaian memakai radio native, dengan `.compliance-option`, `.compliance-radio`, dan fokus keyboard yang terlihat. Pilihan Tidak Sesuai membuka alasan dan catatan. Alasan wajib terisi untuk status tersebut; catatan wajib untuk alasan Lainnya. Field tersembunyi dinonaktifkan agar tidak menghalangi validasi.
 - Username wajib terisi dan tidak boleh mengandung spasi. Tanggal/jam login wajib terisi; Set Jam Sekarang menggunakan `Intl.DateTimeFormat` dengan zona Asia/Jakarta, tanpa mencampur tanggal UTC dengan jam lokal.
 - Draft lokal memiliki versi format dan nama profil. Draft dapat memuat isian belum lengkap; format, panjang teks, alasan, dan tanggal/jam diverifikasi saat dimuat kembali. Checkbox konfirmasi tidak dipulihkan dari draft agar pemeriksaan harus dikonfirmasi kembali.
-- Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Kedua tombol rekap membuka `/forms/kesesuaian-user/history`; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
+- Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Kedua tombol rekap membuka `/reports/kesesuaian-user`; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
 - Sidebar memakai tiga sampel dari HTML referensi, ditandai sebagai data referensi. Jumlah badge mengikuti array, tanpa mengklaim Hari Ini (4). Ganti sumber data melalui Model setelah backend tersedia.
 - View memiliki anotasi PHPDoc untuk variabel yang dikirim controller. Ikon `user-search` dan `history` menggunakan helper yang sama. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi tersedia.
 
 ### 9.4 Laporan Kesesuaian User HIS
 
-Route `/forms/kesesuaian-user/history` memakai `KesesuaianUserController::history()`, view `app/Views/reports/kesesuaian-user.php`, konfigurasi `config/kesesuaian-user-reports.php`, dan script `public/assets/js/kesesuaian-user-history.js`.
+Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::history()`, view `app/Views/reports/kesesuaian-user.php`, konfigurasi `config/kesesuaian-user-reports.php`, dan script `public/assets/js/kesesuaian-user-history.js`.
 
 - Navbar global, breadcrumb, dan `.page-shell` mengikuti halaman form/home. Hero berwarna hijau dengan judul sans-serif 24/30 px. Empat kartu ringkasan memakai grid satu/dua/empat kolom sesuai breakpoint, padding 20 px, dan angka 30 px.
 - Ringkasan dihitung dari data yang tersedia dan mengikuti filter tabel, termasuk jumlah sesuai/tidak sesuai, persentase, dan sampling terakhir. Data awal tujuh baris referensi menghasilkan 7/5/2 dan 71,4%; jangan memakai 128/122/6 sebagai angka operasional tanpa sumber data.
@@ -382,6 +421,31 @@ Route `/forms/kesesuaian-user/history` memakai `KesesuaianUserController::histor
 - Pagination dihitung dari hasil filter dengan tujuh baris per halaman. Kartu ringkasan menghitung seluruh hasil, bukan hanya baris di halaman aktif. Tampilan cetak A4 landscape memuat seluruh hasil filter lintas halaman dan ringkasan filter.
 - Data referensi diberi penanda. Ekspor Excel/PDF membuka keterangan integrasi belum tersedia; tidak membuat unduhan palsu. Penyimpanan serta ekspor operasional menunggu backend dan kontrol akses. Controller mempertahankan batas `APP_ENV=local`.
 - Komponen logo mengikuti SVG bersama; jangan menyalin markup header/footer atau membuat folder components di dalam reports.
+
+### 9.5 Form Monitoring Antrian Online BPJS
+
+Route `/forms/antrian-online` memakai `AntrianOnlineController::index()`, view `app/Views/forms/antrian-online.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`. Kartu Antrian Online bertipe internal dengan `available=true`. Kedua tautan rekap mengarah ke `/reports/antrian-online`.
+
+- Gunakan header, footer, logo, dan `.page-shell` bersama. Hero hijau memakai judul sans-serif 24/30 px dan padding 24/36 px; metadata, dua kelompok cron, endpoint/tiket, serta unggah/catatan mengikuti susunan referensi. Panel isi putih radius 12 px, padding 20/32 px. Permukaan field memakai `#eff4ff`, label utama 14 px, deskripsi 12 px, dan metadata monospace 9–11 px. Jangan membawa CSS global referensi yang menyembunyikan scrollbar atau mengunci ukuran body.
+- Radio cron menggunakan `.queue-choice` dan `.queue-radio` native dengan focus ring. Status TERKIRIM berwarna mint, TIDAK TERKIRIM merah. Pilihan awal mengikuti referensi; konfirmasi pemeriksaan tetap wajib dicentang pengguna. Jika salah satu cron gagal, catatan tindak lanjut wajib terisi dan tidak boleh hanya spasi.
+- Shift awal dihitung menurut WIB: pagi 07:00–14:00, siang 14:00–21:00, malam 21:00–07:00. Perubahan shift memperbarui label periode, dan waktu pencatatan ditampilkan dalam Asia/Jakarta.
+- Empat jumlah tiket wajib berupa bilangan bulat nonnegatif. Nilai awal 284/112/68/18 merupakan input manual dari referensi, dengan penanda pada halaman; jangan mengklaimnya sebagai tiket tersinkron langsung atau menampilkan 100% Pushed tanpa sumber.
+- Endpoint hanya ditampilkan dari konfigurasi. Tidak ada pemanggilan BPJS, status HTTP 200, latency 124 ms, atau status keamanan/uptime tiruan.
+- Pemilihan bukti menerima satu berkas PNG/JPG/JPEG/PDF/TXT/LOG, berisi data, maksimal 5 MiB. Tipe/ekstensi dan ukuran diperiksa di browser. Pemilihan normal dan drop mengisi input file; nama berkas dimasukkan lewat `textContent`. Pemeriksaan tipe/konten dan penyimpanan server tetap diperlukan pada integrasi backend. Jangan menampilkan berkas seolah terlampir dari daemon.
+- Draft lokal menyimpan isian dan nama berkas sebagai pengingat, tanpa byte berkas atau checkbox konfirmasi. Pemulihan draft meminta pemilihan berkas dan konfirmasi ulang. Draft dapat berisi jumlah tiket yang belum diisi. Reset meminta konfirmasi, menghapus draft, mengosongkan catatan/bukti/konfirmasi, mengatur tiket ke nol, serta memperbarui waktu dan shift WIB.
+- Kirim Laporan membuka ringkasan setelah validasi, dengan keterangan bahwa laporan dan berkas belum dikirim. Tambahkan POST, validasi server, CSRF, identitas sesi, serta penyimpanan saat backend diintegrasikan. Controller tetap dibatasi ke `APP_ENV=local`.
+- Ikon `upload` dan `reset` berasal dari helper `icon()` bersama.
+
+### 9.6 Rekap Monitoring Antrian Online BPJS
+
+Route `/reports/antrian-online` memakai `AntrianOnlineController::history()`, view `app/Views/reports/antrian-online.php`, konfigurasi `config/antrian-online-reports.php`, dan script `public/assets/js/antrian-online-history.js`. Semua halaman tetap memakai header, footer, logo, dan `.page-shell` bersama, tanpa folder modul atau komponen tambahan.
+
+- Hero hijau memiliki judul sans-serif 24/30 px. Empat kartu ringkasan mengikuti grid satu/dua/empat kolom dan menampilkan jumlah sesi, persentase cron antrian, persentase cron bed, serta audit terakhir. Angka dihitung dari seluruh hasil filter, bukan hanya halaman aktif. Tujuh baris referensi menghasilkan 7 sesi, 6 cron antrian terkirim (85,7%), dan 7 cron bed terkirim (100%). Jangan memakai jumlah 62 atau 98,4% tanpa sumber data yang mendukung.
+- Panel log memakai lima filter: bulan, status cron antrian, status cron bed, shift, dan pencarian. Layout kontrol satu/dua/lima kolom mengikuti breakpoint. Pencarian frasa tidak peka huruf besar/kecil dan mencakup tanggal WIB, kode HTTP, nama lampiran, petugas, serta catatan. Filter dapat digabung; perubahan mengembalikan pagination ke halaman pertama. Hasil kosong menampilkan nol dan persentase “—”, lalu menyediakan Reset Filter.
+- Tabel memiliki tujuh kolom, font isi 12 px, header/badge monospace 10 px, dan lebar minimum 1280 px. Catatan lengkap membungkus, wrapper tabel dapat digeser, dan hanya ada satu footer global. Nomor audit membuka rincian melalui dialog native.
+- Nama bukti log mengikuti referensi HTML. Klik lampiran menjelaskan berkas belum tersedia; tidak membuat URL unduhan palsu. Tombol SOP juga menjelaskan dokumen belum ditambahkan, tanpa mengklaim versi atau aturan operasional yang belum diverifikasi dari dokumen resmi. Ekspor Excel/PDF menunggu backend.
+- Cetak Rekap menggunakan dialog cetak browser, A4 landscape, dengan identitas rumah sakit, ringkasan filter, dan semua hasil lintas halaman. Navigasi, hero, kartu, tombol, pagination, dan panel SOP tidak dicetak. Penanda data referensi tetap tercetak.
+- Data JSON memakai `JSON_HEX_*` dan teks dialog dimasukkan melalui `textContent`. Kode HTTP dan latency pada catatan merupakan konten referensi historis, bukan hasil pemanggilan BPJS langsung. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi dan penyimpanan server tersedia.
 
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 
@@ -405,6 +469,10 @@ final class HardwareServerController
     {
         View::render('forms/hardware-server', [
             'pageTitle' => 'Monitoring Hardware Server',
+            'breadcrumbs' => [
+                ['label' => 'Monitoring Harian'],
+                ['label' => 'Form Monitoring Hardware Server IT'],
+            ],
             'profile' => config('dashboard')['profile'],
         ]);
     }

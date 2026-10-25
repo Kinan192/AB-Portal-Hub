@@ -8,8 +8,7 @@ $latest = $summary['latest'];
 $latestStamp = $latest ? strtotime($latest['at']) : null;
 $latestLabel = $latestStamp ? date('d', $latestStamp) . ' ' . $months[(int) date('n', $latestStamp) - 1] . date(' Y • H:i', $latestStamp) : 'Belum ada sampel';
 ?>
-<main id="main-content" class="compliance-history page-shell flex-1 py-4">
-    <nav aria-label="Breadcrumb" class="user-report-breadcrumb mb-4 text-xs font-medium text-slate-500"><ol class="flex flex-wrap items-center gap-x-2 gap-y-1"><li><a href="/" class="inline-flex items-center gap-1 hover:text-emerald-700"><?= icon('dashboard', 'size-3.5') ?>Portal Monitoring Terpadu</a></li><li aria-hidden="true" class="text-slate-300">/</li><li><a href="/#section-daily" class="hover:text-emerald-700">Monitoring Harian</a></li><li aria-hidden="true" class="text-slate-300">/</li><li><a href="/forms/kesesuaian-user" class="hover:text-emerald-700">Kesesuaian User</a></li><li aria-hidden="true" class="text-slate-300">/</li><li aria-current="page" class="font-semibold text-slate-800">Rekap Hasil Inputan</li></ol></nav>
+<main id="main-content" class="compliance-history page-shell flex-1 pb-4">
 
     <section class="user-report-hero hero-pattern mb-6 rounded-2xl bg-[#043b2e] p-6 text-white shadow-lg md:p-8" aria-labelledby="user-report-title">
         <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">

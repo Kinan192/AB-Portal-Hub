@@ -14,9 +14,13 @@ npm run dev
 
 Buka http://127.0.0.1:8080. PHP 8.3 atau lebih baru dapat menjalankan frontend; target produksi tetap PHP 8.4 sesuai arsitektur. MySQL dan Composer belum diperlukan untuk melihat dashboard.
 
+URL pengisian menggunakan `/forms/{nama-modul}`, sedangkan laporan menggunakan `/reports/{nama-modul}`. Route laporan hanya didaftarkan pada `/reports/...`.
+
+Semua form dan laporan memakai breadcrumb bersama di bawah header, melalui `app/Views/components/breadcrumbs.php`. Portal Monitoring Terpadu menuju `/`; Monitoring Harian adalah label kategori tanpa tautan; halaman aktif tidak ditautkan. Pada laporan, nama modul di tengah breadcrumb menuju form terkait. Controller mengirim array `breadcrumbs`; jangan menulis ulang navigasinya pada view atau navbar.
+
 Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Simpan Draft menyimpan data di browser perangkat yang sama dan memuatnya kembali saat halaman dibuka; pengiriman ke server masih menunggu integrasi backend.
 
-Halaman rekap bulanan tersedia di http://127.0.0.1:8080/forms/hardware-server/history, juga melalui tombol Lihat Riwayat & Rekap Laporan pada form. Filter bulan/rak/status, pencarian, rincian laporan, pagination, serta Cetak Rekap sudah berfungsi di frontend. Tujuh baris awal berasal dari HTML referensi dan ditandai sebagai data referensi di halaman. Jumlah hasil dihitung dari data yang tersedia. Ekspor Excel/PDF dan unduh lembar menjelaskan bahwa integrasi laporan server belum tersedia; tidak ada unduhan atau persetujuan operasional yang diklaim berasal dari backend.
+Halaman rekap bulanan tersedia di http://127.0.0.1:8080/reports/hardware-server, juga melalui tombol Lihat Riwayat & Rekap Laporan pada form. Filter bulan/rak/status, pencarian, rincian laporan, pagination, serta Cetak Rekap sudah berfungsi di frontend. Tujuh baris awal berasal dari HTML referensi dan ditandai sebagai data referensi di halaman. Jumlah hasil dihitung dari data yang tersedia. Ekspor Excel/PDF dan unduh lembar menjelaskan bahwa integrasi laporan server belum tersedia; tidak ada unduhan atau persetujuan operasional yang diklaim berasal dari backend.
 
 Perintah `npm run dev` menjalankan server PHP lokal. Hentikan dengan Ctrl+C. Untuk menjalankan tanpa npm, gunakan `php -S 127.0.0.1:8080 -t public public/index.php`.
 
@@ -24,9 +28,13 @@ CSS Tailwind dan font sudah tersedia di `public/assets/`, sehingga dashboard tid
 
 ## Mengembangkan tampilan
 
+Form Monitoring Antrian Online BPJS tersedia di http://127.0.0.1:8080/forms/antrian-online, melalui kartu Antrian Online di dashboard. View berada di `app/Views/forms/antrian-online.php`, controller di `app/Controllers/Forms/AntrianOnlineController.php`, dan konfigurasi di `config/antrian-online.php`. Pilihan cron, shift, tiket, catatan, file picker/drag-and-drop, reset, draft, dan ringkasan sudah berjalan di frontend. Bukti dibatasi satu PNG/JPG/PDF/TXT/LOG maksimal 5 MB. Draft menyimpan isian serta nama berkas sebagai pengingat; isi berkas dan konfirmasi tidak disimpan. Pengiriman/unggah ke server dan konektivitas BPJS menunggu integrasi.
+
+Rekap BPJS tersedia di http://127.0.0.1:8080/reports/antrian-online, melalui kedua tautan rekap pada form. View berada di `app/Views/reports/antrian-online.php`, data referensi di `config/antrian-online-reports.php`, dan script di `public/assets/js/antrian-online-history.js`. Ringkasan, lima filter, pencarian frasa, rincian audit, pagination, serta cetak hasil filter sudah berfungsi. Tujuh baris referensi menghasilkan 7 sesi, cron antrian 85,7%, dan cron bed 100%. Lampiran, SOP, serta ekspor Excel/PDF menjelaskan status belum tersedia; tidak ada berkas atau hasil koneksi server yang diklaim tersedia tanpa integrasi.
+
 Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/forms/kesesuaian-user.php`, controller di `app/Controllers/Forms/KesesuaianUserController.php`, serta konfigurasi alasan dan sampel di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB; draft disimpan di browser. Konfirmasi pemeriksaan tidak dipulihkan dari draft dan harus dicentang kembali. Pengiriman ke server masih menunggu integrasi.
 
-Laporan Kesesuaian User tersedia di http://127.0.0.1:8080/forms/kesesuaian-user/history melalui kedua tombol rekap pada form. View berada di `app/Views/reports/kesesuaian-user.php`, data referensi di `config/kesesuaian-user-reports.php`, dan interaksi di `public/assets/js/kesesuaian-user-history.js`. Filter periode/status/unit dan pencarian memperbarui tabel serta ringkasannya. Klik username untuk rincian; Cetak Rekap mencetak semua hasil filter lintas halaman. Ekspor Excel/PDF menunggu backend. Tujuh baris referensi menghasilkan ringkasan awal 7 user, 5 sesuai, 2 tidak sesuai, dan kepatuhan 71,4%, tanpa jumlah 128 yang tidak didukung data tabel.
+Laporan Kesesuaian User tersedia di http://127.0.0.1:8080/reports/kesesuaian-user melalui kedua tombol rekap pada form. View berada di `app/Views/reports/kesesuaian-user.php`, data referensi di `config/kesesuaian-user-reports.php`, dan interaksi di `public/assets/js/kesesuaian-user-history.js`. Filter periode/status/unit dan pencarian memperbarui tabel serta ringkasannya. Klik username untuk rincian; Cetak Rekap mencetak semua hasil filter lintas halaman. Ekspor Excel/PDF menunggu backend. Tujuh baris referensi menghasilkan ringkasan awal 7 user, 5 sesuai, 2 tidak sesuai, dan kepatuhan 71,4%, tanpa jumlah 128 yang tidak didukung data tabel.
 
 ```powershell
 npm ci
@@ -34,6 +42,8 @@ npm run build
 ```
 
 Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk membangun CSS. Sumber CSS berada di `resources/css/app.css`, hasil build di `public/assets/css/app.css`. `package-lock.json` mengunci dependensi frontend. Panduan CLI: https://tailwindcss.com/docs/installation/tailwind-cli.
+
+Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `button-secondary` untuk draft, `button-neutral` untuk kembali, `button-soft` untuk rekap/bantuan, `button-ghost` untuk reset/tutup, `button-on-dark` untuk aksi hero, dan `button-danger` untuk hapus berkas. Pasangkan dengan class ukuran seperti `inspection-button`. Detail ada di Design System bagian 9. Breadcrumb laporan menyebut nama modul secara lengkap agar tujuan rekap jelas.
 
 ## Lokasi kode
 
@@ -51,10 +61,12 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 | `public/assets/js/hardware-server.js` | Interaksi form, validasi, dan draft lokal |
 | `app/Views/reports/hardware-server.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
 | `app/Views/reports/kesesuaian-user.php` | Rekap dan riwayat verifikasi user HIS |
+| `app/Views/reports/antrian-online.php` | Rekap cron, tiket, bukti, dan tindak lanjut antrian BPJS |
 | `app/Views/layouts/` | Kerangka HTML, header, varian header, dan footer |
 | `config/hardware-server-reports.php` | Data referensi dan periode halaman rekap |
 | `public/assets/js/hardware-server-history.js` | Filter, pencarian, pagination, rincian, dan cetak |
 | `app/Views/components/` | Komponen UI bersama: brand, kartu, progres, dialog, pilihan kondisi, dan hero hardware |
+| `app/Views/components/breadcrumbs.php` | Breadcrumb bersama berdasarkan data controller |
 | `config/portal.php` | Daftar 15 kartu, kategori, target, serta urutannya |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal sebelum integrasi backend |
 | `config/database.php` | Parameter koneksi MySQL dari environment |
@@ -70,8 +82,8 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 - Logo memakai SVG yang diberikan pengguna di `public/assets/images/brand/rs-awal-bros.svg`, melalui komponen brand bersama pada semua halaman. Rasio asli 348:53 dipertahankan pada tinggi 32 px; URL logo diberi versi `filemtime` agar perubahan tidak tertahan cache. Teks satu baris digunakan hanya jika aset tidak tersedia. Path dapat diubah di `config/app.php`.
 - Proporsi kartu berangkat dari `code.html`, lalu disesuaikan berdasarkan arahan pengguna: judul 11.7 px, deskripsi 10.8 px, badge 9 px, padding 16 px, dan ikon 48 px. Grid enam/tujuh kolom aktif mulai lebar 1024 px.
 - Halaman memakai alur vertikal alami, tanpa tinggi tetap 100vh atau pemadatan kartu berdasarkan tinggi layar. Semua kartu kembali vertikal dengan ikon 48 px. Container desktop memakai lebar 90%, maksimal 1440 px, agar margin kiri dan kanan lebih lapang. Navbar, banner, dan hero tetap ringkas; bagian Sistem berada setelah Monitoring & Laporan dan dapat dijangkau dengan scroll.
-- Semua kartu memakai `justify-start`, padding atas yang sama, dan kotak ikon 48 px yang tidak menyusut. Hover tidak menggeser kartu atau memperbesar ikon, sehingga posisi ikon tetap sejajar meskipun panjang judul berbeda.
-- Kartu hardware server berlabel `Form` dan membuka halaman pengisian. Kartu internal lainnya masih berlabel `Segera` dan menampilkan keterangan modul. Properti `available=true` digunakan hanya setelah route dan halamannya tersedia.
+- Semua kartu memakai tiga baris subgrid bersama untuk ikon, judul, dan deskripsi. Judul diratakan ke atas dan tinggi barisnya mengikuti judul terpanjang pada satu baris kartu, tanpa minimum dua baris. Deskripsi memakai margin atas 2 px dan tetap sejajar antar kartu; ruang tersisa di bawah judul pendek menjaga perataan kedua teks. Padding serta kotak ikon 48 px tetap sama; hover tidak menggeser kartu atau memperbesar ikon.
+- Kartu Hardware Server, Kesesuaian User, dan Antrian Online berlabel `Form` dan membuka halaman pengisian. Kartu internal yang belum tersedia masih berlabel `Segera` dan menampilkan keterangan modul. Properti `available=true` digunakan hanya setelah route dan halamannya tersedia.
 - Kartu eksternal berlabel `Atur URL` sampai target dikonfigurasi di `config/portal.php`. URL HTTPS yang valid dibuka di tab baru dengan `noopener noreferrer`.
 - Password, Users, dan Logout menampilkan penjelasan bahwa autentikasi belum tersedia. Tidak ada password atau data akun yang dikumpulkan.
 - Badge `Portal aktif` merujuk pada halaman portal, bukan uptime sistem eksternal.

@@ -24,6 +24,11 @@ final class KesesuaianUserController
 
         View::render('reports/kesesuaian-user', [
             'pageTitle' => 'Rekap & Riwayat Kesesuaian User (HIS)',
+            'breadcrumbs' => [
+                ['label' => 'Monitoring Harian'],
+                ['label' => 'Kesesuaian User', 'href' => '/forms/kesesuaian-user'],
+                ['label' => 'Rekap Kesesuaian User (HIS)'],
+            ],
             'profile' => config('dashboard')['profile'],
             'report' => $report,
             'records' => $records,
@@ -48,6 +53,10 @@ final class KesesuaianUserController
 
         View::render('forms/kesesuaian-user', [
             'pageTitle' => 'Form Kesesuaian User (HIS)',
+            'breadcrumbs' => [
+                ['label' => 'Monitoring Harian'],
+                ['label' => 'Form Kesesuaian User'],
+            ],
             'profile' => config('dashboard')['profile'],
             'verification' => config('kesesuaian-user'),
             'pageScripts' => ['js/kesesuaian-user.js'],

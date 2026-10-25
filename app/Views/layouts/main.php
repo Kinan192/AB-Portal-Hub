@@ -17,6 +17,11 @@
 <body class="flex min-h-screen flex-col<?= isset($groups) ? ' portal-page' : '' ?>">
     <a href="#main-content" class="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-teal-800 px-4 py-3 text-sm text-white focus:translate-y-0">Langsung ke konten</a>
     <?php require __DIR__ . '/header.php'; ?>
+    <?php if (!empty($breadcrumbs)): ?>
+    <div class="breadcrumb-shell page-shell pb-3 pt-4">
+        <?php require BASE_PATH . '/app/Views/components/breadcrumbs.php'; ?>
+    </div>
+    <?php endif; ?>
     <?= $content ?>
     <?php require __DIR__ . '/footer.php'; ?>
     <?php require BASE_PATH . '/app/Views/components/portal-dialog.php'; ?>
