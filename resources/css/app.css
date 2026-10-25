@@ -134,6 +134,15 @@
   .user-report-metric { @apply flex min-w-0 items-center justify-between gap-3 rounded-xl border border-slate-200/60 bg-white p-5 shadow-sm; }
   .user-report-metric-icon { @apply flex size-12 shrink-0 items-center justify-center rounded-xl; }
   .queue-meta-label { @apply mb-0.5 block font-mono text-[9px] font-semibold tracking-wide text-slate-500 uppercase; }
+  .queue-paired-grid { @apply grid grid-cols-1 gap-4 lg:grid-cols-2; }
+  .queue-field-group {
+    @apply grid min-w-0 gap-2;
+    grid-template-rows: auto 1fr auto;
+    @media (width >= 64rem) {
+      grid-row: span 3;
+      grid-template-rows: subgrid;
+    }
+  }
   .queue-choice { @apply min-w-0 rounded-lg border border-transparent bg-white transition-colors; }
   .queue-choice-good:has(> .queue-radio:checked) { @apply border-emerald-200 bg-[#c7eee3]; }
   .queue-choice-bad:has(> .queue-radio:checked) { @apply border-red-200 bg-red-50; }
