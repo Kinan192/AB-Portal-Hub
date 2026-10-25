@@ -24,7 +24,9 @@ CSS Tailwind dan font sudah tersedia di `public/assets/`, sehingga dashboard tid
 
 ## Mengembangkan tampilan
 
-Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/forms/kesesuaian-user.php`, controller di `app/Controllers/Forms/KesesuaianUserController.php`, serta konfigurasi alasan dan sampel di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB; draft disimpan di browser. Konfirmasi pemeriksaan tidak dipulihkan dari draft dan harus dicentang kembali. Pengiriman serta halaman laporan masih menunggu integrasi.
+Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/forms/kesesuaian-user.php`, controller di `app/Controllers/Forms/KesesuaianUserController.php`, serta konfigurasi alasan dan sampel di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB; draft disimpan di browser. Konfirmasi pemeriksaan tidak dipulihkan dari draft dan harus dicentang kembali. Pengiriman ke server masih menunggu integrasi.
+
+Laporan Kesesuaian User tersedia di http://127.0.0.1:8080/forms/kesesuaian-user/history melalui kedua tombol rekap pada form. View berada di `app/Views/reports/kesesuaian-user.php`, data referensi di `config/kesesuaian-user-reports.php`, dan interaksi di `public/assets/js/kesesuaian-user-history.js`. Filter periode/status/unit dan pencarian memperbarui tabel serta ringkasannya. Klik username untuk rincian; Cetak Rekap mencetak semua hasil filter lintas halaman. Ekspor Excel/PDF menunggu backend. Tujuh baris referensi menghasilkan ringkasan awal 7 user, 5 sesuai, 2 tidak sesuai, dan kepatuhan 71,4%, tanpa jumlah 128 yang tidak didukung data tabel.
 
 ```powershell
 npm ci
@@ -48,6 +50,7 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 | `config/hardware-server.php` | Lokasi, periode, pilihan rak, dan teks pemeriksaan |
 | `public/assets/js/hardware-server.js` | Interaksi form, validasi, dan draft lokal |
 | `app/Views/reports/hardware-server.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
+| `app/Views/reports/kesesuaian-user.php` | Rekap dan riwayat verifikasi user HIS |
 | `app/Views/layouts/` | Kerangka HTML, header, varian header, dan footer |
 | `config/hardware-server-reports.php` | Data referensi dan periode halaman rekap |
 | `public/assets/js/hardware-server-history.js` | Filter, pencarian, pagination, rincian, dan cetak |
@@ -64,7 +67,7 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 - Jam dan tanggal mengikuti Asia/Jakarta dan diperbarui melalui JavaScript.
 - Identitas IT Botania dan keterangan IT Division berasal dari `config/dashboard.php`. Keterangan departemen ini tidak menetapkan role atau hak akses pengguna.
 - Panel progres menggunakan nilai awal frontend 5/6 form (83%) dari `config/dashboard.php`. Cincin, bar capaian, dan jumlah form tersisa dihitung dari nilai tersebut. Saat integrasi backend, ganti sumber array `$progress` di `HomeController` dengan hasil perhitungan pengisian form dari MySQL.
-- Logo sementara berupa teks `RS AWAL BROS` dalam satu baris. Letakkan SVG resmi di `public/assets/images/brand/rs-awal-bros.svg` agar otomatis menggantikan teks. Path dapat diubah di `config/app.php`.
+- Logo memakai SVG yang diberikan pengguna di `public/assets/images/brand/rs-awal-bros.svg`, melalui komponen brand bersama pada semua halaman. Rasio asli 348:53 dipertahankan pada tinggi 32 px; URL logo diberi versi `filemtime` agar perubahan tidak tertahan cache. Teks satu baris digunakan hanya jika aset tidak tersedia. Path dapat diubah di `config/app.php`.
 - Proporsi kartu berangkat dari `code.html`, lalu disesuaikan berdasarkan arahan pengguna: judul 11.7 px, deskripsi 10.8 px, badge 9 px, padding 16 px, dan ikon 48 px. Grid enam/tujuh kolom aktif mulai lebar 1024 px.
 - Halaman memakai alur vertikal alami, tanpa tinggi tetap 100vh atau pemadatan kartu berdasarkan tinggi layar. Semua kartu kembali vertikal dengan ikon 48 px. Container desktop memakai lebar 90%, maksimal 1440 px, agar margin kiri dan kanan lebih lapang. Navbar, banner, dan hero tetap ringkas; bagian Sistem berada setelah Monitoring & Laporan dan dapat dijangkau dengan scroll.
 - Semua kartu memakai `justify-start`, padding atas yang sama, dan kotak ikon 48 px yang tidak menyusut. Hover tidak menggeser kartu atau memperbesar ikon, sehingga posisi ikon tetap sejajar meskipun panjang judul berbeda.

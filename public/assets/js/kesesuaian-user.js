@@ -83,11 +83,6 @@
     }
     feedback.scrollIntoView({ block: 'nearest', behavior: 'instant' });
   }));
-  document.querySelectorAll('[data-compliance-history]').forEach((button) => button.addEventListener('click', () => {
-    document.getElementById('dialog-title').textContent = 'Rekap Kesesuaian User';
-    document.getElementById('dialog-description').textContent = 'Halaman riwayat dan unduh laporan kesesuaian user belum tersedia. Fitur ini akan dihubungkan setelah halaman laporan serta penyimpanan verifikasi selesai dibuat.';
-    document.getElementById('portal-dialog').showModal();
-  }));
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     syncValidation();

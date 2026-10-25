@@ -23,7 +23,7 @@
                 <div class="flex min-h-12 items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-4 py-2">
                     <?= icon('calendar', 'size-5 shrink-0 text-emerald-300') ?><span><span class="block text-[10px] font-bold tracking-wide text-emerald-200/80 uppercase">Periode Verifikasi</span><time id="compliance-period" datetime="<?= e($loginDate) ?>" class="block text-xs font-bold"><?= e(date_wib()) ?></time></span>
                 </div>
-                <button type="button" data-compliance-history class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/15 px-4 py-2 text-xs font-semibold text-white hover:bg-white/25" aria-haspopup="dialog"><?= icon('download', 'size-4 shrink-0 text-emerald-200') ?>Lihat Rekap &amp; Unduh Laporan</button>
+                <a href="/forms/kesesuaian-user/history" class="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/15 px-4 py-2 text-xs font-semibold text-white hover:bg-white/25"><?= icon('download', 'size-4 shrink-0 text-emerald-200') ?>Lihat Rekap &amp; Unduh Laporan</a>
             </div>
         </div>
     </section>
@@ -72,7 +72,7 @@
                 <div class="flex items-start gap-2.5 rounded-lg bg-slate-50 p-3.5"><input id="compliance-confirm" name="confirmed" type="checkbox" required class="mt-0.5 size-4 shrink-0 accent-emerald-600"><label for="compliance-confirm" class="cursor-pointer text-xs leading-relaxed text-slate-600">Saya mengonfirmasi bahwa pengecekan sampel kesesuaian hak akses ini telah dilakukan secara valid sesuai regulasi melalui pengecekan terminal log / active session HIS.</label></div>
                 <div class="flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-6">
                     <a href="/" class="inspection-button border-slate-200 bg-white text-slate-700 hover:bg-slate-50"><?= icon('arrow-left', 'size-4') ?>Kembali ke Portal Terpadu</a>
-                    <div class="flex flex-wrap gap-3"><button type="button" data-compliance-history class="inspection-button border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100" aria-haspopup="dialog"><?= icon('table', 'size-4') ?>Lihat Riwayat &amp; Rekap Laporan</button><button type="button" data-compliance-save class="inspection-button border-slate-200 text-slate-700 hover:bg-slate-50"><?= icon('bookmark', 'size-4') ?>Simpan Draft</button><button type="submit" class="inspection-button border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800" aria-haspopup="dialog"><?= icon('send', 'size-4') ?>Kirim Verifikasi</button></div>
+                    <div class="flex flex-wrap gap-3"><a href="/forms/kesesuaian-user/history" class="inspection-button border-emerald-200 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"><?= icon('table', 'size-4') ?>Lihat Riwayat &amp; Rekap Laporan</a><button type="button" data-compliance-save class="inspection-button border-slate-200 text-slate-700 hover:bg-slate-50"><?= icon('bookmark', 'size-4') ?>Simpan Draft</button><button type="submit" class="inspection-button border-emerald-700 bg-emerald-700 text-white hover:bg-emerald-800" aria-haspopup="dialog"><?= icon('send', 'size-4') ?>Kirim Verifikasi</button></div>
                 </div>
                 <noscript><p class="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">Aktifkan JavaScript untuk menggunakan draft, catatan ketidaksesuaian, dan validasi form.</p></noscript>
             </form>

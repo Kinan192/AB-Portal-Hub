@@ -194,9 +194,9 @@ Source: `app/Views/layouts/header.php` dan `header-form.php`. Layout `main.php` 
 
 Source: `app/Views/components/brand.php` dan `config/app.php`.
 
-Letakkan SVG resmi di `public/assets/images/brand/rs-awal-bros.svg`. Komponen otomatis menampilkan file tersebut jika tersedia. Sebelum file tersedia, gunakan wordmark teks `RS AWAL BROS` dalam satu baris.
+SVG pengguna sudah terpasang di `public/assets/images/brand/rs-awal-bros.svg`, dengan isi asli dari `logo-rs-awalbros (2).svg`. Komponen brand dipakai semua header dan otomatis menampilkan SVG tersebut. Wordmark teks `RS AWAL BROS` dalam satu baris hanya menjadi fallback jika file tidak tersedia.
 
-Logo SVG ditampilkan pada tinggi 32 px, lebar otomatis, maksimum 220 px, `object-contain`. Pertahankan `viewBox` SVG. Jangan memaksa rasio yang mengubah bentuk logo atau memberi tint pada SVG resmi.
+Logo SVG ditampilkan pada tinggi 32 px, lebar otomatis, maksimum 220 px, `object-contain`. Pertahankan `viewBox="0 0 348 53"` dan atribut intrinsik 348 × 53. URL memakai versi `filemtime`. Jangan memaksa rasio yang mengubah bentuk logo atau memberi tint pada SVG resmi.
 
 ### 8.4 Kartu portal
 
@@ -308,7 +308,8 @@ app/Views/
 │   ├── hardware-server.php
 │   └── kesesuaian-user.php
 ├── reports/
-│   └── hardware-server.php
+│   ├── hardware-server.php
+│   └── kesesuaian-user.php
 ├── layouts/
 │   ├── main.php
 │   ├── header.php
@@ -359,16 +360,28 @@ Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports
 
 ### 9.3 Form Kesesuaian User HIS
 
-Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::index()` dan view `app/Views/forms/kesesuaian-user.php`. Halaman laporannya nanti ditambahkan ke `app/Views/reports/`, tanpa membuat folder modul baru. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
+Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::index()` dan view `app/Views/forms/kesesuaian-user.php`. Halaman laporannya berada di `app/Views/reports/kesesuaian-user.php`, tanpa folder modul tambahan. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
 
 - Gunakan navbar global dan breadcrumb di dalam `.page-shell`, mengikuti referensi. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
 - Isi memakai satu kolom pada mobile dan grid 12 kolom mulai `lg`: form delapan kolom dan sampel terakhir empat kolom. Panel putih memakai radius 12 px, padding 24/32 px. Field 13 px dengan tinggi 48 px; label 14 px; deskripsi 12 px.
 - Pilihan kesesuaian memakai radio native, dengan `.compliance-option`, `.compliance-radio`, dan fokus keyboard yang terlihat. Pilihan Tidak Sesuai membuka alasan dan catatan. Alasan wajib terisi untuk status tersebut; catatan wajib untuk alasan Lainnya. Field tersembunyi dinonaktifkan agar tidak menghalangi validasi.
 - Username wajib terisi dan tidak boleh mengandung spasi. Tanggal/jam login wajib terisi; Set Jam Sekarang menggunakan `Intl.DateTimeFormat` dengan zona Asia/Jakarta, tanpa mencampur tanggal UTC dengan jam lokal.
 - Draft lokal memiliki versi format dan nama profil. Draft dapat memuat isian belum lengkap; format, panjang teks, alasan, dan tanggal/jam diverifikasi saat dimuat kembali. Checkbox konfirmasi tidak dipulihkan dari draft agar pemeriksaan harus dikonfirmasi kembali.
-- Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Tombol rekap/unduh menjelaskan halaman laporan belum dibuat; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
+- Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Kedua tombol rekap membuka `/forms/kesesuaian-user/history`; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
 - Sidebar memakai tiga sampel dari HTML referensi, ditandai sebagai data referensi. Jumlah badge mengikuti array, tanpa mengklaim Hari Ini (4). Ganti sumber data melalui Model setelah backend tersedia.
 - View memiliki anotasi PHPDoc untuk variabel yang dikirim controller. Ikon `user-search` dan `history` menggunakan helper yang sama. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi tersedia.
+
+### 9.4 Laporan Kesesuaian User HIS
+
+Route `/forms/kesesuaian-user/history` memakai `KesesuaianUserController::history()`, view `app/Views/reports/kesesuaian-user.php`, konfigurasi `config/kesesuaian-user-reports.php`, dan script `public/assets/js/kesesuaian-user-history.js`.
+
+- Navbar global, breadcrumb, dan `.page-shell` mengikuti halaman form/home. Hero berwarna hijau dengan judul sans-serif 24/30 px. Empat kartu ringkasan memakai grid satu/dua/empat kolom sesuai breakpoint, padding 20 px, dan angka 30 px.
+- Ringkasan dihitung dari data yang tersedia dan mengikuti filter tabel, termasuk jumlah sesuai/tidak sesuai, persentase, dan sampling terakhir. Data awal tujuh baris referensi menghasilkan 7/5/2 dan 71,4%; jangan memakai 128/122/6 sebagai angka operasional tanpa sumber data.
+- Filter periode, status, unit, dan pencarian beberapa kata dapat digabung. Pencarian mencakup username, nama lengkap, unit, petugas, dan temuan. Perubahan filter mengembalikan halaman pertama. Kondisi kosong menampilkan nol, persentase “—”, pesan kosong, dan Reset Filter.
+- Tabel memiliki enam kolom, font isi 12 px, header 10 px, dan lebar minimum 1120 px. Kolom temuan membungkus agar seluruh isinya terbaca. Wrapper tabel dapat digeser; body halaman tetap mengikuti container. Username berupa tombol yang membuka rincian pada dialog native sehingga tidak perlu kolom aksi tambahan.
+- Pagination dihitung dari hasil filter dengan tujuh baris per halaman. Kartu ringkasan menghitung seluruh hasil, bukan hanya baris di halaman aktif. Tampilan cetak A4 landscape memuat seluruh hasil filter lintas halaman dan ringkasan filter.
+- Data referensi diberi penanda. Ekspor Excel/PDF membuka keterangan integrasi belum tersedia; tidak membuat unduhan palsu. Penyimpanan serta ekspor operasional menunggu backend dan kontrol akses. Controller mempertahankan batas `APP_ENV=local`.
+- Komponen logo mengikuti SVG bersama; jangan menyalin markup header/footer atau membuat folder components di dalam reports.
 
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 

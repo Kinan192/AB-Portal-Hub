@@ -9,3 +9,4 @@ $router->get('/', [new HomeController(), 'index']);
 $router->get('/forms/hardware-server', [new HardwareServerController(), 'index']);
 $router->get('/forms/hardware-server/history', [new HardwareServerController(), 'history']);
 $router->get('/forms/kesesuaian-user', [new KesesuaianUserController(), 'index']);
+$router->get('/forms/kesesuaian-user/history', [new KesesuaianUserController(), 'history']);

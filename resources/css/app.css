@@ -116,9 +116,34 @@
   .compliance-option-icon { @apply flex size-5 shrink-0 items-center justify-center rounded-full bg-slate-300 text-white; }
   .compliance-radio:checked + label .compliance-option-icon { @apply bg-emerald-600; }
   .compliance-option-bad .compliance-radio:checked + label .compliance-option-icon { @apply bg-rose-600; }
+  .user-report-metric { @apply flex min-w-0 items-center justify-between gap-3 rounded-xl border border-slate-200/60 bg-white p-5 shadow-sm; }
+  .user-report-metric-icon { @apply flex size-12 shrink-0 items-center justify-center rounded-xl; }
 }
 
 .report-page-hidden { display: none; }
+.user-report-page-hidden { display: none; }
+
+@page user-compliance-report { size: A4 landscape; margin: 12mm; }
+@media print {
+  body:has(.compliance-history) > :not(.compliance-history) { display: none !important; }
+  .compliance-history { page: user-compliance-report; width: 100%; max-width: none; padding: 0; }
+  .compliance-history .user-report-breadcrumb,
+  .compliance-history .user-report-hero,
+  .compliance-history .user-report-metrics,
+  .compliance-history .user-report-exports,
+  .compliance-history #user-report-filters,
+  .compliance-history .user-report-pagination { display: none !important; }
+  .compliance-history > section { margin: 0; padding: 0; border: 0; box-shadow: none; }
+  .compliance-history .user-report-print-brand,
+  .compliance-history #user-report-print-filter { display: block; }
+  .compliance-history .user-report-table-scroll { overflow: visible; }
+  .compliance-history .report-table { min-width: 0; table-layout: fixed; }
+  .compliance-history .report-table th, .compliance-history .report-table td { padding: 7px 5px; overflow-wrap: anywhere; }
+  .compliance-history .report-table * { min-width: 0; max-width: none; font-size: 8px; white-space: normal; }
+  .compliance-history .report-table thead { display: table-header-group; }
+  .compliance-history .report-table tr { break-inside: avoid; }
+  .compliance-history .user-report-page-hidden:not([hidden]) { display: table-row; }
+}
 
 @page hardware-report { size: A4 landscape; margin: 12mm; }
 @media print {
