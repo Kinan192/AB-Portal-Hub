@@ -66,6 +66,8 @@ function icon(string $name, string $class = 'size-5'): string
         'chevron-down' => '<path d="m6 9 6 6 6-6"/>',
         'eye' => '<path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>',
         'download' => '<path d="M12 3v12m-5-5 5 5 5-5M4 17v4h16v-4"/>',
+        'user-search' => '<circle cx="9" cy="7" r="4"/><path d="M3 21v-2a5 5 0 0 1 5-5h3"/><circle cx="17" cy="16" r="4"/><path d="m20 19 2 3"/>',
+        'history' => '<path d="M3 11a9 9 0 1 1 2.5 7M3 4v7h7m2-4v5l3 2"/>',
     ];
     return '<svg class="' . e($class) . '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . ($paths[$name] ?? $paths['info']) . '</svg>';
 }

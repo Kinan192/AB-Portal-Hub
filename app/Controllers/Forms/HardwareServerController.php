@@ -19,7 +19,7 @@ final class HardwareServerController
         $records = $report['records'];
         usort($records, static fn (array $a, array $b): int => strcmp($b['at'], $a['at']));
 
-        View::render('hardware-server/reports/index', [
+        View::render('reports/hardware-server', [
             'pageTitle' => 'Rekap Bulanan Monitoring Hardware Server',
             'navbarVariant' => 'form',
             'hardwarePage' => 'history',
@@ -40,7 +40,7 @@ final class HardwareServerController
             return;
         }
 
-        View::render('hardware-server/form/index', [
+        View::render('forms/hardware-server', [
             'pageTitle' => 'Form Monitoring Hardware Server IT',
             'navbarVariant' => 'form',
             'pageScripts' => ['js/hardware-server.js'],

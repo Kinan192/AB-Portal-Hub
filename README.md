@@ -24,6 +24,8 @@ CSS Tailwind dan font sudah tersedia di `public/assets/`, sehingga dashboard tid
 
 ## Mengembangkan tampilan
 
+Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/forms/kesesuaian-user.php`, controller di `app/Controllers/Forms/KesesuaianUserController.php`, serta konfigurasi alasan dan sampel di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB; draft disimpan di browser. Konfirmasi pemeriksaan tidak dipulihkan dari draft dan harus dicentang kembali. Pengiriman serta halaman laporan masih menunggu integrasi.
+
 ```powershell
 npm ci
 npm run build
@@ -41,14 +43,15 @@ Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk memban
 | `app/Controllers/HomeController.php` | Data dashboard dan pengelompokan menu |
 | `app/Views/home/index.php` | Dashboard portal |
 | `app/Controllers/Forms/HardwareServerController.php` | Data halaman pemeriksaan hardware server |
-| `app/Views/hardware-server/form/` | Form pemeriksaan dan komponen pilihan kondisi |
+| `app/Views/forms/hardware-server.php` | Halaman pengisian pemeriksaan hardware |
+| `app/Views/forms/kesesuaian-user.php` | Halaman pengisian verifikasi user HIS |
 | `config/hardware-server.php` | Lokasi, periode, pilihan rak, dan teks pemeriksaan |
 | `public/assets/js/hardware-server.js` | Interaksi form, validasi, dan draft lokal |
-| `app/Views/hardware-server/reports/index.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
-| `app/Views/hardware-server/components/hero.php` | Hero bersama untuk form dan rekap |
+| `app/Views/reports/hardware-server.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
+| `app/Views/layouts/` | Kerangka HTML, header, varian header, dan footer |
 | `config/hardware-server-reports.php` | Data referensi dan periode halaman rekap |
 | `public/assets/js/hardware-server-history.js` | Filter, pencarian, pagination, rincian, dan cetak |
-| `app/Views/components/` | Navbar, kartu, footer, dan dialog |
+| `app/Views/components/` | Komponen UI bersama: brand, kartu, progres, dialog, pilihan kondisi, dan hero hardware |
 | `config/portal.php` | Daftar 15 kartu, kategori, target, serta urutannya |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal sebelum integrasi backend |
 | `config/database.php` | Parameter koneksi MySQL dari environment |

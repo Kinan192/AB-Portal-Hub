@@ -2,10 +2,6 @@
 /** @var array{name: string, initials: string, subtitle: string} $profile */
 /** @var string|null $hardwarePage */
 ?>
-<?php
-/** @var array{name: string, initials: string, subtitle: string} $profile */
-/** @var string|null $hardwarePage */
-?>
 <header class="sticky top-0 z-40 border-b border-slate-200 bg-white">
     <div class="page-shell flex flex-wrap items-center justify-between gap-x-5 gap-y-3 py-3">
         <a href="/" class="flex flex-wrap items-center gap-4" aria-label="Beranda Portal RS Awal Bros Botania">

@@ -10,8 +10,10 @@ Dokumen ini mencatat implementasi terakhir pada 25 Oktober 2026. Ukuran di bawah
 | --- | --- |
 | `design-system.md` | Patokan komponen, ukuran, interaksi, dan pola halaman baru |
 | `resources/css/app.css` | Implementasi font, token, class komponen, dan aturan responsif |
-| `app/Views/layouts/main.php` | Kerangka HTML bersama, aset, navbar, footer, dan dialog |
-| `app/Views/components/` | Komponen yang harus digunakan ulang |
+| `app/Views/layouts/` | Kerangka HTML, header, varian header, dan footer |
+| `app/Views/forms/` | Semua halaman pengisian, satu file per halaman |
+| `app/Views/reports/` | Semua halaman laporan, satu file per halaman |
+| `app/Views/components/` | Satu folder untuk elemen kecil yang digunakan ulang |
 | `config/portal.php` | Definisi dan urutan kartu portal |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal frontend |
 | Dokumen arsitektur awal dari pemilik project | Rancangan backend, database, autentikasi, dan middleware |
@@ -178,7 +180,7 @@ ID `main-content` harus ada satu kali pada setiap halaman agar skip link berfung
 
 ### 8.2 Navbar
 
-Source: `app/Views/components/navbar.php`.
+Source: `app/Views/layouts/header.php` dan `header-form.php`. Layout `main.php` memanggil `header.php`; file ini memilih varian header sesuai `navbarVariant`. Footer beserta wrapper tampilannya berada di `app/Views/layouts/footer.php`.
 
 - Sticky di atas, `z-40`, latar putih, border bawah.
 - Padding vertikal 12 px di semua ukuran layar.
@@ -296,29 +298,44 @@ Tampilkan keadaan kosong jika daftar belum berisi data. Jika ada pengambilan dat
 
 ### 9.1 Form hardware server yang sudah tersedia
 
-Source: `app/Views/hardware-server/form/index.php`, `form/condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
+Source: `app/Views/forms/hardware-server.php`, `app/Views/components/hardware-condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
 
-Pisahkan view pengisian dan laporan dalam setiap modul. Gunakan struktur berikut sebagai pola modul selanjutnya:
+Kelompokkan view berdasarkan fungsinya. Semua halaman pengisian berada di `forms/`, semua halaman laporan di `reports/`, dan hanya ada satu folder `components/`. Gunakan struktur berikut untuk halaman selanjutnya:
 
 ```text
-app/Views/hardware-server/
-├── form/
-│   ├── index.php
-│   └── condition.php
+app/Views/
+├── forms/
+│   ├── hardware-server.php
+│   └── kesesuaian-user.php
 ├── reports/
+│   └── hardware-server.php
+├── layouts/
+│   ├── main.php
+│   ├── header.php
+│   ├── header-form.php
+│   └── footer.php
+├── components/
+│   ├── brand.php
+│   ├── hardware-condition.php
+│   ├── hardware-server-hero.php
+│   ├── portal-card.php
+│   ├── portal-dialog.php
+│   └── progress-summary.php
+├── home/
 │   └── index.php
-└── components/
-    └── hero.php
+└── errors/
+    ├── 404.php
+    └── unavailable.php
 ```
 
-Tambahkan halaman pengisian berikutnya ke `form/`, halaman riwayat/rekap ke `reports/`, dan partial yang dipakai keduanya ke `components/`. Komponen global tetap di `app/Views/components/`. URL route tidak harus mengikuti lokasi fisik view.
+Tambahkan file halaman pengisian berikutnya ke `forms/` dan halaman riwayat/rekap ke `reports/`. Jangan membuat ulang folder `form/`, `reports/`, atau `components/` di dalam folder bernama modul. `layouts/` hanya untuk kerangka dokumen dan struktur global seperti header serta footer. Bagian konten yang dipakai ulang seperti hero hardware, kartu, dialog, logo, atau pilihan kondisi masuk `components/`, meskipun ukurannya besar. Pembagian mengikuti fungsi, bukan ukuran atau jumlah baris. URL route tetap independen dari lokasi fisik view.
 
 - Route: `/forms/hardware-server`; controller: `App\Controllers\Forms\HardwareServerController`.
 - `navbarVariant=form` memilih navbar dengan breadcrumb. Komponen brand, profil, jam, ikon, dan dialog akun tetap memakai sumber bersama.
 - Form, laporan, dan isi hero memakai `.page-shell` yang sama dengan home dan navbar: lebar 90% mulai desktop, maksimal 1440 px, dengan padding mobile 20/32 px. Jangan menambahkan batas 1024 px pada halaman hardware server.
 - `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
 - `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
-- Kelompok CPU/monitor memakai partial `condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
+- Kelompok CPU/monitor memakai partial `components/hardware-condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
 - Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal serta menghapus draft setelah konfirmasi.
 - Simpan Draft menggunakan `localStorage` dengan versi format dan nama profil, lalu memuat draft pada pembukaan berikutnya di browser yang sama. Ini belum merupakan penyimpanan lintas akun/perangkat; sumber identitas dan penyimpanan harus diganti saat autentikasi/backend diintegrasikan.
 - Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Lihat Riwayat & Rekap Laporan mengarah ke `/forms/hardware-server/history`. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
@@ -327,7 +344,7 @@ Tambahkan halaman pengisian berikutnya ke `form/`, halaman riwayat/rekap ke `rep
 
 ### 9.2 Rekap bulanan hardware server
 
-Source: `app/Views/hardware-server/reports/index.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/forms/hardware-server/history` memakai method `history()` pada controller hardware yang sama. Navbar dan `components/hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Bulanan.
+Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/forms/hardware-server/history` memakai method `history()` pada controller hardware yang sama. Header dan `components/hardware-server-hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Bulanan.
 
 - Pertahankan `.page-shell` yang sama dengan home (90% pada desktop, maksimal 1440 px), jarak antarpanel 24 px, radius 16 px. Heading rekap 18 px; isi tabel 12 px; header dan badge tabel 10–11 px, mengikuti HTML referensi.
 - Panel kontrol memakai satu kolom pada mobile, dua mulai `sm`, dan empat mulai `md`. Label terhubung ke setiap input. Kelompok tombol ekspor dapat membungkus ketika ruang menyempit.
@@ -339,6 +356,19 @@ Source: `app/Views/hardware-server/reports/index.php`, `config/hardware-server-r
 - Cetak Rekap membuka dialog cetak browser. CSS cetak menampilkan semua hasil filter lintas halaman, identitas rumah sakit, dan ringkasan filter; navigasi, hero, tombol aksi, dan pagination tidak ikut dicetak. Tata letak cetak memakai A4 landscape.
 - Ekspor Excel/PDF dan unduh lembar membuka keterangan integrasi yang belum tersedia. Jangan membuat pesan unduhan berhasil atau file dengan ekstensi palsu. Ekspor operasional menunggu backend dan hak akses.
 - Ikon tambahan: `chart-search`, `table`, `printer`, `search`, `chevron-down`, `eye`, dan `download`, melalui helper `icon()` yang sama.
+
+### 9.3 Form Kesesuaian User HIS
+
+Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::index()` dan view `app/Views/forms/kesesuaian-user.php`. Halaman laporannya nanti ditambahkan ke `app/Views/reports/`, tanpa membuat folder modul baru. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
+
+- Gunakan navbar global dan breadcrumb di dalam `.page-shell`, mengikuti referensi. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
+- Isi memakai satu kolom pada mobile dan grid 12 kolom mulai `lg`: form delapan kolom dan sampel terakhir empat kolom. Panel putih memakai radius 12 px, padding 24/32 px. Field 13 px dengan tinggi 48 px; label 14 px; deskripsi 12 px.
+- Pilihan kesesuaian memakai radio native, dengan `.compliance-option`, `.compliance-radio`, dan fokus keyboard yang terlihat. Pilihan Tidak Sesuai membuka alasan dan catatan. Alasan wajib terisi untuk status tersebut; catatan wajib untuk alasan Lainnya. Field tersembunyi dinonaktifkan agar tidak menghalangi validasi.
+- Username wajib terisi dan tidak boleh mengandung spasi. Tanggal/jam login wajib terisi; Set Jam Sekarang menggunakan `Intl.DateTimeFormat` dengan zona Asia/Jakarta, tanpa mencampur tanggal UTC dengan jam lokal.
+- Draft lokal memiliki versi format dan nama profil. Draft dapat memuat isian belum lengkap; format, panjang teks, alasan, dan tanggal/jam diverifikasi saat dimuat kembali. Checkbox konfirmasi tidak dipulihkan dari draft agar pemeriksaan harus dikonfirmasi kembali.
+- Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Tombol rekap/unduh menjelaskan halaman laporan belum dibuat; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
+- Sidebar memakai tiga sampel dari HTML referensi, ditandai sebagai data referensi. Jumlah badge mengikuti array, tanpa mengklaim Hari Ini (4). Ganti sumber data melalui Model setelah backend tersedia.
+- View memiliki anotasi PHPDoc untuk variabel yang dikirim controller. Ikon `user-search` dan `history` menggunakan helper yang sama. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi tersedia.
 
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 
@@ -360,7 +390,7 @@ final class HardwareServerController
 {
     public function index(): void
     {
-        View::render('hardware-server/form/index', [
+        View::render('forms/hardware-server', [
             'pageTitle' => 'Monitoring Hardware Server',
             'profile' => config('dashboard')['profile'],
         ]);
@@ -383,7 +413,7 @@ Router saat ini hanya mendukung `get(path, callable)` dengan path persis. Parame
 
 ### C. Buat view
 
-Lokasi: `app/Views/hardware-server/form/index.php`.
+Lokasi: `app/Views/forms/hardware-server.php`.
 
 ```php
 <main id="main-content" class="page-shell flex-1 space-y-5 py-4">

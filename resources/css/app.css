@@ -109,6 +109,13 @@
   .report-table td { @apply px-4 py-3; }
   .report-page-button { @apply inline-flex min-h-8 min-w-8 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-[11px] text-slate-600 transition-colors hover:bg-slate-100 disabled:cursor-not-allowed disabled:text-slate-400 disabled:hover:bg-white; }
   .report-page-button[aria-current="page"] { @apply border-teal-700 bg-teal-700 font-semibold text-white hover:bg-teal-800; }
+  .compliance-option { @apply min-w-0 rounded-lg border border-slate-200 bg-slate-50 shadow-sm transition-colors hover:border-emerald-300; }
+  .compliance-option:has(> .compliance-radio:checked) { @apply border-emerald-200 bg-emerald-50/80; }
+  .compliance-option-bad:has(> .compliance-radio:checked) { @apply border-rose-200 bg-rose-50/80; }
+  .compliance-option:has(> .compliance-radio:focus-visible) { outline: 3px solid #0f766e; outline-offset: 4px; }
+  .compliance-option-icon { @apply flex size-5 shrink-0 items-center justify-center rounded-full bg-slate-300 text-white; }
+  .compliance-radio:checked + label .compliance-option-icon { @apply bg-emerald-600; }
+  .compliance-option-bad .compliance-radio:checked + label .compliance-option-icon { @apply bg-rose-600; }
 }
 
 .report-page-hidden { display: none; }

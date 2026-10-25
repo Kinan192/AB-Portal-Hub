@@ -13,7 +13,7 @@
  */
 ?>
 <main id="main-content" class="flex-1 bg-slate-100">
-    <?php require dirname(__DIR__) . '/components/hero.php'; ?>
+    <?php require BASE_PATH . '/app/Views/components/hardware-server-hero.php'; ?>
 
     <div class="page-shell relative -mt-4 pb-16">
         <form id="hardware-monitoring-form" method="post" class="space-y-6" data-inspector="<?= e($profile['name']) ?>">
@@ -65,7 +65,7 @@
             </fieldset>
 
             <?php foreach ($inspection['conditions'] as $condition): ?>
-                <?php require __DIR__ . '/condition.php'; ?>
+                <?php require BASE_PATH . '/app/Views/components/hardware-condition.php'; ?>
             <?php endforeach; ?>
 
             <section class="inspection-panel" aria-labelledby="hardware-notes-title">

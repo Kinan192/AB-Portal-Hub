@@ -26,7 +26,7 @@
  */
 ?>
 <main id="main-content" class="hardware-history flex-1 bg-slate-100">
-    <?php require dirname(__DIR__) . '/components/hero.php'; ?>
+    <?php require BASE_PATH . '/app/Views/components/hardware-server-hero.php'; ?>
     <div class="page-shell report-content relative -mt-4 pb-16">
         <section class="report-toolbar mb-6 flex flex-col gap-4 rounded-2xl border border-slate-200/60 bg-white p-5 shadow-sm sm:p-6" aria-labelledby="report-title">
             <p class="report-print-brand hidden text-sm font-bold text-slate-800"><?= e(config('app')['hospital']) ?> • IT Division</p>
