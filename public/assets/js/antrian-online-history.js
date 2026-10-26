@@ -3,11 +3,10 @@
   const form = document.getElementById('queue-report-filters');
   if (!form) return;
   const byId = (id) => document.getElementById(id);
-  const { records, perPage, shifts } = JSON.parse(byId('queue-report-data').textContent);
+  const { records, perPage } = JSON.parse(byId('queue-report-data').textContent);
   const period = byId('queue-report-period');
   const queue = byId('queue-report-queue');
   const bed = byId('queue-report-bed');
-  const shift = byId('queue-report-shift');
   const search = byId('queue-report-search');
   const defaultPeriod = period.value;
   const pages = byId('queue-report-pages');
@@ -21,11 +20,10 @@
   });
   const number = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 });
   const normalize = (value) => String(value).normalize('NFKC').toLocaleLowerCase('id-ID').trim();
-  const shiftName = (key) => shifts[key]?.short || key;
   const searchable = new Map(records.map((record) => [record.id, normalize([
-    record.id, record.at, formatter.format(new Date(record.at)), shiftName(record.shift), record.queue_http,
+    record.id, record.at, formatter.format(new Date(record.at)), record.queue_http,
     record.queue_sent ? 'Terkirim' : 'Tidak Terkirim', record.bed_sent ? 'Terkirim Update' : 'Tidak Terkirim',
-    record.attachment, record.notes, record.inspector, record.inspector_role, record.tickets, record.tasks, record.task_note,
+    record.notes, record.inspector, record.inspector_role,
   ].join(' '))]));
   let page = 1;
   let filtered = [];
@@ -34,7 +32,6 @@
     const query = normalize(search.value);
     filtered = records.filter((record) => (period.value === 'all' || record.at.slice(0, 7) === period.value)
       && matchesStatus(queue.value, record.queue_sent) && matchesStatus(bed.value, record.bed_sent)
-      && (shift.value === 'all' || shift.value === record.shift)
       && searchable.get(record.id).includes(query));
     const count = filtered.length;
     const queueSent = filtered.filter((record) => record.queue_sent).length;
@@ -49,13 +46,12 @@
     bedLabel.className = `rounded-full px-2 py-0.5 font-mono text-[9px] ${!count ? 'bg-slate-100 text-slate-600' : bedSent === count ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`;
     const latest = filtered[0];
     byId('queue-report-latest').textContent = latest ? `${formatter.format(new Date(latest.at))} WIB` : 'Belum ada audit';
-    byId('queue-report-latest-shift').textContent = latest ? shiftName(latest.shift) : '—';
     byId('queue-report-latest-inspector').textContent = latest ? `Oleh: ${latest.inspector} (${latest.inspector_role})` : 'Tidak ada data yang sesuai filter.';
     const periodLabel = period.selectedOptions[0].textContent.replace(' (Aktif)', '');
     byId('queue-report-period-label').textContent = periodLabel;
     byId('queue-report-print-filter').textContent = [
       `Periode: ${periodLabel}`, `Cron antrian: ${queue.selectedOptions[0].textContent}`, `Cron bed: ${bed.selectedOptions[0].textContent}`,
-      shift.selectedOptions[0].textContent, search.value.trim() ? `Pencarian: ${search.value.trim()}` : '', `${count} sesi`,
+      search.value.trim() ? `Pencarian: ${search.value.trim()}` : '', `${count} sesi`,
     ].filter(Boolean).join(' • ');
     const totalPages = Math.max(1, Math.ceil(count / pageSize));
     page = Math.min(Math.max(1, page), totalPages);
@@ -83,7 +79,7 @@
   };
   const changed = () => { page = 1; render(); };
   form.addEventListener('submit', (event) => { event.preventDefault(); changed(); });
-  [period, queue, bed, shift].forEach((input) => input.addEventListener('change', changed));
+  [period, queue, bed].forEach((input) => input.addEventListener('change', changed));
   search.addEventListener('input', changed);
   previous.addEventListener('click', () => { if (!previous.disabled) { page -= 1; render(); } });
   next.addEventListener('click', () => { if (!next.disabled) { page += 1; render(); } });
@@ -93,7 +89,7 @@
     page = Number(button.dataset.queuePage); render(); pages.querySelector('[aria-current="page"]')?.focus();
   });
   document.querySelector('[data-queue-reset-filter]').addEventListener('click', () => {
-    period.value = defaultPeriod; queue.value = bed.value = shift.value = 'all'; search.value = ''; changed(); period.focus();
+    period.value = defaultPeriod; queue.value = bed.value = 'all'; search.value = ''; changed(); period.focus();
   });
   document.querySelectorAll('[data-queue-detail]').forEach((button) => button.addEventListener('click', () => {
     const record = records.find((item) => String(item.id) === button.dataset.queueDetail);
@@ -101,11 +97,10 @@
     const fields = byId('queue-report-detail-fields'); fields.replaceChildren();
     [
       ['Nomor Audit', `#${String(record.id).padStart(3, '0')}`], ['Waktu Audit (WIB)', formatter.format(new Date(record.at))],
-      ['Shift', shiftName(record.shift)], ['Petugas', `${record.inspector} (${record.inspector_role})`],
+      ['Petugas', `${record.inspector} (${record.inspector_role})`],
       ['Cron Antrian', `${record.queue_sent ? 'Terkirim' : 'Tidak Terkirim'}${record.queue_http === null ? '' : ` (HTTP ${record.queue_http})`}`],
       ['Cron Bed MJKN', record.bed_sent ? 'Terkirim (Update)' : 'Tidak Terkirim'],
-      ['Jumlah Tiket', number.format(record.tickets)], ['Task ID', record.tasks === null ? record.task_note : number.format(record.tasks)],
-      ['Bukti Log', `${record.attachment} — berkas belum tersedia`], ['Catatan Operasional', record.notes],
+      ['Catatan Operasional', record.notes],
     ].forEach(([label, value]) => {
       const group = document.createElement('div'); if (label === 'Catatan Operasional') group.className = 'sm:col-span-2';
       const term = document.createElement('dt'); term.className = 'text-xs text-slate-500'; term.textContent = label;
@@ -126,9 +121,6 @@
   document.querySelector('[data-queue-print]').addEventListener('click', () => { if (filtered.length) window.print(); });
   document.querySelectorAll('[data-queue-export]').forEach((button) => button.addEventListener('click', () => {
     showInfo(button.dataset.queueExport === 'excel' ? 'Export Excel (.xlsx)' : 'Export PDF Rekap Bulanan', 'Ekspor operasional belum tersedia karena laporan belum terhubung ke server. Data pada halaman ini berasal dari referensi desain. Cetak Rekap dapat digunakan untuk mencetak seluruh hasil filter.');
-  }));
-  document.querySelectorAll('[data-queue-log]').forEach((button) => button.addEventListener('click', () => {
-    showInfo('Bukti Log Monitoring', `Nama lampiran: ${button.dataset.queueLog}. Berkas ini belum tersedia; referensi desain hanya memuat nama lampiran. Unduhan akan dihubungkan setelah penyimpanan bukti server tersedia.`);
   }));
   document.querySelector('[data-queue-sop]').addEventListener('click', () => {
     showInfo('Dokumen SOP Integrasi BPJS', 'Dokumen SOP belum tersedia pada project. Nama SOP pada halaman mengikuti referensi desain. Unduhan akan dihubungkan setelah dokumen resmi ditambahkan oleh pengelola.');

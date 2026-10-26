@@ -401,6 +401,8 @@ Source: `app/Views/hardware-server/rekap.php`, `config/hardware-server-reports.p
 
 ### 9.3 Form Kesesuaian User HIS
 
+Panel Sampel Terakhir Tercatat sudah dihapus beserta konfigurasi data referensinya. Form memakai lebar container penuh dan hanya memuat isian verifikasi serta tindakan form.
+
 Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::form()` dan view `app/Views/kesesuaian-user/form.php`. Halaman laporannya berada di `app/Views/kesesuaian-user/rekap.php`, tanpa folder modul tambahan. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
 
 - Gunakan navbar global dan breadcrumb bersama dari layout; jangan menulis breadcrumb di view. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
@@ -426,29 +428,24 @@ Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::rekap()`, vi
 
 ### 9.5 Form Monitoring Antrian Online BPJS
 
-Route `/forms/antrian-online` memakai `AntrianOnlineController::form()`, view `app/Views/antrian-online/form.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`. Kartu Antrian Online bertipe internal dengan `available=true`. Kedua tautan rekap mengarah ke `/reports/antrian-online`.
+Route `/forms/antrian-online` memakai `AntrianOnlineController::form()`, view `app/Views/antrian-online/form.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`.
 
-- Gunakan header, footer, logo, dan `.page-shell` bersama. Hero hijau memakai judul sans-serif 24/30 px dan padding 24/36 px; metadata, dua kelompok cron, endpoint/tiket, serta unggah/catatan mengikuti susunan referensi. Panel isi putih radius 12 px, padding 20/32 px. Permukaan field memakai `#eff4ff`, label utama 14 px, deskripsi 12 px, dan metadata monospace 9–11 px. Jangan membawa CSS global referensi yang menyembunyikan scrollbar atau mengunci ukuran body.
-- Pasangan cron, endpoint/tiket, serta unggah/catatan memakai `.queue-paired-grid` dan `.queue-field-group`. Mulai `lg`, setiap pasangan berbagi tiga track subgrid agar judul, isi, dan keterangan sejajar meskipun teks membungkus. Bagian unggah mengikuti tinggi gabungan catatan dan konfirmasi. Pada layar kecil, masing-masing bagian kembali satu kolom dengan tinggi alami. Jangan menyamakan tinggi memakai angka tetap atau memotong deskripsi.
-- Radio cron menggunakan `.queue-choice` dan `.queue-radio` native dengan focus ring. Status TERKIRIM berwarna mint, TIDAK TERKIRIM merah. Pilihan awal mengikuti referensi; konfirmasi pemeriksaan tetap wajib dicentang pengguna. Jika salah satu cron gagal, catatan tindak lanjut wajib terisi dan tidak boleh hanya spasi.
-- Shift awal dihitung menurut WIB: pagi 07:00–14:00, siang 14:00–21:00, malam 21:00–07:00. Perubahan shift memperbarui label periode, dan waktu pencatatan ditampilkan dalam Asia/Jakarta.
-- Empat jumlah tiket wajib berupa bilangan bulat nonnegatif. Nilai awal 284/112/68/18 merupakan input manual dari referensi, dengan penanda pada halaman; jangan mengklaimnya sebagai tiket tersinkron langsung atau menampilkan 100% Pushed tanpa sumber.
-- Endpoint hanya ditampilkan dari konfigurasi. Tidak ada pemanggilan BPJS, status HTTP 200, latency 124 ms, atau status keamanan/uptime tiruan.
-- Pemilihan bukti menerima satu berkas PNG/JPG/JPEG/PDF/TXT/LOG, berisi data, maksimal 5 MiB. Tipe/ekstensi dan ukuran diperiksa di browser. Pemilihan normal dan drop mengisi input file; nama berkas dimasukkan lewat `textContent`. Pemeriksaan tipe/konten dan penyimpanan server tetap diperlukan pada integrasi backend. Jangan menampilkan berkas seolah terlampir dari daemon.
-- Draft lokal menyimpan isian dan nama berkas sebagai pengingat, tanpa byte berkas atau checkbox konfirmasi. Pemulihan draft meminta pemilihan berkas dan konfirmasi ulang. Draft dapat berisi jumlah tiket yang belum diisi. Reset meminta konfirmasi, menghapus draft, mengosongkan catatan/bukti/konfirmasi, mengatur tiket ke nol, serta memperbarui waktu dan shift WIB.
-- Kirim Laporan membuka ringkasan setelah validasi, dengan keterangan bahwa laporan dan berkas belum dikirim. Tambahkan POST, validasi server, CSRF, identitas sesi, serta penyimpanan saat backend diintegrasikan. Controller tetap dibatasi ke `APP_ENV=local`.
-- Ikon `upload` dan `reset` berasal dari helper `icon()` bersama.
+- Form berisi status cron antrian dan cron bed MJKN, catatan tindak lanjut, serta checkbox konfirmasi. Identitas petugas dan waktu WIB ditampilkan sebagai metadata. Periode hero cukup bertuliskan Inspeksi Harian.
+- Pilihan shift, endpoint/status koneksi bridging, jumlah tiket, serta unggah bukti sudah dihapus dari view, konfigurasi, validasi, draft, reset, dan ringkasan.
+- Dua card cron tetap memakai subgrid bersama agar judul, deskripsi, dan pilihan sejajar. Catatan dan konfirmasi memakai lebar penuh tanpa kolom unggah kosong.
+- Jika salah satu cron tidak terkirim, catatan wajib terisi dan tidak boleh hanya spasi. Konfirmasi tetap wajib dicentang sebelum ringkasan dibuka.
+- Draft hanya menyimpan kedua status cron, catatan, dan waktu. Konfirmasi harus diulang. Draft lama dapat dimuat untuk field yang masih ada; field tambahan yang sudah dihapus tidak dipakai dan tidak disimpan kembali.
+- Reset meminta konfirmasi, menghapus draft, mengembalikan status awal, mengosongkan catatan/konfirmasi, serta memperbarui waktu WIB. Kirim membuka ringkasan dengan keterangan bahwa pengiriman server belum tersedia.
 
 ### 9.6 Rekap Monitoring Antrian Online BPJS
 
-Route `/reports/antrian-online` memakai `AntrianOnlineController::rekap()`, view `app/Views/antrian-online/rekap.php`, konfigurasi `config/antrian-online-reports.php`, dan script `public/assets/js/antrian-online-history.js`. Semua halaman tetap memakai header, footer, logo, dan `.page-shell` bersama, tanpa folder modul atau komponen tambahan.
+Route `/reports/antrian-online` memakai `AntrianOnlineController::rekap()`, view `app/Views/antrian-online/rekap.php`, konfigurasi `config/antrian-online-reports.php`, dan script `public/assets/js/antrian-online-history.js`.
 
-- Hero hijau memiliki judul sans-serif 24/30 px. Empat kartu ringkasan mengikuti grid satu/dua/empat kolom dan menampilkan jumlah sesi, persentase cron antrian, persentase cron bed, serta audit terakhir. Angka dihitung dari seluruh hasil filter, bukan hanya halaman aktif. Tujuh baris referensi menghasilkan 7 sesi, 6 cron antrian terkirim (85,7%), dan 7 cron bed terkirim (100%). Jangan memakai jumlah 62 atau 98,4% tanpa sumber data yang mendukung.
-- Panel log memakai lima filter: bulan, status cron antrian, status cron bed, shift, dan pencarian. Layout kontrol satu/dua/lima kolom mengikuti breakpoint. Pencarian frasa tidak peka huruf besar/kecil dan mencakup tanggal WIB, kode HTTP, nama lampiran, petugas, serta catatan. Filter dapat digabung; perubahan mengembalikan pagination ke halaman pertama. Hasil kosong menampilkan nol dan persentase “—”, lalu menyediakan Reset Filter.
-- Tabel memiliki tujuh kolom, font isi 12 px, header/badge monospace 10 px, dan lebar minimum 1280 px. Catatan lengkap membungkus, wrapper tabel dapat digeser, dan hanya ada satu footer global. Nomor audit membuka rincian melalui dialog native.
-- Nama bukti log mengikuti referensi HTML. Klik lampiran menjelaskan berkas belum tersedia; tidak membuat URL unduhan palsu. Tombol SOP juga menjelaskan dokumen belum ditambahkan, tanpa mengklaim versi atau aturan operasional yang belum diverifikasi dari dokumen resmi. Ekspor Excel/PDF menunggu backend.
-- Cetak Rekap menggunakan dialog cetak browser, A4 landscape, dengan identitas rumah sakit, ringkasan filter, dan semua hasil lintas halaman. Navigasi, hero, kartu, tombol, pagination, dan panel SOP tidak dicetak. Penanda data referensi tetap tercetak.
-- Data JSON memakai `JSON_HEX_*` dan teks dialog dimasukkan melalui `textContent`. Kode HTTP dan latency pada catatan merupakan konten referensi historis, bukan hasil pemanggilan BPJS langsung. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi dan penyimpanan server tersedia.
+- Empat ringkasan menampilkan jumlah sesi, persentase kedua cron, dan audit terakhir. Angka dihitung dari hasil filter. Tujuh baris referensi menghasilkan 7 sesi, 6 cron antrian terkirim (85,7%), dan 7 cron bed terkirim (100%).
+- Empat kontrol pencarian terdiri dari periode, status cron antrian, status cron bed, dan kata kunci. Filter shift sudah dihapus. Pencarian mencakup waktu WIB, kode respons cron, status, petugas, dan catatan.
+- Tabel memiliki lima kolom: nomor/waktu audit, cron antrian, cron bed MJKN, catatan operasional, dan petugas. Kolom transaksi tiket, bukti log, dan informasi shift sudah dihapus beserta data serta rincian terkait. Lebar minimum tabel 960 px; catatan tetap membungkus.
+- Pagination, rincian audit, keadaan kosong, reset filter, dan cetak seluruh hasil filter tetap berjalan. Ekspor Excel/PDF serta unduh SOP menjelaskan status belum tersedia sampai integrasi backend.
+- Data JSON memakai `JSON_HEX_*`; rincian ditulis melalui `textContent`. Data referensi diberi label dan tidak mengklaim hasil koneksi server secara langsung.
 
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 

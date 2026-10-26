@@ -28,7 +28,6 @@ final class AntrianOnlineController
             'profile' => config('dashboard')['profile'],
             'report' => $report,
             'records' => $records,
-            'shifts' => config('antrian-online')['shifts'],
             'summary' => [
                 'total' => $total,
                 'queue_sent' => $queueSent,
@@ -49,14 +48,13 @@ final class AntrianOnlineController
             return;
         }
 
-        $hour = (int) date('G');
         View::render('antrian-online/form', [
             'pageTitle' => 'Form Monitoring Antrian Online BPJS',
             'breadcrumbs' => monitoring_breadcrumbs('antrian-online'),
             'profile' => config('dashboard')['profile'],
             'monitoring' => config('antrian-online'),
             'recordedAt' => date(DATE_ATOM),
-            'initialShift' => $hour >= 7 && $hour < 14 ? 'pagi' : ($hour >= 14 && $hour < 21 ? 'siang' : 'malam'),
+
             'pageScripts' => ['js/antrian-online.js'],
         ]);
     }
