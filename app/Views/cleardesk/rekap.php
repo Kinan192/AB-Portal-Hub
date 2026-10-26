@@ -16,22 +16,12 @@ ob_start(); ?>
             <span class="text-headline-sm font-semibold">Oktober 2026 (Aktif)</span>
         </div>
     </div>
-    <?= partial('button', ['label' => 'Input Form Baru', 'href' => url('/form/cleardesk'), 'icon' => 'list-checks', 'iconClass' => 'text-[20px]', 'class' => 'inline-flex items-center gap-2 px-space-md py-3 rounded-lg bg-tertiary-fixed text-on-tertiary-fixed hover:bg-tertiary-fixed-dim transition-all text-headline-sm font-semibold active:scale-95 shadow-rs']) ?>
+    <?= partial('button', ['label' => 'Input Form Baru', 'href' => url('/form/cleardesk'), 'icon' => 'list-checks', 'iconClass' => 'text-[20px]', 'class' => 'button-on-dark module-action inline-flex items-center gap-2 px-space-md py-3 rounded-lg transition-all text-headline-sm font-semibold active:scale-95 shadow-rs']) ?>
 </div>
 <?php $heroAside = ob_get_clean(); ?>
 <main id="main-content" class="w-full bg-surface min-h-[calc(100vh-56px)]">
 <div class="flex flex-col w-full">
-    <div class="page-shell py-space-md flex flex-col gap-space-lg">
-        <?= partial('breadcrumb', [
-            'class' => 'flex items-center gap-2 text-body-sm text-on-surface-variant',
-            'separator' => ['icon' => 'chevron-right', 'class' => 'text-[14px]'],
-            'items' => [
-                ['label' => 'Portal Monitoring Terpadu', 'href' => url('/'), 'class' => 'hover:text-primary transition-colors'],
-                ['label' => 'Monitoring Harian', 'href' => url('/'), 'class' => 'hover:text-primary transition-colors'],
-                ['label' => 'Clear Desk & Screen', 'href' => url('/form/cleardesk'), 'class' => 'hover:text-primary transition-colors'],
-                ['label' => 'Rekap Hasil Inspeksi', 'class' => 'font-semibold text-on-surface'],
-            ],
-        ]) ?>
+    <div class="page-shell pb-space-md flex flex-col gap-space-lg">
 
         <?= partial('page-header', [
             'class' => 'relative overflow-hidden rounded-xl p-space-lg',
@@ -62,9 +52,9 @@ ob_start(); ?>
                         <p class="text-body-sm text-on-surface-variant mt-0.5">Daftar hasil inspeksi berkala per unit kerja, data MAC Address, IP, OS, dan status kepatuhan fisik.</p>
                     </div>
                     <div class="flex flex-wrap items-center gap-2 shrink-0">
-                        <?= partial('button', ['label' => 'Export Excel (.xlsx)', 'icon' => 'sheet', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-tertiary text-body-sm font-semibold transition-colors rsab-action', 'attrs' => ['data-export' => 'xlsx']]) ?>
-                        <?= partial('button', ['label' => 'Export PDF Rekap Bulanan', 'icon' => 'file-text', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-primary text-body-sm font-semibold transition-colors rsab-action', 'attrs' => ['data-export' => 'pdf']]) ?>
-                        <?= partial('button', ['label' => 'Cetak Rekap', 'icon' => 'printer', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low hover:bg-surface-container-high text-on-surface text-body-sm font-semibold transition-colors rsab-action', 'attrs' => ['data-print' => true]]) ?>
+                        <?= partial('button', ['label' => 'Export Excel (.xlsx)', 'icon' => 'sheet', 'iconClass' => 'text-[18px]', 'class' => 'button-soft module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-body-sm font-semibold transition-colors rsab-action border', 'attrs' => ['data-export' => 'xlsx']]) ?>
+                        <?= partial('button', ['label' => 'Export PDF Rekap Bulanan', 'icon' => 'file-text', 'iconClass' => 'text-[18px]', 'class' => 'button-soft module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-body-sm font-semibold transition-colors rsab-action border', 'attrs' => ['data-export' => 'pdf']]) ?>
+                        <?= partial('button', ['label' => 'Cetak Rekap', 'icon' => 'printer', 'iconClass' => 'text-[18px]', 'class' => 'button-neutral module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-body-sm font-semibold transition-colors rsab-action border', 'attrs' => ['data-print' => true]]) ?>
                     </div>
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-space-sm pt-space-xs">
@@ -91,14 +81,14 @@ ob_start(); ?>
                 <div class="flex flex-col sm:flex-row items-center justify-between gap-space-sm px-space-md py-space-sm bg-surface-container-low/40">
                     <div class="text-body-sm text-on-surface-variant">Menampilkan <span class="font-semibold text-on-surface" data-filter-count>1 - <?= e(count($module['entries'])) ?></span> dari <span class="font-semibold text-on-surface"><?= e($module['total']) ?></span> data rekaman kepatuhan</div>
                     <div class="flex items-center gap-1 text-body-sm">
-                        <button class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-on-surface-variant hover:bg-surface-container-high disabled:opacity-40 disabled:pointer-events-none" disabled type="button" aria-label="Halaman sebelumnya"><?= design_icon('chevron-left', 'text-[18px]') ?></button>
-                        <button class="w-8 h-8 rounded-lg font-semibold flex items-center justify-center bg-rs-teal-700 text-white border-rs-teal-700 hover:bg-rs-teal-800" type="button" aria-current="page">1</button>
+                        <button class="button-neutral module-action-small inline-flex items-center justify-center w-8 h-8 rounded-lg disabled:opacity-40 disabled:pointer-events-none border" disabled type="button" aria-label="Halaman sebelumnya"><?= design_icon('chevron-left', 'text-[18px]') ?></button>
+                        <button class="button-neutral module-page-button w-8 h-8 rounded-lg font-semibold flex items-center justify-center border" type="button" aria-current="page">1</button>
                         <?php foreach ([2, 3, 4] as $pageNo): ?>
-                        <button class="w-8 h-8 rounded-lg text-on-surface hover:bg-surface-container-high flex items-center justify-center" type="button" data-page-btn><?= e($pageNo) ?></button>
+                        <button class="button-neutral module-page-button w-8 h-8 rounded-lg flex items-center justify-center border" type="button" data-page-btn><?= e($pageNo) ?></button>
                         <?php endforeach; ?>
                         <span class="px-1 text-on-surface-variant">...</span>
-                        <button class="w-8 h-8 rounded-lg text-on-surface hover:bg-surface-container-high flex items-center justify-center" type="button" data-page-btn>21</button>
-                        <button class="inline-flex items-center justify-center w-8 h-8 rounded-lg text-on-surface hover:bg-surface-container-high" type="button" data-page-btn aria-label="Halaman berikutnya"><?= design_icon('chevron-right', 'text-[18px]') ?></button>
+                        <button class="button-neutral module-page-button w-8 h-8 rounded-lg flex items-center justify-center border" type="button" data-page-btn>21</button>
+                        <button class="button-neutral module-page-button inline-flex items-center justify-center w-8 h-8 rounded-lg border" type="button" data-page-btn aria-label="Halaman berikutnya"><?= design_icon('chevron-right', 'text-[18px]') ?></button>
                     </div>
                 </div>
             </div>

@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controllers\Forms;
+namespace App\Controllers;
 
 use App\Core\View;
 
 final class HardwareServerController
 {
-    public function history(): void
+    public function rekap(): void
     {
         if (config('app')['environment'] !== 'local') {
             http_response_code(503);
@@ -19,14 +19,9 @@ final class HardwareServerController
         $records = $report['records'];
         usort($records, static fn (array $a, array $b): int => strcmp($b['at'], $a['at']));
 
-        View::render('reports/hardware-server', [
+        View::render('hardware-server/rekap', [
             'pageTitle' => 'Rekap Bulanan Monitoring Hardware Server',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Hardware Server IT', 'href' => '/forms/hardware-server'],
-                ['label' => 'Rekap Monitoring Hardware Server IT'],
-            ],
-            'navbarVariant' => 'form',
+            'breadcrumbs' => monitoring_breadcrumbs('hardware-server', true),
             'hardwarePage' => 'history',
             'pageScripts' => ['js/hardware-server-history.js'],
             'profile' => config('dashboard')['profile'],
@@ -36,7 +31,7 @@ final class HardwareServerController
         ]);
     }
 
-    public function index(): void
+    public function form(): void
     {
         // Keep the same access restriction as the dashboard until authentication is connected.
         if (config('app')['environment'] !== 'local') {
@@ -45,13 +40,9 @@ final class HardwareServerController
             return;
         }
 
-        View::render('forms/hardware-server', [
+        View::render('hardware-server/form', [
             'pageTitle' => 'Form Monitoring Hardware Server IT',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Form Monitoring Hardware Server IT'],
-            ],
-            'navbarVariant' => 'form',
+            'breadcrumbs' => monitoring_breadcrumbs('hardware-server'),
             'pageScripts' => ['js/hardware-server.js'],
             'profile' => config('dashboard')['profile'],
             'inspection' => config('hardware-server'),

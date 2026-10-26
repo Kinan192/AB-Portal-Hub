@@ -13,12 +13,12 @@
         <div class="flex shrink-0 flex-wrap items-center gap-3">
             <div class="flex min-h-12 items-center gap-3 rounded-xl border border-white/20 bg-white/10 px-4 py-2">
                 <span class="flex size-8 shrink-0 items-center justify-center rounded-lg border border-teal-400/30 bg-teal-500/20 text-teal-300"><?= icon('calendar', 'size-4') ?></span>
-                <span class="flex flex-col"><span class="text-[10px] font-bold tracking-wide text-teal-200/80 uppercase">Periode Laporan</span><span class="text-xs font-bold"><?= e($inspection['period']) ?></span></span>
+                <span class="flex flex-col"><span class="text-xs font-bold tracking-wide text-teal-200/80 uppercase">Periode Laporan</span><span class="text-xs font-bold"><?= e($inspection['period']) ?></span></span>
             </div>
             <?php if (($hardwarePage ?? '') === 'history'): ?>
-            <a href="/forms/hardware-server" class="button-on-dark inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"><?= icon('check-circle', 'size-4') ?>Input Form Baru</a>
+            <a href="/forms/hardware-server" class="button-on-dark module-action inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"><?= icon('check-circle', 'size-4') ?>Input Form Baru</a>
             <?php else: ?>
-            <button type="button" data-new-inspection class="button-on-dark inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"><?= icon('check-circle', 'size-4') ?>Input Form Baru</button>
+            <button type="button" data-new-inspection class="button-on-dark module-action inline-flex min-h-12 items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold transition-colors"><?= icon('check-circle', 'size-4') ?>Input Form Baru</button>
             <?php endif; ?>
         </div>
     </div>

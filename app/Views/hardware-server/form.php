@@ -57,7 +57,7 @@
                                 <span class="min-w-0 flex-1"><span class="block text-sm font-bold text-slate-800"><?= e($rack['value']) ?></span><span class="mt-0.5 block text-xs leading-relaxed text-slate-500"><?= e($rack['description']) ?></span></span>
                                 <span class="flex size-10 shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white text-teal-600"><?= icon($rack['icon'], 'size-4') ?></span>
                             </span>
-                            <span class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-200/60 pt-3 text-[11px] font-medium text-slate-500"><span class="inline-flex items-center gap-1.5"><?= icon('cube', 'size-3.5 text-slate-400') ?>42U Enclosure</span><span class="inline-flex items-center gap-1.5 text-emerald-700"><?= icon('check-circle', 'size-3.5') ?><?= e($rack['detail']) ?></span></span>
+                            <span class="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-slate-200/60 pt-3 text-xs font-medium text-slate-500"><span class="inline-flex items-center gap-1.5"><?= icon('cube', 'size-3.5 text-slate-400') ?>42U Enclosure</span><span class="inline-flex items-center gap-1.5 text-emerald-700"><?= icon('check-circle', 'size-3.5') ?><?= e($rack['detail']) ?></span></span>
                         </label>
                     </div>
                     <?php endforeach; ?>
@@ -77,7 +77,7 @@
                 <div class="mt-5 flex flex-wrap items-center gap-2">
                     <span class="mr-1 text-xs font-semibold text-slate-500">Rekomendasi Cepat:</span>
                     <?php foreach ($inspection['quick_notes'] as $note): ?>
-                    <button type="button" data-quick-note="<?= e($note['text']) ?>" class="button-soft rounded-full border px-3 py-1.5 text-[11px] transition-colors">+ <?= e($note['label']) ?></button>
+                    <button type="button" data-quick-note="<?= e($note['text']) ?>" class="button-soft module-action-small rounded-full border px-3 py-1.5 text-xs transition-colors">+ <?= e($note['label']) ?></button>
                     <?php endforeach; ?>
                 </div>
                 <label for="hardware-notes" class="sr-only">Catatan kondisi hardware dan lain-lain</label>
@@ -86,13 +86,13 @@
 
             <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:grid lg:grid-cols-[1.2fr_0.55fr_1.4fr_0.8fr_1.4fr] lg:gap-3">
                 <div class="flex flex-wrap items-center gap-3 lg:contents">
-                    <a href="/" class="button-neutral inspection-button"><?= icon('arrow-left', 'size-4 shrink-0') ?><span>Kembali ke Portal Terpadu</span></a>
-                    <button type="reset" class="button-ghost min-h-11 rounded-lg px-3 py-2.5 text-xs font-semibold">Reset Form</button>
-                    <a href="/reports/hardware-server" class="button-soft inspection-button"><?= icon('file', 'size-4 shrink-0') ?><span>Lihat Riwayat &amp; Rekap Laporan</span></a>
+                    <a href="/" class="button-neutral module-action inspection-button border"><?= icon('arrow-left', 'size-4 shrink-0') ?><span>Kembali ke Portal Terpadu</span></a>
+                    <button type="reset" class="button-ghost module-action min-h-11 rounded-lg px-3 py-2.5 text-xs font-semibold">Reset Form</button>
+                    <a href="/reports/hardware-server" class="button-soft module-action inspection-button border"><?= icon('file', 'size-4 shrink-0') ?><span>Lihat Riwayat &amp; Rekap Laporan</span></a>
                 </div>
                 <div class="flex flex-col gap-3 sm:flex-row lg:contents">
-                    <button type="button" data-save-inspection class="button-secondary inspection-button"><?= icon('bookmark', 'size-4 shrink-0') ?>Simpan Draft</button>
-                    <button type="submit" class="button-primary inspection-button shadow-sm" aria-haspopup="dialog"><?= icon('send', 'size-4 shrink-0') ?>Kirim Laporan Monitoring</button>
+                    <button type="button" data-save-inspection class="button-secondary module-action inspection-button border"><?= icon('bookmark', 'size-4 shrink-0') ?>Simpan Draft</button>
+                    <button type="submit" class="button-primary module-action inspection-button shadow-sm" aria-haspopup="dialog"><?= icon('send', 'size-4 shrink-0') ?>Kirim Laporan Monitoring</button>
                 </div>
             </div>
         </form>
@@ -100,8 +100,8 @@
 </main>
 
 <dialog id="inspection-review" class="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-xl" aria-labelledby="inspection-review-title" aria-describedby="inspection-review-help">
-    <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-semibold text-teal-700">Pemeriksaan Hardware Server</p><h2 id="inspection-review-title" class="mt-1 text-lg font-bold text-slate-900">Ringkasan laporan</h2></div><button type="button" data-close-inspection-review class="button-ghost rounded-lg p-2" aria-label="Tutup ringkasan"><?= icon('close', 'size-5') ?></button></div>
+    <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-semibold text-teal-700">Pemeriksaan Hardware Server</p><h2 id="inspection-review-title" class="mt-1 text-lg font-bold text-slate-900">Ringkasan laporan</h2></div><button type="button" data-close-inspection-review class="button-ghost module-action-small rounded-lg p-2" aria-label="Tutup ringkasan"><?= icon('close', 'size-5') ?></button></div>
     <dl id="inspection-review-details" class="my-5 space-y-3 text-sm"></dl>
     <p id="inspection-review-help" class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">Pengiriman laporan ke server belum tersedia. Data belum dikirim. Simpan draft di perangkat ini untuk melanjutkan pengisian nanti.</p>
-    <div class="mt-5 flex flex-wrap justify-end gap-3"><button type="button" data-close-inspection-review class="button-neutral inspection-button">Kembali ke Form</button><button type="button" data-save-inspection class="button-secondary inspection-button">Simpan Draft</button></div>
+    <div class="mt-5 flex flex-wrap justify-end gap-3"><button type="button" data-close-inspection-review class="button-neutral module-action inspection-button border">Kembali ke Form</button><button type="button" data-save-inspection class="button-secondary module-action inspection-button border">Simpan Draft</button></div>
 </dialog>

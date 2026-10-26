@@ -12,6 +12,17 @@ function config(string $name): array
     return $loaded[$name] ??= require BASE_PATH . '/config/' . $name . '.php';
 }
 
+/** @return list<array{label: string}> */
+function monitoring_breadcrumbs(string $module, bool $report = false): array
+{
+    $page = config('monitoring-navigation')[$module];
+    return [
+        ['label' => 'Monitoring Harian'],
+        ['label' => $page['module']],
+        ['label' => $page[$report ? 'report' : 'form']],
+    ];
+}
+
 /** Dummy records used until the module tables are connected (database/dummy/*.php). */
 function dummy(string $name): array
 {

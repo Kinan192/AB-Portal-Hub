@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controllers\Forms;
+namespace App\Controllers;
 
 use App\Core\View;
 
 final class AntrianOnlineController
 {
-    public function history(): void
+    public function rekap(): void
     {
         if (config('app')['environment'] !== 'local') {
             http_response_code(503);
@@ -22,13 +22,9 @@ final class AntrianOnlineController
         $total = count($periodRecords);
         $queueSent = count(array_filter($periodRecords, static fn (array $record): bool => $record['queue_sent']));
         $bedSent = count(array_filter($periodRecords, static fn (array $record): bool => $record['bed_sent']));
-        View::render('reports/antrian-online', [
+        View::render('antrian-online/rekap', [
             'pageTitle' => 'Rekap & Riwayat Monitoring Antrian Online BPJS',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Antrian Online BPJS', 'href' => '/forms/antrian-online'],
-                ['label' => 'Rekap Monitoring Antrian Online BPJS'],
-            ],
+            'breadcrumbs' => monitoring_breadcrumbs('antrian-online', true),
             'profile' => config('dashboard')['profile'],
             'report' => $report,
             'records' => $records,
@@ -45,7 +41,7 @@ final class AntrianOnlineController
         ]);
     }
 
-    public function index(): void
+    public function form(): void
     {
         if (config('app')['environment'] !== 'local') {
             http_response_code(503);
@@ -54,12 +50,9 @@ final class AntrianOnlineController
         }
 
         $hour = (int) date('G');
-        View::render('forms/antrian-online', [
+        View::render('antrian-online/form', [
             'pageTitle' => 'Form Monitoring Antrian Online BPJS',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Form Monitoring Antrian Online BPJS'],
-            ],
+            'breadcrumbs' => monitoring_breadcrumbs('antrian-online'),
             'profile' => config('dashboard')['profile'],
             'monitoring' => config('antrian-online'),
             'recordedAt' => date(DATE_ATOM),

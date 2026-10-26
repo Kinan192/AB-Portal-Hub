@@ -14,23 +14,13 @@ ob_start(); ?>
             <div class="text-headline-sm font-semibold">Inspeksi Harian (Shift Pagi)</div>
         </div>
     </div>
-    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/cleardesk'), 'icon' => 'file-text', 'iconClass' => 'text-lg', 'class' => 'inline-flex items-center gap-2 bg-surface-container-lowest text-tertiary hover:bg-surface-container-low px-4 py-2.5 rounded-full text-body-sm font-semibold transition-all shadow-rs whitespace-nowrap']) ?>
+    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/cleardesk'), 'icon' => 'file-text', 'iconClass' => 'text-lg', 'class' => 'button-on-dark module-action inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-body-sm font-semibold transition-all shadow-rs whitespace-nowrap']) ?>
 </div>
 <?php $heroAside = ob_get_clean(); ?>
 <main id="main-content" class="w-full bg-surface min-h-[calc(100vh-56px)]">
 <div class="flex flex-col w-full">
     <div class="w-full bg-surface-container-low py-3 border-b-0 shadow-rs">
         <div class="page-shell flex flex-wrap items-center justify-between gap-3">
-        <?= partial('breadcrumb', [
-            'class' => 'flex items-center gap-2 text-body-sm text-on-surface-variant flex-wrap',
-            'separator' => ['icon' => 'chevron-right', 'class' => 'text-sm text-on-surface-variant/60'],
-            'items' => [
-                ['label' => 'Portal Monitoring Terpadu', 'href' => url('/'), 'class' => 'hover:text-tertiary cursor-pointer transition-colors'],
-                ['label' => 'Monitoring Harian', 'class' => 'hover:text-tertiary cursor-pointer transition-colors'],
-                ['label' => 'Clear Desk & Screen', 'class' => 'hover:text-tertiary cursor-pointer transition-colors'],
-                ['label' => 'Form Input Inspeksi', 'class' => 'font-semibold text-tertiary'],
-            ],
-        ]) ?>
         <?= partial('badge', ['tag' => 'div', 'label' => 'ISO 27001 ISMS Compliance', 'labelClass' => 'text-label-sm uppercase tracking-wider text-secondary', 'icon' => 'shield-check', 'iconClass' => 'text-tertiary text-base', 'class' => 'flex items-center gap-2 bg-surface-container-lowest px-3 py-1 rounded-full text-on-surface shadow-rs whitespace-nowrap']) ?>
         </div>
     </div>
@@ -89,7 +79,7 @@ ob_start(); ?>
                         <div class="flex flex-wrap items-center gap-2 pt-1">
                             <span class="text-label-sm text-on-surface-variant">Pilihan Cepat:</span>
                             <?php foreach ($module['quick_locations'] as $quick): ?>
-                            <?= partial('button', ['label' => $quick, 'class' => 'px-2.5 py-1 rounded-full bg-surface-container hover:bg-secondary-container hover:text-on-secondary-container text-label-sm text-on-surface transition-colors shadow-rs whitespace-nowrap', 'attrs' => ['data-fill-target' => 'lokasiInput']]) ?>
+                            <?= partial('button', ['label' => $quick, 'class' => 'button-soft module-action px-2.5 py-1 rounded-full text-label-sm transition-colors shadow-rs whitespace-nowrap border', 'attrs' => ['data-fill-target' => 'lokasiInput']]) ?>
                             <?php endforeach; ?>
                         </div>
                     </div>
@@ -184,13 +174,13 @@ ob_start(); ?>
 
                     <div class="pt-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-surface-container-low/50 -mx-6 lg:-mx-8 p-6 lg:p-8 rounded-b-[12px]">
                         <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-                            <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-lg', 'class' => 'inline-flex items-center gap-1.5 text-body-sm font-semibold text-on-surface-variant hover:text-on-surface transition-colors']) ?>
-                            <?= partial('button', ['label' => 'Lihat Riwayat', 'href' => url('/rekap/cleardesk'), 'class' => 'text-body-sm font-semibold text-secondary hover:text-tertiary transition-colors']) ?>
+                            <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-lg', 'class' => 'button-neutral module-action inline-flex items-center gap-1.5 text-body-sm font-semibold transition-colors border']) ?>
+                            <?= partial('button', ['label' => 'Lihat Riwayat', 'href' => url('/rekap/cleardesk'), 'class' => 'button-soft module-action text-body-sm font-semibold transition-colors border']) ?>
                         </div>
                         <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-                            <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'px-4 py-2 text-body-sm font-semibold text-on-surface-variant hover:text-primary transition-colors']) ?>
-                            <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'px-4 py-2.5 rounded-lg bg-surface-container-lowest text-on-surface hover:bg-surface-container text-body-sm font-semibold transition-all shadow-rs', 'attrs' => ['data-draft' => true]]) ?>
-                            <?= partial('button', ['label' => 'Kirim Laporan Inspeksi', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-lg', 'class' => 'inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-body-sm font-bold transition-all bg-rs-teal-700 text-white border-rs-teal-700 hover:bg-rs-teal-800 shadow-rs']) ?>
+                            <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'button-ghost module-action px-4 py-2 text-body-sm font-semibold transition-colors']) ?>
+                            <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'button-secondary module-action px-4 py-2.5 rounded-lg text-body-sm font-semibold transition-all shadow-rs border', 'attrs' => ['data-draft' => true]]) ?>
+                            <?= partial('button', ['label' => 'Kirim Laporan Inspeksi', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-lg', 'class' => 'button-primary module-action inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-body-sm font-bold transition-all shadow-rs']) ?>
                         </div>
                     </div>
                 </form>

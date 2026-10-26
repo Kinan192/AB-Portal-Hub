@@ -39,9 +39,9 @@
                     <p class="mt-0.5 text-xs leading-relaxed text-slate-500">Daftar riwayat pengecekan fisik perangkat server, rack mounting, storage, display, dan lingkungan data center.</p>
                 </div>
                 <div class="report-export-actions flex shrink-0 flex-wrap items-center gap-3">
-                    <button type="button" data-report-export="excel" class="report-export-button bg-emerald-50 text-emerald-800 hover:bg-emerald-100" aria-haspopup="dialog"><?= icon('table', 'size-4 text-emerald-600') ?>Export Excel (.xlsx)</button>
-                    <button type="button" data-report-export="pdf" class="report-export-button bg-rose-50 text-rose-800 hover:bg-rose-100" aria-haspopup="dialog"><?= icon('file', 'size-4 text-rose-600') ?>Export PDF Rekap Bulanan</button>
-                    <button type="button" data-report-print class="report-export-button bg-slate-100 text-slate-700 hover:bg-slate-200"><?= icon('printer', 'size-4 text-slate-500') ?>Cetak Rekap</button>
+                    <button type="button" data-report-export="excel" class="button-soft module-action report-export-button border" aria-haspopup="dialog"><?= icon('table', 'size-4 text-emerald-600') ?>Export Excel (.xlsx)</button>
+                    <button type="button" data-report-export="pdf" class="button-soft module-action report-export-button border" aria-haspopup="dialog"><?= icon('file', 'size-4 text-rose-600') ?>Export PDF Rekap Bulanan</button>
+                    <button type="button" data-report-print class="button-neutral module-action report-export-button border"><?= icon('printer', 'size-4 text-slate-500') ?>Cetak Rekap</button>
                 </div>
             </div>
 
@@ -69,7 +69,7 @@
                 </div>
             </form>
             <?php if ($report['source'] === 'reference'): ?>
-            <p class="report-source flex items-center gap-1.5 text-[11px] leading-relaxed text-slate-500"><?= icon('info', 'size-3.5 shrink-0') ?>Data referensi desain. Laporan pemeriksaan belum terhubung ke server.</p>
+            <p class="report-source flex items-center gap-1.5 text-xs leading-relaxed text-slate-500"><?= icon('info', 'size-3.5 shrink-0') ?>Data referensi desain. Laporan pemeriksaan belum terhubung ke server.</p>
             <?php endif; ?>
             <p id="report-print-filter" class="hidden text-xs text-slate-600"></p>
             <noscript><p class="rounded-lg bg-amber-50 p-3 text-xs text-amber-900">Aktifkan JavaScript untuk menggunakan filter, pencarian, dan detail laporan.</p></noscript>
@@ -79,7 +79,7 @@
             <div class="report-table-scroll overflow-x-auto" tabindex="0" role="region" aria-label="Tabel rekap laporan; geser untuk melihat seluruh kolom">
                 <table id="hardware-report-table" class="report-table w-full min-w-345 text-left text-xs text-slate-600">
                     <caption class="sr-only">Log pemeriksaan hardware server, kondisi perangkat, catatan, petugas, dan verifikasi</caption>
-                    <thead class="bg-slate-50/80 text-[11px] font-bold tracking-wide text-slate-500 uppercase">
+                    <thead class="bg-slate-50/80 text-xs font-bold tracking-wide text-slate-500 uppercase">
                         <tr><th scope="col">Waktu Inspeksi</th><th scope="col">Rak Server</th><th scope="col">Kondisi CPU</th><th scope="col">Monitor Console</th><th scope="col">Parameter Lingkungan &amp; Catatan</th><th scope="col">Petugas</th><th scope="col">Verifikasi</th><th scope="col" class="report-row-actions text-center">Aksi</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -91,23 +91,23 @@
                         $rackLabel = match ($record['rack']) { 'rack-1' => 'Rak Server 1', 'rack-2' => 'Rak Server 2', default => 'Rak Backup' };
                         ?>
                         <tr data-report-id="<?= e($record['id']) ?>" class="transition-colors hover:bg-teal-50/40">
-                            <td class="whitespace-nowrap"><time datetime="<?= e($record['at']) ?>" class="block font-bold text-slate-900"><?= e(date('d', $stamp) . ' ' . $month . ' ' . date('Y', $stamp)) ?> • <?= e(date('H:i', $stamp)) ?> WIB</time><span class="mt-0.5 block text-[10px] font-medium <?= $warning ? 'text-amber-700' : 'text-slate-500' ?>"><?= e($record['shift']) ?></span></td>
-                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-1 text-[11px] font-semibold <?= $warning ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-800' ?>"><?= icon('server', 'size-3 text-teal-600') ?><?= e($rackLabel) ?></span></td>
-                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-bold <?= $warning ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' ?>"><span class="size-1.5 rounded-full bg-current" aria-hidden="true"></span><?= e($record['cpu']) ?></span></td>
-                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700"><?= icon('check-circle', 'size-3') ?><?= e($record['monitor']) ?></span></td>
-                            <td class="min-w-72"><span class="block text-[11px] font-semibold <?= $warning ? 'text-amber-800' : 'text-slate-800' ?>"><?= e($record['environment']) ?></span><p class="mt-0.5 max-w-xs truncate text-[11px] text-slate-500" title="<?= e($record['notes']) ?>"><?= e($record['notes']) ?></p></td>
-                            <td><span class="flex items-center gap-2 whitespace-nowrap"><span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-teal-800 text-[10px] font-bold text-white"><?= e($record['initials']) ?></span><span><span class="block text-[11px] font-bold text-slate-800"><?= e($record['inspector']) ?></span><span class="block text-[10px] text-slate-500">NIK: <?= e($record['nik']) ?></span></span></span></td>
-                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-md bg-teal-100 px-2 py-0.5 text-[10px] font-bold text-teal-800"><?= icon('shield', 'size-3') ?><?= e($record['verification']) ?></span></td>
-                            <td class="report-row-actions text-center"><span class="inline-flex items-center gap-1"><button type="button" data-report-detail="<?= e($record['id']) ?>" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-teal-700" aria-label="Lihat rincian <?= e($record['id']) ?>" aria-haspopup="dialog"><?= icon('eye', 'size-4') ?></button><button type="button" data-report-export="sheet" data-record-id="<?= e($record['id']) ?>" class="rounded-lg p-2 text-teal-700 hover:bg-teal-50" aria-label="Unduh lembar <?= e($record['id']) ?>, belum tersedia" aria-haspopup="dialog"><?= icon('download', 'size-4') ?></button></span></td>
+                            <td class="whitespace-nowrap"><time datetime="<?= e($record['at']) ?>" class="block font-bold text-slate-900"><?= e(date('d', $stamp) . ' ' . $month . ' ' . date('Y', $stamp)) ?> • <?= e(date('H:i', $stamp)) ?> WIB</time><span class="mt-0.5 block text-xs font-medium <?= $warning ? 'text-amber-700' : 'text-slate-500' ?>"><?= e($record['shift']) ?></span></td>
+                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-semibold <?= $warning ? 'bg-amber-100 text-amber-800' : 'bg-slate-100 text-slate-800' ?>"><?= icon('server', 'size-3 text-teal-600') ?><?= e($rackLabel) ?></span></td>
+                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-bold <?= $warning ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800' ?>"><span class="size-1.5 rounded-full bg-current" aria-hidden="true"></span><?= e($record['cpu']) ?></span></td>
+                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700"><?= icon('check-circle', 'size-3') ?><?= e($record['monitor']) ?></span></td>
+                            <td class="min-w-72"><span class="block text-xs font-semibold <?= $warning ? 'text-amber-800' : 'text-slate-800' ?>"><?= e($record['environment']) ?></span><p class="mt-0.5 max-w-xs truncate text-xs text-slate-500" title="<?= e($record['notes']) ?>"><?= e($record['notes']) ?></p></td>
+                            <td><span class="flex items-center gap-2 whitespace-nowrap"><span class="flex size-6 shrink-0 items-center justify-center rounded-full bg-teal-800 text-xs font-bold text-white"><?= e($record['initials']) ?></span><span><span class="block text-xs font-bold text-slate-800"><?= e($record['inspector']) ?></span><span class="block text-xs text-slate-500">NIK: <?= e($record['nik']) ?></span></span></span></td>
+                            <td><span class="inline-flex items-center gap-1 whitespace-nowrap rounded-md bg-teal-100 px-2 py-0.5 text-xs font-bold text-teal-800"><?= icon('shield', 'size-3') ?><?= e($record['verification']) ?></span></td>
+                            <td class="report-row-actions text-center"><span class="inline-flex items-center gap-1"><button type="button" data-report-detail="<?= e($record['id']) ?>" class="button-ghost module-action-small rounded-lg p-2" aria-label="Lihat rincian <?= e($record['id']) ?>" aria-haspopup="dialog"><?= icon('eye', 'size-4') ?></button><button type="button" data-report-export="sheet" data-record-id="<?= e($record['id']) ?>" class="button-soft module-action-small rounded-lg p-2 border" aria-label="Unduh lembar <?= e($record['id']) ?>, belum tersedia" aria-haspopup="dialog"><?= icon('download', 'size-4') ?></button></span></td>
                         </tr>
                         <?php endforeach; ?>
-                        <tr id="report-empty" hidden><td colspan="8" class="py-12 text-center"><p class="font-semibold text-slate-700">Tidak ada laporan yang sesuai.</p><p class="mt-1 text-xs text-slate-500">Ubah periode, rak, status, atau kata kunci pencarian.</p><button type="button" data-report-reset class="mt-4 rounded-lg border border-teal-200 px-3 py-2 text-xs font-semibold text-teal-700 hover:bg-teal-50">Reset Filter</button></td></tr>
+                        <tr id="report-empty" hidden><td colspan="8" class="py-12 text-center"><p class="font-semibold text-slate-700">Tidak ada laporan yang sesuai.</p><p class="mt-1 text-xs text-slate-500">Ubah periode, rak, status, atau kata kunci pencarian.</p><button type="button" data-report-reset class="button-ghost module-action mt-4 rounded-lg border px-3 py-2 text-xs font-semibold">Reset Filter</button></td></tr>
                     </tbody>
                 </table>
             </div>
             <div class="report-pagination flex flex-col justify-between gap-4 border-t border-slate-100 bg-slate-50/70 px-5 py-4 sm:flex-row sm:items-center">
                 <p id="report-result-count" role="status" aria-live="polite" class="text-xs text-slate-500">Menampilkan <?= count($records) ? '1–' . count($records) : '0' ?> dari <?= count($records) ?> data log monitoring</p>
-                <nav aria-label="Halaman rekap laporan" class="flex flex-wrap items-center gap-1.5"><button type="button" data-report-step="previous" class="report-page-button" disabled>Sebelumnya</button><span id="report-page-numbers" class="flex items-center gap-1.5"><button type="button" data-report-page="1" aria-current="page" class="report-page-button bg-teal-700 font-semibold text-white">1</button></span><button type="button" data-report-step="next" class="report-page-button" disabled>Selanjutnya</button></nav>
+                <nav aria-label="Halaman rekap laporan" class="flex flex-wrap items-center gap-1.5"><button type="button" data-report-step="previous" class="button-neutral module-page-button report-page-button border" disabled>Sebelumnya</button><span id="report-page-numbers" class="flex items-center gap-1.5"><button type="button" data-report-page="1" aria-current="page" class="button-neutral module-page-button report-page-button font-semibold border">1</button></span><button type="button" data-report-step="next" class="button-neutral module-page-button report-page-button border" disabled>Selanjutnya</button></nav>
             </div>
         </section>
     </div>
@@ -115,7 +115,7 @@
 
 <script type="application/json" id="hardware-report-data"><?= json_encode(['records' => $records, 'perPage' => $report['per_page']], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) ?></script>
 <dialog id="report-detail-dialog" class="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-xl" aria-labelledby="report-detail-title">
-    <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-semibold text-teal-700">Monitoring Hardware Server</p><h2 id="report-detail-title" class="mt-1 text-lg font-bold text-slate-900">Rincian pemeriksaan</h2><p id="report-detail-id" class="mt-1 text-xs text-slate-500"></p></div><button type="button" data-close-report-detail class="rounded-lg p-2 hover:bg-slate-100" aria-label="Tutup rincian"><?= icon('close', 'size-5') ?></button></div>
+    <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-semibold text-teal-700">Monitoring Hardware Server</p><h2 id="report-detail-title" class="mt-1 text-lg font-bold text-slate-900">Rincian pemeriksaan</h2><p id="report-detail-id" class="mt-1 text-xs text-slate-500"></p></div><button type="button" data-close-report-detail class="button-ghost module-action-small rounded-lg p-2" aria-label="Tutup rincian"><?= icon('close', 'size-5') ?></button></div>
     <dl id="report-detail-fields" class="mt-5 grid grid-cols-1 gap-4 text-sm sm:grid-cols-2"></dl>
-    <div class="mt-6 flex justify-end"><button type="button" data-close-report-detail class="inspection-button border-slate-300 hover:bg-slate-50">Tutup Rincian</button></div>
+    <div class="mt-6 flex justify-end"><button type="button" data-close-report-detail class="button-ghost module-action inspection-button">Tutup Rincian</button></div>
 </dialog>

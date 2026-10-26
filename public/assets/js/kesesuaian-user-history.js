@@ -67,7 +67,7 @@
         const dots = document.createElement('span'); dots.textContent = '…'; pages.append(dots);
       }
       const button = document.createElement('button');
-      button.type = 'button'; button.className = 'report-page-button'; button.textContent = String(number);
+      button.type = 'button'; button.className = 'button-neutral module-page-button report-page-button'; button.textContent = String(number);
       button.dataset.userPage = String(number); button.disabled = !count;
       button.setAttribute('aria-label', `Halaman ${number}`);
       if (page === number) button.setAttribute('aria-current', 'page');

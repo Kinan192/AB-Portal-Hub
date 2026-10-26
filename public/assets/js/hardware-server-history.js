@@ -69,7 +69,7 @@
       button.type = 'button';
       button.textContent = String(number);
       button.dataset.reportPage = String(number);
-      button.className = 'report-page-button';
+      button.className = 'button-neutral module-page-button report-page-button';
       button.disabled = filtered.length === 0;
       button.setAttribute('aria-label', `Halaman ${number}`);
       if (number === page) button.setAttribute('aria-current', 'page');

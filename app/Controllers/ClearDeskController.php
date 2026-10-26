@@ -9,7 +9,6 @@ final class ClearDeskController extends Controller
     {
         return [
             'htmlClass' => 'rs-no-scrollbar',
-            'navStatus' => 'ONLINE',
             'bodyClass' => 'text-body-md antialiased',
             'footer' => ['class' => 'w-full py-space-md', 'innerClass' => 'text-center text-on-surface-variant text-body-sm', 'text' => '© ' . date('Y') . ' RS Awal Bros Botania. All rights reserved.'],
         ];
@@ -20,6 +19,7 @@ final class ClearDeskController extends Controller
         $this->render('cleardesk/form', $this->shell() + [
             'pageTitle' => 'Form Clear Desk & Clear Screen',
             'page' => 'form-cleardesk',
+            'breadcrumbs' => monitoring_breadcrumbs('cleardesk'),
             'modal' => ['formName' => 'Clear Desk & Screen', 'formId' => 'clearDeskForm'],
             'module' => dummy('cleardesk'),
         ]);
@@ -30,6 +30,7 @@ final class ClearDeskController extends Controller
         $this->render('cleardesk/rekap', $this->shell() + [
             'pageTitle' => 'Rekap Clear Desk & Clear Screen',
             'page' => 'rekap-cleardesk',
+            'breadcrumbs' => monitoring_breadcrumbs('cleardesk', true),
             'flash' => $this->submittedFlash('Clear Desk & Screen'),
             'module' => dummy('cleardesk'),
         ]);

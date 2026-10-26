@@ -7,4 +7,4 @@
  */
 $tag = $tag ?? 'span';
 ?>
-<<?= $tag ?><?= attrs(['class' => $class ?? null] + ($attrs ?? [])) ?>><?php if (isset($dot)): ?><span class="<?= e($dot) ?>"></span><?php endif; ?><?= isset($icon) ? design_icon($icon, $iconClass ?? '') : '' ?><?= ($wrap ?? (isset($dot) || isset($icon) || isset($labelClass))) ? '<span' . attrs(['class' => $labelClass ?? null]) . '>' . e($label) . '</span>' : e($label) ?></<?= $tag ?>>
+<<?= $tag ?><?= attrs(['class' => cx('ui-caption', $class ?? '')] + ($attrs ?? [])) ?>><?php if (isset($dot)): ?><span class="<?= e($dot) ?>"></span><?php endif; ?><?= isset($icon) ? design_icon($icon, $iconClass ?? '') : '' ?><?= ($wrap ?? (isset($dot) || isset($icon) || isset($labelClass))) ? '<span' . attrs(['class' => $labelClass ?? null]) . '>' . e($label) . '</span>' : e($label) ?></<?= $tag ?>>

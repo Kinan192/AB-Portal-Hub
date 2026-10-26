@@ -15,23 +15,13 @@ ob_start(); ?>
             <span class="text-headline-sm text-on-tertiary font-bold mt-1">Oktober 2026 (Aktif)</span>
         </div>
     </div>
-    <?= partial('button', ['label' => 'Input Form Baru', 'href' => url('/form/cctv'), 'icon' => 'circle-check', 'iconClass' => 'text-[20px]', 'class' => 'inline-flex items-center gap-2 px-5 py-3 rounded-lg bg-tertiary-container text-on-tertiary hover:bg-tertiary-container/90 transition-all text-headline-sm active:scale-95 whitespace-nowrap shadow-rs']) ?>
+    <?= partial('button', ['label' => 'Input Form Baru', 'href' => url('/form/cctv'), 'icon' => 'circle-check', 'iconClass' => 'text-[20px]', 'class' => 'button-on-dark module-action inline-flex items-center gap-2 px-5 py-3 rounded-lg transition-all text-headline-sm active:scale-95 whitespace-nowrap shadow-rs']) ?>
 </div>
 <?php $heroAside = ob_get_clean(); ?>
 <main id="main-content" class="w-full bg-background flex-1">
 <div class="flex flex-col w-full">
     <div class="w-full bg-surface-container-low py-space-sm">
-        <div class="page-shell flex items-center justify-between text-on-surface-variant text-label-md">
-            <?= partial('breadcrumb', [
-                'tag' => 'div', 'class' => 'flex items-center gap-space-xs flex-wrap',
-                'separator' => ['text' => '/', 'class' => 'text-outline-variant'],
-                'items' => [
-                    ['label' => 'Portal Monitoring Terpadu', 'href' => url('/'), 'icon' => 'layout-grid', 'iconClass' => 'text-[16px] text-tertiary', 'class' => 'hover:text-primary transition-colors flex items-center gap-1'],
-                    ['label' => 'Monitoring Harian', 'class' => 'text-on-surface-variant'],
-                    ['label' => 'CCTV', 'href' => url('/form/cctv'), 'class' => 'text-on-surface-variant'],
-                    ['label' => 'Rekap Hasil Inputan', 'class' => 'text-primary font-semibold'],
-                ],
-            ]) ?>
+        <div class="page-shell flex items-center justify-end text-on-surface-variant text-label-md">
             <div class="hidden sm:flex items-center gap-space-sm text-label-sm">
                 <?= partial('badge', ['label' => 'AUDIT COMPLIANCE: 99.1%', 'wrap' => false, 'dot' => 'w-1.5 h-1.5 rounded-full bg-tertiary-container animate-ping', 'class' => 'inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-secondary-container text-on-secondary-container whitespace-nowrap']) ?>
                 <span class="text-outline-variant">|</span>
@@ -69,9 +59,9 @@ ob_start(); ?>
                     <p class="text-body-md text-on-surface-variant">Daftar data hasil input pemeriksaan kamera CCTV per sesi dinas, unit ruangan, dan catatan teknis.</p>
                 </div>
                 <div class="flex items-center gap-2 flex-wrap sm:flex-nowrap">
-                    <?= partial('button', ['label' => 'Export Excel (.xlsx)', 'icon' => 'sheet', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low text-secondary text-headline-sm hover:bg-surface-container transition-colors rsab-action shadow-rs', 'attrs' => ['data-export' => 'xlsx']]) ?>
-                    <?= partial('button', ['label' => 'Export PDF Rekap Bulanan', 'icon' => 'file-text', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container-low text-primary text-headline-sm hover:bg-surface-container transition-colors rsab-action shadow-rs', 'attrs' => ['data-export' => 'pdf']]) ?>
-                    <?= partial('button', ['label' => 'Cetak Rekap', 'icon' => 'printer', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-surface-container text-on-surface text-headline-sm hover:bg-surface-container-high transition-colors rsab-action shadow-rs', 'attrs' => ['data-print' => true]]) ?>
+                    <?= partial('button', ['label' => 'Export Excel (.xlsx)', 'icon' => 'sheet', 'iconClass' => 'text-[18px]', 'class' => 'button-soft module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-headline-sm transition-colors rsab-action shadow-rs border', 'attrs' => ['data-export' => 'xlsx']]) ?>
+                    <?= partial('button', ['label' => 'Export PDF Rekap Bulanan', 'icon' => 'file-text', 'iconClass' => 'text-[18px]', 'class' => 'button-soft module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-headline-sm transition-colors rsab-action shadow-rs border', 'attrs' => ['data-export' => 'pdf']]) ?>
+                    <?= partial('button', ['label' => 'Cetak Rekap', 'icon' => 'printer', 'iconClass' => 'text-[18px]', 'class' => 'button-neutral module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-headline-sm transition-colors rsab-action shadow-rs border', 'attrs' => ['data-print' => true]]) ?>
                 </div>
             </div>
             <div class="p-space-md bg-surface-container-low/60 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-space-sm items-center">
@@ -95,13 +85,13 @@ ob_start(); ?>
             <div class="p-space-md bg-surface-bright flex flex-col sm:flex-row items-center justify-between gap-space-sm text-label-sm text-on-surface-variant">
                 <div class="flex items-center gap-2"><span>Menampilkan <strong class="text-on-surface font-semibold" data-filter-count>1 - <?= e(count($module['entries'])) ?></strong> dari <strong class="text-on-surface font-semibold"><?= e($module['total']) ?></strong> data rekaman monitoring CCTV</span></div>
                 <div class="flex items-center gap-1">
-                    <button class="px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors disabled:opacity-50" disabled type="button"><?= design_icon('chevron-left', 'text-[16px] align-middle') ?> <span class="align-middle">Sebelumnya</span></button>
-                    <button class="w-8 h-8 rounded-lg bg-primary text-on-primary font-bold" type="button" aria-current="page">1</button>
+                    <button class="button-neutral module-action px-2.5 py-1.5 rounded-lg transition-colors disabled:opacity-50 border" disabled type="button"><?= design_icon('chevron-left', 'text-[16px] align-middle') ?> <span class="align-middle">Sebelumnya</span></button>
+                    <button class="button-neutral module-page-button w-8 h-8 rounded-lg font-bold border" type="button" aria-current="page">1</button>
                     <?php foreach ([2, 3, 4] as $pageNo): ?>
-                    <button class="w-8 h-8 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors" type="button" data-page-btn><?= e($pageNo) ?></button>
+                    <button class="button-neutral module-page-button w-8 h-8 rounded-lg transition-colors border" type="button" data-page-btn><?= e($pageNo) ?></button>
                     <?php endforeach; ?>
                     <span class="px-1 text-outline-variant">...</span>
-                    <button class="px-2.5 py-1.5 rounded-lg bg-surface-container text-on-surface hover:bg-surface-container-high transition-colors" type="button" data-page-btn><span class="align-middle">Selanjutnya</span> <?= design_icon('chevron-right', 'text-[16px] align-middle') ?></button>
+                    <button class="button-neutral module-page-button px-2.5 py-1.5 rounded-lg transition-colors border" type="button" data-page-btn><span class="align-middle">Selanjutnya</span> <?= design_icon('chevron-right', 'text-[16px] align-middle') ?></button>
                 </div>
             </div>
         </div>

@@ -7,21 +7,21 @@
  *           plus 'class'), and per-item 'separator' to override the one placed before that item.
  */
 $tag = $tag ?? 'nav';
-$separator = $separator ?? ['icon' => 'chevron-right'];
+$separator = ['text' => '/', 'class' => 'text-slate-400'];
 $renderSeparator = static function (array $sep): string {
     return isset($sep['icon'])
         ? design_icon($sep['icon'], $sep['class'] ?? '')
-        : '<span' . attrs(['class' => $sep['class'] ?? null]) . '>' . e($sep['text'] ?? '/') . '</span>';
+        : '<span' . attrs(['class' => $sep['class'] ?? null, 'aria-hidden' => 'true']) . '>' . e($sep['text'] ?? '/') . '</span>';
 };
 ?>
 <<?= $tag ?><?= attrs(['aria-label' => 'Breadcrumb', 'class' => cx($class ?? '', 'rsab-crumbs')]) ?>>
 <?php foreach ($items as $i => $item): ?>
-<?php if ($i > 0): ?><?= $renderSeparator($item['separator'] ?? $separator) ?><?php endif; ?>
+<?php if ($i > 0): ?><?= $renderSeparator($separator) ?><?php endif; ?>
 <?php $label = (isset($item['icon']) ? design_icon($item['icon'], $item['iconClass'] ?? '') : '') . (isset($item['icon']) ? '<span>' . e($item['label']) . '</span>' : e($item['label'])); ?>
-<?php if (isset($item['href']) && $i < count($items) - 1): ?>
+<?php if ($i === 0 && isset($item['href']) && count($items) > 1): ?>
 <a<?= attrs(['class' => $item['class'] ?? null, 'href' => $item['href']]) ?>><?= $label ?></a>
 <?php else: ?>
-<span<?= attrs(['class' => $item['class'] ?? null, 'aria-current' => $i === count($items) - 1 ? 'page' : null]) ?>><?= $label ?></span>
+<span<?= attrs(['aria-current' => $i === count($items) - 1 ? 'page' : null]) ?>><?= $label ?></span>
 <?php endif; ?>
 <?php endforeach; ?>
 </<?= $tag ?>>

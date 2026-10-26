@@ -16,6 +16,7 @@ final class SuhuController extends Controller
         $this->render('suhu/form', self::SHELL + [
             'pageTitle' => 'Form Monitoring Suhu Server',
             'page' => 'form-suhu',
+            'breadcrumbs' => monitoring_breadcrumbs('suhu'),
             'modal' => ['formName' => 'Suhu Server', 'formId' => 'monitoringForm'],
             'module' => dummy('suhu'),
         ]);
@@ -26,6 +27,7 @@ final class SuhuController extends Controller
         $this->render('suhu/rekap', self::SHELL + [
             'pageTitle' => 'Rekap Suhu Server',
             'page' => 'rekap-suhu',
+            'breadcrumbs' => monitoring_breadcrumbs('suhu', true),
             'flash' => $this->submittedFlash('Suhu Server'),
             'module' => dummy('suhu'),
         ]);

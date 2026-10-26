@@ -22,8 +22,6 @@ final class AccountController extends Controller
         return [
             'pageTitle' => $title,
             'page' => $page,
-            'navActive' => $page,
-            'brandSubtitle' => 'IT Division',
             'bodyClass' => 'rs-content-box',
             'crumbbar' => [
                 'class' => 'flex items-center',

@@ -75,7 +75,7 @@
     windowPages.forEach((value, index) => {
       if (index && value - windowPages[index - 1] > 1) { const dots = document.createElement('span'); dots.textContent = '…'; pages.append(dots); }
       const button = document.createElement('button');
-      button.type = 'button'; button.className = 'report-page-button queue-report-page'; button.textContent = String(value);
+      button.type = 'button'; button.className = 'button-neutral module-page-button report-page-button queue-report-page'; button.textContent = String(value);
       button.dataset.queuePage = String(value); button.disabled = !count; button.setAttribute('aria-label', `Halaman ${value}`);
       if (value === page) button.setAttribute('aria-current', 'page');
       pages.append(button);

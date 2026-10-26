@@ -1,13 +1,13 @@
 <?php
 declare(strict_types=1);
 
-namespace App\Controllers\Forms;
+namespace App\Controllers;
 
 use App\Core\View;
 
 final class KesesuaianUserController
 {
-    public function history(): void
+    public function rekap(): void
     {
         if (config('app')['environment'] !== 'local') {
             http_response_code(503);
@@ -22,13 +22,9 @@ final class KesesuaianUserController
         $total = count($periodRecords);
         $compliant = count(array_filter($periodRecords, static fn (array $record): bool => $record['compliant']));
 
-        View::render('reports/kesesuaian-user', [
+        View::render('kesesuaian-user/rekap', [
             'pageTitle' => 'Rekap & Riwayat Kesesuaian User (HIS)',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Kesesuaian User', 'href' => '/forms/kesesuaian-user'],
-                ['label' => 'Rekap Kesesuaian User (HIS)'],
-            ],
+            'breadcrumbs' => monitoring_breadcrumbs('kesesuaian-user', true),
             'profile' => config('dashboard')['profile'],
             'report' => $report,
             'records' => $records,
@@ -43,7 +39,7 @@ final class KesesuaianUserController
         ]);
     }
 
-    public function index(): void
+    public function form(): void
     {
         if (config('app')['environment'] !== 'local') {
             http_response_code(503);
@@ -51,12 +47,9 @@ final class KesesuaianUserController
             return;
         }
 
-        View::render('forms/kesesuaian-user', [
+        View::render('kesesuaian-user/form', [
             'pageTitle' => 'Form Kesesuaian User (HIS)',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Form Kesesuaian User'],
-            ],
+            'breadcrumbs' => monitoring_breadcrumbs('kesesuaian-user'),
             'profile' => config('dashboard')['profile'],
             'verification' => config('kesesuaian-user'),
             'pageScripts' => ['js/kesesuaian-user.js'],

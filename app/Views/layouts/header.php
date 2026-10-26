@@ -1,11 +1,5 @@
-<?php
-/** @var string|null $navbarVariant */
-if (($navbarVariant ?? '') === 'form') {
-    require __DIR__ . '/header-form.php';
-    return;
-}
-?>
-<header class="sticky top-0 z-40 border-b border-slate-200 bg-white">
+<?php $profile = config('dashboard')['profile']; ?>
+<header class="portal-navbar sticky top-0 z-40 border-b border-slate-200 bg-white">
     <div class="portal-header page-shell flex flex-wrap items-center justify-between gap-4 py-3">
         <a href="/" class="flex min-w-0 flex-wrap items-center gap-4" aria-label="Beranda Portal RS Awal Bros Botania">
             <?php require BASE_PATH . '/app/Views/components/brand.php'; ?>

@@ -1,0 +1,47 @@
+@layer components {
+  .button-primary { @apply border-teal-700 bg-teal-700 text-white hover:border-teal-800 hover:bg-teal-800; }
+  .button-secondary { @apply border-teal-600 bg-white text-teal-700 hover:border-teal-700 hover:bg-teal-50; }
+  .button-neutral { @apply border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:text-slate-900; }
+  .button-soft { @apply border-teal-200 bg-teal-50 text-teal-800 hover:border-teal-300 hover:bg-teal-100; }
+  .button-ghost { @apply border-transparent bg-transparent text-slate-500 hover:bg-slate-100 hover:text-slate-800; }
+  .button-on-dark { @apply border-white bg-white text-teal-800 hover:border-teal-100 hover:bg-teal-50; }
+  .button-danger { @apply border-transparent bg-transparent text-red-700 hover:bg-red-50 hover:text-red-800; }
+  .module-page-button[aria-current="page"] { @apply border-teal-700 bg-teal-700 font-semibold text-white hover:bg-teal-800; }
+}
+
+/* One typeface and role-based size scale for every application layout. */
+:root {
+  --ui-font: Inter, Arial, sans-serif;
+  --ui-body: 14px;
+  --ui-small: 13px;
+  --ui-caption: 12px;
+  --ui-section-title: 17px;
+  --ui-panel-title: 20px;
+}
+:is(.module-page, .rs-body) { font-family: var(--ui-font); font-size: var(--ui-body); line-height: 1.5; }
+:is(.module-page, .rs-body) :is(main, dialog, .rs-modal) {
+  font-family: Inter, Arial, sans-serif;
+}
+:is(.module-action, .module-action-small, .module-page-button) { font-family: inherit; font-size: 14px; font-weight: 600; line-height: 1.5; }
+:is(.module-action-small, .module-page-button) { font-size: 13px; }
+.ui-body { font-size: var(--ui-body); line-height: 1.5; }
+.ui-field-label { font-size: var(--ui-body); font-weight: 600; line-height: 1.5; }
+.ui-section-title { font-size: var(--ui-section-title); font-weight: 600; line-height: 1.35; }
+.ui-panel-title { font-size: var(--ui-panel-title); font-weight: 600; line-height: 1.35; }
+.ui-caption { font-size: var(--ui-caption); line-height: 1.5; }
+:is(.module-action, .module-action-small, .module-page-button) :is(svg, .rs-ic) { color: inherit; }
+.module-page :is(main, dialog) :is([class~="text-[9px]"], [class~="text-[10px]"], [class~="text-[11px]"]) { font-size: 12px; line-height: 1.5; }
+.module-page .module-hero h1 { font-size: clamp(22px, 1.4rem + .6vw, 28px); }
+.module-page .inspection-section-heading h2 { font-size: 17px; line-height: 1.35; font-weight: 600; }
+.module-page #compliance-form-title { font-size: 20px; line-height: 1.35; }
+.module-page main :is(.inspection-input, .report-filter-input) { font-size: 14px; line-height: 1.5; }
+.module-page .report-table th { font-size: 11.5px; line-height: 1.5; font-weight: 600; }
+.module-page .report-table td { font-size: 13px; line-height: 1.5; }
+.module-page .report-export-button { font-size: 13px; }
+.module-page :is(.queue-meta-label, .queue-report-meta) { font-family: var(--font-sans); font-size: 12px; line-height: 1.5; }
+.queue-page :is(label, span).font-mono { font-family: var(--font-sans); }
+
+@media print {
+  .breadcrumb-shell { display: none !important; }
+  .module-page .report-table :is(th, td) { font-size: 8px; }
+}

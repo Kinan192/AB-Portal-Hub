@@ -7,7 +7,7 @@
   /* Icons rendered by the server, cloned when the UI needs to swap one (see components/toast.php). */
   const iconHtml = (name) => document.getElementById('rs-icons')?.content.querySelector(`[data-name="${name}"]`)?.outerHTML ?? '';
 
-  /* The navbar clock and mobile menu live in design-navbar.js. */
+  /* The shared portal clock is updated by app.js. */
 
   /* ---------------------------------------------------------------- */
   /* Toast                                                             */

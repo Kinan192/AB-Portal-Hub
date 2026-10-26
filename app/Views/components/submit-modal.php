@@ -11,7 +11,7 @@
         <h3 id="submit-modal-title">Laporan Berhasil Terkirim!</h3>
         <p id="submit-modal-desc">Data <?= e($formName) ?> telah berhasil diverifikasi dan tersimpan ke rekapitulasi audit.</p>
         <div class="pt-2 flex justify-center">
-            <button type="submit" form="<?= e($formId) ?>" class="rs-modal__btn" data-submit-confirm>Buka Rekapitulasi Laporan</button>
+            <button type="submit" form="<?= e($formId) ?>" class="button-primary module-action rs-modal__btn" data-submit-confirm>Buka Rekapitulasi Laporan</button>
         </div>
     </div>
 </div>

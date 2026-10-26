@@ -10,8 +10,8 @@ foreach ([
         'attrs' => ['autocomplete' => $autocomplete, 'required' => true], 'error' => $error,
     ]);
 }
-$foot = partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'class' => 'rs-btn rs-btn--ghost', 'icon' => 'arrow-left'])
-    . partial('button', ['label' => 'Simpan Password', 'type' => 'submit', 'class' => 'rs-btn rs-btn--primary', 'icon' => 'circle-check']);
+$foot = partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'class' => 'button-neutral module-action rs-btn border', 'icon' => 'arrow-left'])
+    . partial('button', ['label' => 'Simpan Password', 'type' => 'submit', 'class' => 'button-primary module-action rs-btn', 'icon' => 'circle-check']);
 $account = '<div class="rs-person"><span class="rsab-avatar">' . e($profile['initials']) . '</span><span><b>' . e($profile['name']) . '</b><small>' . e($profile['role']) . '</small></span></div>'
     . '<dl class="rs-kv"><dt>Username</dt><dd>' . e($profile['name']) . '</dd><dt>Peran</dt><dd>' . e($profile['role']) . '</dd><dt>Status</dt><dd><span class="rs-pill rs-pill--ok"><i></i>Online</span></dd></dl>';
 ?>

@@ -1,6 +1,5 @@
 <?php
-// The "/" dashboard (it passes $groups) keeps the portal header. Every other page on this layout is a
-// form or report page and gets the design-system navbar and breadcrumb, as on /form/cctv.
+// Module pages retain their content styling; every page uses the shared portal header.
 $modulePage = !isset($groups);
 ?>
 <!doctype html>
@@ -12,33 +11,18 @@ $modulePage = !isset($groups);
     <meta name="theme-color" content="#043b33">
     <title><?= e($pageTitle ?? config('app')['name']) ?> | RS Awal Bros Botania</title>
     <link rel="icon" href="data:,">
-    <link rel="preload" href="<?= e(asset($modulePage ? 'fonts/ibm-plex-sans-latin-400-normal.woff2' : 'fonts/inter-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= e(asset('fonts/inter-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="stylesheet" href="<?= e(asset('css/app.css')) ?>?v=<?= e(is_file(BASE_PATH . '/public/assets/css/app.css') ? filemtime(BASE_PATH . '/public/assets/css/app.css') : '1') ?>">
     <script src="<?= e(asset('js/app.js')) ?>?v=<?= e(is_file(BASE_PATH . '/public/assets/js/app.js') ? filemtime(BASE_PATH . '/public/assets/js/app.js') : '1') ?>" defer></script>
-    <?php if ($modulePage): ?>
-    <script src="<?= e(asset_v('js/design-navbar.js')) ?>" defer></script>
-    <?php endif; ?>
     <?php foreach ($pageScripts ?? [] as $script): ?>
     <script src="<?= e(asset($script)) ?>?v=<?= e(filemtime(BASE_PATH . '/public/assets/' . $script)) ?>" defer></script>
     <?php endforeach; ?>
 </head>
 <body class="flex min-h-screen flex-col<?= $modulePage ? ' module-page' : ' portal-page' ?>">
     <a href="#main-content" class="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-teal-800 px-4 py-3 text-sm text-white focus:translate-y-0">Langsung ke konten</a>
-    <?php if ($modulePage): ?>
-    <?= partial('design-navbar', ['active' => 'portal', 'subtitle' => 'RS Awal Bros Botania', 'status' => 'ONLINE']) ?>
-    <?php else: ?>
     <?php require __DIR__ . '/header.php'; ?>
-    <?php endif; ?>
-    <?php if (!empty($breadcrumbs) && $modulePage): ?>
-    <?php
-    $crumbItems = array_merge([['label' => 'Portal Monitoring Terpadu', 'href' => url('/')]], $breadcrumbs);
-    $crumbItems[1]['separator'] = ['text' => '>', 'class' => 'text-slate-400'];
-    ?>
+    <?php if (!empty($breadcrumbs)): ?>
     <div class="breadcrumb-shell page-shell py-5">
-        <?= partial('breadcrumb', ['class' => 'flex items-center gap-2 text-xs font-medium text-slate-500', 'separator' => ['text' => '/', 'class' => 'text-slate-400'], 'items' => $crumbItems]) ?>
-    </div>
-    <?php elseif (!empty($breadcrumbs)): ?>
-    <div class="breadcrumb-shell page-shell pb-3 pt-4">
         <?php require BASE_PATH . '/app/Views/components/breadcrumbs.php'; ?>
     </div>
     <?php endif; ?>

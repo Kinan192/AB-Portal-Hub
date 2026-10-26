@@ -4,25 +4,15 @@ ob_start(); ?>
     <div class="flex items-center gap-3 bg-surface-container-lowest/10 backdrop-blur-md px-4 py-3 rounded-lg border border-surface-container-lowest/20">
         <div class="w-10 h-10 rounded-lg bg-surface-container-lowest/15 flex items-center justify-center text-tertiary-fixed"><?= design_icon('calendar-days', 'text-[22px]') ?></div>
         <div class="flex flex-col text-left">
-            <span class="uppercase tracking-wider text-tertiary-fixed font-semibold">PERIODE LAPORAN</span>
+            <span class="ui-caption uppercase tracking-wider text-tertiary-fixed font-semibold">PERIODE LAPORAN</span>
             <span class="font-bold text-on-tertiary leading-tight">Oktober 2026 (Aktif)</span>
         </div>
     </div>
-    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/suhu'), 'icon' => 'file-text', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-2 px-4 py-3 rounded-lg bg-surface-container-lowest text-tertiary font-bold hover:bg-surface-container transition-all shadow-rs']) ?>
+    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/suhu'), 'icon' => 'file-text', 'iconClass' => 'text-[18px]', 'class' => 'button-on-dark module-action inline-flex items-center gap-2 px-4 py-3 rounded-lg font-bold transition-all shadow-rs']) ?>
 </div>
 <?php $heroAside = ob_get_clean(); ?>
-<main id="main-content" class="page-shell py-6 space-y-6 min-h-[calc(100vh-80px)]">
+<main id="main-content" class="page-shell pb-6 space-y-6 min-h-[calc(100vh-80px)]">
 <div class="flex flex-col w-full">
-    <?= partial('breadcrumb', [
-        'tag' => 'div', 'class' => 'flex items-center space-x-2 text-on-surface-variant mb-4',
-        'separator' => ['text' => '/', 'class' => 'text-surface-container-highest'],
-        'items' => [
-            ['label' => 'Portal Monitoring Terpadu', 'href' => url('/'), 'icon' => 'house', 'iconClass' => 'text-[16px]', 'class' => 'hover:text-tertiary transition-colors flex items-center gap-1'],
-            ['label' => 'Monitoring Harian', 'class' => 'hover:text-tertiary cursor-pointer'],
-            ['label' => 'Suhu Server', 'class' => 'hover:text-tertiary cursor-pointer'],
-            ['label' => 'Form Input Suhu Bulanan', 'class' => 'text-tertiary font-semibold'],
-        ],
-    ]) ?>
 
     <?= partial('page-header', [
         'class' => 'relative overflow-hidden rounded-xl p-6 lg:p-8 mb-8',
@@ -40,20 +30,20 @@ ob_start(); ?>
                 <div class="flex items-center justify-between pb-4 border-b border-rs-line">
                     <div class="flex items-center gap-2">
                         <span class="w-2.5 h-6 bg-tertiary rounded-full"></span>
-                        <h2 class="text-on-surface font-bold">Data Pengukuran Suhu Server Bulanan</h2>
+                        <h2 class="ui-panel-title text-on-surface">Data Pengukuran Suhu Server Bulanan</h2>
                     </div>
                     <?= partial('badge', ['label' => '* Wajib Diisi', 'class' => 'text-error bg-error-container/40 px-2.5 py-1 rounded-sm font-semibold uppercase tracking-[.04em]']) ?>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <?= partial('field', [
-                        'class' => 'space-y-1.5', 'label' => 'Periode Bulan Monitoring ', 'labelClass' => 'block text-on-surface', 'required' => true,
+                        'class' => 'space-y-1.5', 'label' => 'Periode Bulan Monitoring ', 'labelClass' => 'ui-field-label block text-on-surface', 'required' => true,
                         'control' => 'select', 'name' => 'period', 'options' => $module['months'], 'selected' => '2026-10', 'boxClass' => 'relative',
                         'controlClass' => 'w-full h-11 px-3.5 pr-10 rounded-lg bg-surface border text-on-surface focus:border-tertiary focus:ring-2 focus:ring-tertiary/20 outline-none transition-all border-rs-line',
                         'iconRight' => ['chevron-down', 'absolute right-3 top-3 pointer-events-none text-on-surface-variant text-[20px]'],
                     ]) ?>
                     <?= partial('field', [
-                        'class' => 'space-y-1.5', 'label' => 'Waktu Pengambilan Data ', 'labelClass' => 'block text-on-surface', 'required' => true,
+                        'class' => 'space-y-1.5', 'label' => 'Waktu Pengambilan Data ', 'labelClass' => 'ui-field-label block text-on-surface', 'required' => true,
                         'type' => 'datetime-local', 'name' => 'captured_at', 'value' => $module['captured_at'], 'boxClass' => 'relative', 'attrs' => ['required' => true],
                         'controlClass' => 'w-full h-11 px-3.5 rounded-lg bg-surface border text-on-surface focus:border-tertiary focus:ring-2 focus:ring-tertiary/20 outline-none transition-all border-rs-line',
                     ]) ?>
@@ -61,10 +51,10 @@ ob_start(); ?>
 
                 <div class="p-5 rounded-xl bg-surface-container-low/50 border space-y-3 border-rs-line">
                     <div class="flex items-center justify-between">
-                        <label class="text-on-surface uppercase font-bold tracking-[.04em]" for="suhuInput">RATA - RATA SUHU PERBULAN <span class="text-error">*</span></label>
+                        <label class="ui-field-label text-on-surface uppercase font-bold tracking-[.04em]" for="suhuInput">RATA - RATA SUHU PERBULAN <span class="text-error">*</span></label>
                         <?= partial('badge', ['label' => 'Target: 15°C - 22°C', 'class' => 'text-tertiary bg-secondary-container px-2 py-0.5 rounded-sm font-bold']) ?>
                     </div>
-                    <p class="text-on-surface-variant">Masukkan nilai rata-rata hasil logging sensor thermometer digital selama 1 bulan berjalan.</p>
+                    <p class="ui-caption text-on-surface-variant">Masukkan nilai rata-rata hasil logging sensor thermometer digital selama 1 bulan berjalan.</p>
                     <div class="relative flex items-center">
                         <input class="w-full h-14 pl-4 pr-32 rounded-lg bg-surface-container-lowest border-2 text-tertiary font-bold focus:border-tertiary focus:ring-0 outline-none transition-all border-rs-line" id="suhuInput" name="avg_temp" max="45" min="10" placeholder="Your answer" required step="0.1" type="number" inputmode="decimal" value="21.5">
                         <div class="absolute right-3.5 flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-surface-container text-on-surface font-bold"><span>°C (Celsius)</span></div>
@@ -84,14 +74,14 @@ ob_start(); ?>
                 </div>
 
                 <div class="space-y-3">
-                    <label class="block text-on-surface" id="sensorLocationLabel">Lokasi / Titik Sensor Monitoring Suhu <span class="text-error">*</span></label>
+                    <label class="ui-field-label block text-on-surface" id="sensorLocationLabel">Lokasi / Titik Sensor Monitoring Suhu <span class="text-error">*</span></label>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" role="radiogroup" aria-labelledby="sensorLocationLabel">
                         <?php foreach ($module['locations'] as $value => $location): ?>
                         <label class="relative flex items-center p-4 rounded-xl border bg-surface cursor-pointer hover:bg-surface-container-low transition-all border-rs-line">
                             <input<?= attrs(['checked' => $value === array_key_first($module['locations']), 'class' => 'w-4 h-4 text-tertiary focus:ring-tertiary border-outline', 'name' => 'sensor_location', 'type' => 'radio', 'value' => $value]) ?>>
                             <div class="ml-3 flex flex-col">
                                 <span class="text-on-surface text-[14px]"><?= e($location['name']) ?></span>
-                                <span class="text-on-surface-variant">Sensor ID: <?= e($location['sensor']) ?></span>
+                                <span class="ui-caption text-on-surface-variant">Sensor ID: <?= e($location['sensor']) ?></span>
                             </div>
                         </label>
                         <?php endforeach; ?>
@@ -100,14 +90,14 @@ ob_start(); ?>
 
                 <div class="space-y-3">
                     <div class="flex items-center justify-between">
-                        <label class="text-on-surface" for="fileUpload">Unggah Berkas Bukti / Laporan Suhu Sensor&nbsp; Perbulan<span class="text-error">*</span></label>
-                        <span class="text-on-surface-variant">Upload 1 supported file. Max 10 MB.</span>
+                        <label class="ui-field-label text-on-surface" for="fileUpload">Unggah Berkas Bukti / Laporan Suhu Sensor&nbsp; Perbulan<span class="text-error">*</span></label>
+                        <span class="ui-caption text-on-surface-variant">Upload 1 supported file. Max 10 MB.</span>
                     </div>
                     <div class="p-6 rounded-xl border-2 border-dashed hover:border-tertiary bg-surface-container-low/30 transition-all flex flex-col items-center justify-center text-center gap-3 border-rs-line">
                         <div class="w-12 h-12 rounded-full bg-secondary-container/50 text-tertiary flex items-center justify-center"><?= design_icon('file-up', 'text-[26px]') ?></div>
                         <div class="space-y-1">
-                            <p class="text-on-surface text-[15px]">Tarik &amp; letakkan file log sensor di sini</p>
-                            <p class="text-on-surface-variant">Mendukung format: PDF, CSV, XLSX, JPG/PNG (foto thermometer)</p>
+                            <p class="ui-body text-on-surface">Tarik &amp; letakkan file log sensor di sini</p>
+                            <p class="ui-caption text-on-surface-variant">Mendukung format: PDF, CSV, XLSX, JPG/PNG (foto thermometer)</p>
                         </div>
                         <label class="inline-flex items-center gap-2 px-5 py-2 rounded-lg bg-surface-container-lowest border text-tertiary font-bold hover:bg-surface-container cursor-pointer transition-colors border-rs-line">
                             <?= design_icon('upload', 'text-[18px]') ?><span>Add file</span>
@@ -120,7 +110,7 @@ ob_start(); ?>
                 </div>
 
                 <?= partial('field', [
-                    'class' => 'space-y-1.5', 'label' => 'Catatan Operasional AC & Pendingin Ruangan (PAC)', 'labelClass' => 'block text-on-surface',
+                    'class' => 'space-y-1.5', 'label' => 'Catatan Operasional AC & Pendingin Ruangan (PAC)', 'labelClass' => 'ui-field-label block text-on-surface',
                     'control' => 'textarea', 'name' => 'ac_notes', 'attrs' => ['rows' => '3'],
                     'placeholder' => 'Contoh: Unit AC Precision 1 beroperasi normal pada setpoint 20°C. Unit AC Precision 2 standby aktif. Filter udara dibersihkan pada tanggal 05 Oktober.',
                     'controlClass' => 'w-full p-3.5 rounded-lg bg-surface border text-on-surface focus:border-tertiary focus:ring-2 focus:ring-tertiary/20 outline-none transition-all border-rs-line',
@@ -128,18 +118,18 @@ ob_start(); ?>
 
                 <div class="p-4 rounded-lg bg-surface-container-low border flex items-start gap-3 border-rs-line">
                     <input class="mt-1 w-4 h-4 rounded-sm text-tertiary focus:ring-tertiary border-outline" id="regulasiCheck" name="declaration" required type="checkbox">
-                    <label class="text-on-surface leading-relaxed cursor-pointer" for="regulasiCheck">Saya menyatakan bahwa pencatatan rata-rata suhu server ini diambil dari data logger sensor resmi dan telah diverifikasi sesuai batas aman operasional data center RS Awal Bros Botania.</label>
+                    <label class="ui-field-label text-on-surface leading-relaxed cursor-pointer" for="regulasiCheck">Saya menyatakan bahwa pencatatan rata-rata suhu server ini diambil dari data logger sensor resmi dan telah diverifikasi sesuai batas aman operasional data center RS Awal Bros Botania.</label>
                 </div>
 
                 <div class="pt-4 border-t flex flex-wrap items-center justify-between gap-4 border-rs-line">
                     <div class="flex items-center gap-2">
-                        <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg border bg-surface-container-lowest text-on-surface-variant font-semibold hover:bg-surface-container hover:text-on-surface transition-colors border-rs-line']) ?>
-                        <?= partial('button', ['label' => 'Lihat Riwayat & Rekap', 'href' => url('/rekap/suhu'), 'icon' => 'history', 'iconClass' => 'text-[18px]', 'class' => 'hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg border bg-surface-container-lowest text-secondary font-semibold hover:bg-surface-container transition-colors border-rs-line']) ?>
+                        <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-[18px]', 'class' => 'button-neutral module-action inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg border font-semibold transition-colors']) ?>
+                        <?= partial('button', ['label' => 'Lihat Riwayat & Rekap', 'href' => url('/rekap/suhu'), 'icon' => 'history', 'iconClass' => 'text-[18px]', 'class' => 'button-soft module-action hidden sm:inline-flex items-center gap-1.5 px-3.5 py-2.5 rounded-lg border font-semibold transition-colors']) ?>
                     </div>
                     <div class="flex items-center gap-3">
-                        <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'px-4 py-2.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/20 font-semibold transition-colors']) ?>
-                        <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'px-4 py-2.5 rounded-lg border bg-surface-container-lowest text-on-surface font-semibold hover:bg-surface-container transition-colors border-rs-line', 'attrs' => ['data-draft' => true]]) ?>
-                        <?= partial('button', ['label' => 'Kirim Data Suhu', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all bg-rs-teal-700 text-white border-rs-teal-700 hover:bg-rs-teal-800 shadow-rs']) ?>
+                        <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'button-ghost module-action px-4 py-2.5 rounded-lg font-semibold transition-colors']) ?>
+                        <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'button-secondary module-action px-4 py-2.5 rounded-lg border font-semibold transition-colors', 'attrs' => ['data-draft' => true]]) ?>
+                        <?= partial('button', ['label' => 'Kirim Data Suhu', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-[18px]', 'class' => 'button-primary module-action inline-flex items-center gap-2 px-6 py-2.5 rounded-lg font-bold transition-all shadow-rs']) ?>
                     </div>
                 </div>
             </form>
@@ -158,7 +148,7 @@ ob_start(); ?>
                     </div>
                     <div class="text-right space-y-1">
                         <span class="text-on-surface-variant block uppercase tracking-[.04em]">Kelembapan Udara</span>
-                        <span class="font-bold text-on-surface block">52% <span class="text-on-surface-variant">RH</span></span>
+                        <span class="font-bold text-on-surface block">52% <span class="ui-caption text-on-surface-variant">RH</span></span>
                         <span class="text-tertiary block">Standar: 45-60%</span>
                     </div>
                 </div>
@@ -176,7 +166,7 @@ ob_start(); ?>
             <div class="bg-surface-container-lowest rounded-xl p-6 border space-y-4 shadow-rs border-rs-line">
                 <div class="flex items-center justify-between pb-3 border-b border-rs-line">
                     <div class="flex items-center gap-2"><?= design_icon('history', 'text-secondary text-[20px]') ?><span class="font-bold text-on-surface uppercase tracking-wider">Sampel Terakhir Tercatat</span></div>
-                    <span class="text-on-surface-variant">Bulan Ini</span>
+                    <span class="ui-caption text-on-surface-variant">Bulan Ini</span>
                 </div>
                 <?php foreach ($module['recent'] as $sample): $tone = $sample['warning'] ? 'text-amber-700' : 'text-tertiary'; ?>
                 <div class="p-3.5 rounded-lg bg-surface-container-low/60 border flex items-center justify-between border-rs-line">
@@ -184,7 +174,7 @@ ob_start(); ?>
                         <div class="w-8 h-8 rounded-lg <?= $sample['warning'] ? 'bg-amber-500/15' : 'bg-secondary-container' ?> <?= e($tone) ?> flex items-center justify-center font-bold"><?= design_icon($sample['icon'], 'text-[18px]') ?></div>
                         <div>
                             <span class="text-on-surface text-[14px] block"><?= e($sample['location']) ?></span>
-                            <span class="text-on-surface-variant"><?= e($sample['time']) ?></span>
+                            <span class="ui-caption text-on-surface-variant"><?= e($sample['time']) ?></span>
                         </div>
                     </div>
                     <div class="text-right">

@@ -10,7 +10,7 @@ final class CctvController extends Controller
         $this->render('cctv/form', [
             'pageTitle' => 'Form Monitoring CCTV',
             'page' => 'form-cctv',
-            'navStatus' => 'ONLINE',
+            'breadcrumbs' => monitoring_breadcrumbs('cctv'),
             'bodyClass' => 'min-h-screen flex flex-col justify-between antialiased rs-forms',
             'footer' => ['class' => 'w-full py-3 mt-4', 'text' => null],
             'modal' => ['formName' => 'Monitoring CCTV', 'formId' => 'cctvMonitoringForm'],
@@ -23,7 +23,7 @@ final class CctvController extends Controller
         $this->render('cctv/rekap', [
             'pageTitle' => 'Rekap Monitoring CCTV',
             'page' => 'rekap-cctv',
-            'navStatus' => 'ONLINE',
+            'breadcrumbs' => monitoring_breadcrumbs('cctv', true),
             'htmlClass' => 'rs-no-scrollbar',
             'bodyClass' => 'antialiased min-h-screen flex flex-col justify-between',
             'footer' => ['class' => 'w-full py-space-md', 'text' => null],

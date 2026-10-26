@@ -25,7 +25,7 @@ if (isset($error['id'])) {
 $boxClass = $account ? 'rs-input' : ($boxClass ?? null);
 ?>
 <div<?= attrs(['class' => $account ? 'rs-field' : ($class ?? null)]) ?>>
-    <label<?= attrs(['class' => $account ? null : ($labelClass ?? null), 'for' => $id]) ?>><?= $labelHtml ?? e($label) ?><?php if (!empty($required)): ?><span class="<?= e($account ? 'req' : ($requiredClass ?? 'text-error')) ?>">*</span><?php endif; ?></label>
+    <label<?= attrs(['class' => $account ? 'ui-field-label' : ($labelClass ?? 'ui-field-label'), 'for' => $id]) ?>><?= $labelHtml ?? e($label) ?><?php if (!empty($required)): ?><span class="<?= e($account ? 'req' : ($requiredClass ?? 'text-error')) ?>">*</span><?php endif; ?></label>
     <?php if ($boxClass !== null): ?><div class="<?= e($boxClass) ?>"><?php endif; ?>
         <?php if (isset($iconLeft)): ?><?= design_icon($iconLeft[0], $iconLeft[1] ?? '') ?><?php endif; ?>
         <?php if ($control === 'select'): ?>
@@ -41,7 +41,7 @@ $boxClass = $account ? 'rs-input' : ($boxClass ?? null);
         <?php endif; ?>
         <?php if (isset($iconRight)): ?><?= design_icon($iconRight[0], $iconRight[1] ?? '') ?><?php endif; ?>
         <?php if (!empty($toggle)): ?>
-        <button type="button" class="rs-input__toggle" data-toggle-password="<?= e($id) ?>" aria-label="Tampilkan password" aria-pressed="false"><?= design_icon('eye') ?></button>
+        <button type="button" class="button-ghost module-action-small rs-input__toggle" data-toggle-password="<?= e($id) ?>" aria-label="Tampilkan password" aria-pressed="false"><?= design_icon('eye') ?></button>
         <?php endif; ?>
     <?php if ($boxClass !== null): ?></div><?php endif; ?>
     <?php if (isset($help)): ?><p class="<?= e($account ? 'rs-help' : ($helpClass ?? '')) ?>"><?= e($help) ?></p><?php endif; ?>

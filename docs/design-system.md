@@ -2,7 +2,7 @@
 
 Panduan frontend Portal Monitoring IT RS Awal Bros Botania untuk rekan pengembang yang melakukan clone repository dan membuat halaman baru.
 
-Dokumen ini mencatat implementasi terakhir pada 25 Oktober 2026. Ukuran di bawah mengikuti source project yang aktif, termasuk penyesuaian pengguna setelah referensi `code.html`. Jangan mengambil ukuran dari versi screenshot lama.
+Dokumen ini mencatat implementasi terakhir pada 26 Oktober 2026. Ukuran di bawah mengikuti source project yang aktif, termasuk penyesuaian pengguna setelah referensi `code.html`. Jangan mengambil ukuran dari versi screenshot lama.
 
 ## 1. Sumber acuan dan batas pengembangan
 
@@ -10,9 +10,9 @@ Dokumen ini mencatat implementasi terakhir pada 25 Oktober 2026. Ukuran di bawah
 | --- | --- |
 | `design-system.md` | Patokan komponen, ukuran, interaksi, dan pola halaman baru |
 | `resources/css/app.css` | Implementasi font, token, class komponen, dan aturan responsif |
-| `app/Views/layouts/` | Kerangka HTML, header, varian header, dan footer |
-| `app/Views/forms/` | Semua halaman pengisian, satu file per halaman |
-| `app/Views/reports/` | Semua halaman laporan, satu file per halaman |
+| `app/Views/layouts/` | Kerangka HTML, satu header bersama, dan footer |
+| `app/Views/{modul}/form.php` | Halaman pengisian per modul |
+| `app/Views/{modul}/rekap.php` | Halaman rekap dalam folder modul yang sama |
 | `app/Views/components/` | Satu folder untuk elemen kecil yang digunakan ulang |
 | `config/portal.php` | Definisi dan urutan kartu portal |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal frontend |
@@ -53,7 +53,7 @@ CSS dan font disajikan dari `public/assets/`. Node.js dipakai untuk build, bukan
 
 - Tema terang untuk pekerjaan operasional rumah sakit.
 - Merah untuk identitas RS, hijau tua untuk area sambutan, dan teal/emerald untuk aksen serta progres.
-- Inter untuk teks aplikasi. Playfair Display hanya untuk sambutan pada dashboard.
+- Semua halaman memakai Inter, termasuk dashboard, navbar, form, rekap, akun, dan login. Ukuran mengikuti peran teks agar hierarki judul, isi, label, dan keterangan tetap jelas.
 - Kartu menu teratur, posisi ikon sejajar, border tipis, dan bayangan terbatas.
 - Tinggi halaman mengikuti isi. Bagian Sistem berada setelah Monitoring & Laporan dan dapat diakses melalui scroll.
 - Jangan memaksa semua konten masuk 100vh, memperkecil halaman dengan CSS zoom, atau memotong isi dengan overflow pada body.
@@ -101,9 +101,13 @@ Jangan menambah container lain dengan `max-width` berbeda di dalam `.page-shell`
 
 ## 5. Tipografi
 
-Font disimpan lokal di `public/assets/fonts/`. Inter tersedia dalam bobot 400, 500, 600, 700, 800, dan 900. Playfair Display tersedia pada bobot 700.
+Font aktif adalah Inter, disimpan lokal di `public/assets/fonts/` dalam bobot 400, 500, 600, 700, 800, dan 900. Deklarasi bersama berada di `resources/css/design-chrome.css`. Semua layout memuat font yang sama; utility `font-sans`, `font-serif`, dan `font-mono` juga diarahkan ke Inter agar halaman baru tidak membawa jenis font berbeda.
+
+Skala konten form/rekap mengikuti halaman Clear Desk, Suhu, dan CCTV. Aturan bersama berada di `resources/css/module-ui.css`, yang diimpor oleh `app.css` dan `design.css`. Judul hero responsif 22–28 px; judul panel utama 20 px; judul kelompok pemeriksaan 17 px; input dan tombol standar 14 px; tabel dan aksi kecil 13 px; keterangan/metadata 12 px; header tabel 11.5 px. Angka ringkasan dapat lebih besar sesuai fungsinya. Metadata lama 9–11 px pada Hardware, Kesesuaian User, dan Antrian Online sudah dinaikkan menjadi 12 px. Cetak laporan tetap memakai skala cetak tersendiri.
 
 Ukuran desimal merupakan hasil kalibrasi terakhir pengguna. Pertahankan angka ini saat menyalin komponen; perubahan skala bersama dilakukan melalui komponen/source CSS, bukan zoom browser atau transform.
+
+Untuk konten baru, gunakan class peran di `module-ui.css`: `ui-panel-title` (20 px), `ui-section-title` (17 px), `ui-field-label`/`ui-body` (14 px), dan `ui-caption` (12 px). Tombol standar 14 px dan aksi kecil 13 px. Form Suhu memakai peran eksplisit tersebut agar label dan keterangan tidak mewarisi ukuran bawaan yang berbeda. Angka ringkasan dan ukuran cetak tetap mengikuti fungsinya.
 
 | Elemen yang sudah ada | Ukuran | Class atau aturan |
 | --- | --- | --- |
@@ -125,7 +129,7 @@ Ukuran desimal merupakan hasil kalibrasi terakhir pengguna. Pertahankan angka in
 
 Untuk halaman baru, gunakan judul halaman sans-serif `text-lg font-bold text-slate-800`. Teks isi form dan tabel boleh lebih besar daripada metadata kartu: gunakan 12–14 px sesuai jenis input dan kepadatan isi. Ini pola halaman baru, bukan komponen form yang sudah tersedia.
 
-Jangan memakai Playfair Display untuk label input, tabel, pesan validasi, atau tombol. Uppercase dipakai untuk label kategori dan sebagian judul kartu; kalimat penjelasan tetap memakai kapitalisasi biasa.
+Gunakan Inter untuk label input, tabel, pesan validasi, tombol, dan judul. Uppercase dipakai untuk label kategori dan sebagian judul kartu; kalimat penjelasan tetap memakai kapitalisasi biasa.
 
 ## 6. Warna
 
@@ -180,25 +184,21 @@ ID `main-content` harus ada satu kali pada setiap halaman agar skip link berfung
 
 ### 8.1.1 Breadcrumb bersama
 
-Source: `app/Views/components/breadcrumbs.php`. Semua form dan laporan mengirim array `breadcrumbs` dari controller. Layout `main.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding atas 16 px dan bawah 12 px. Jangan membuat breadcrumb lagi di navbar atau view halaman. View yang memakai container `.page-shell` menggunakan padding bawah tanpa padding atas agar hero dimulai setelah jarak bersama tersebut.
+Source: `config/monitoring-navigation.php`, helper `monitoring_breadcrumbs()`, serta `app/Views/components/breadcrumbs.php` dan `breadcrumb.php`. Semua form dan laporan mengirim array `breadcrumbs` dari controller. Layout `main.php` dan `design.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding vertikal 20 px. Jangan membuat breadcrumb lagi di navbar atau view halaman.
 
-Komponen menambahkan Portal Monitoring Terpadu dengan tautan `/`. Controller memberikan trail sesudah home. Monitoring Harian berupa label kategori tanpa `href`, sehingga tidak mengulang tujuan home. Elemen terakhir selalu menjadi teks aktif dengan `aria-current=page` dan latar emerald-50; elemen tengah hanya menjadi tautan jika memiliki `href` route internal yang valid. Pada laporan, nama modul menaut ke form induk. Home dan halaman error tidak mengirim breadcrumb dan tidak menampilkannya.
+Urutan selalu `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya Portal Monitoring Terpadu memiliki tautan `/`. Kategori, nama modul, dan halaman aktif berupa teks tanpa tautan maupun cursor pointer, termasuk pada halaman rekap. Halaman aktif memiliki `aria-current=page`. Home dan halaman error tidak menampilkan breadcrumb monitoring.
 
 Contoh data halaman laporan:
 
 ```php
-'breadcrumbs' => [
-    ['label' => 'Monitoring Harian'],
-    ['label' => 'Kesesuaian User', 'href' => '/forms/kesesuaian-user'],
-    ['label' => 'Rekap Kesesuaian User (HIS)'],
-],
+'breadcrumbs' => monitoring_breadcrumbs('suhu', true),
 ```
 
-Untuk form, cukup kategori dan nama halaman aktif. Nama aktif laporan harus menyebut modul: `Rekap Monitoring Hardware Server IT`, `Rekap Kesesuaian User (HIS)`, dan `Rekap Monitoring Antrian Online BPJS`. Hindari label generik seperti `Rekap Hasil Inputan` tanpa nama modul. Jika halaman khusus kategori dibuat nanti, kategori boleh diberi tautan ke halaman tersebut; jangan mengarahkannya kembali ke `/` atau `/#section-daily`. Breadcrumb memakai font 12 px, separator `›` yang disembunyikan dari pembaca layar, dukungan wrap, dan focus ring dari style global. Komponen berada di luar `<main>` sehingga aturan cetak laporan menyembunyikannya bersama header.
+Untuk form gunakan `monitoring_breadcrumbs('suhu')`, yang menghasilkan `Monitoring Harian / Suhu Server / Form Input Suhu Bulanan` sesudah portal. Untuk rekap gunakan argumen kedua `true`; nama halaman rekap tetap menyebut modulnya. Keenam modul memakai pola yang sama. Breadcrumb memakai font 13 px, separator `/` yang disembunyikan dari pembaca layar, dukungan wrap, dan focus ring global. Komponen berada di luar `<main>` dan disembunyikan saat cetak.
 
 ### 8.2 Navbar
 
-Source: `app/Views/layouts/header.php` dan `header-form.php`. Layout `main.php` memanggil `header.php`; file ini memilih varian header sesuai `navbarVariant`. Footer beserta wrapper tampilannya berada di `app/Views/layouts/footer.php`.
+Source: `app/Views/layouts/header.php`. Layout `main.php` dan `design.php` memanggil file ini langsung. Navbar home menjadi satu-satunya navbar untuk dashboard, form, rekap, dan akun; jangan membuat varian navbar form. Halaman login memakai layout `auth.php` tanpa navbar. Style navbar dan font Inter bersama berada di `resources/css/design-chrome.css`, yang dibangun ke kedua bundle CSS. Jam WIB diperbarui oleh `public/assets/js/app.js`. Footer tetap mengikuti layout masing-masing.
 
 - Sticky di atas, `z-40`, latar putih, border bawah.
 - Padding vertikal 12 px di semua ukuran layar.
@@ -314,64 +314,66 @@ Contoh field:
 </div>
 ```
 
-Warna aksi form memakai class bersama di `resources/css/app.css`. Pasangkan varian warna berikut dengan `.inspection-button` untuk tombol standar, atau class ukuran kontrol yang sudah ada untuk tombol kecil/hero. Jangan menambah utility warna lain pada tombol atau ikonnya agar tidak menimpa varian bersama. Aturan ini juga berlaku pada dialog ringkasan.
+Warna aksi form dan rekap memakai class bersama di `resources/css/module-ui.css`. Patokannya adalah form Hardware Server, Kesesuaian User, dan Antrian Online. Pasangkan varian warna berikut dengan `.module-action` untuk font tombol standar 14 px, `.module-action-small` untuk aksi kecil 13 px, atau `.module-page-button` untuk pagination 13 px. Bentuk dan padding tetap dapat memakai `.inspection-button` atau utility ukuran yang sesuai. Jangan menambah utility warna lain pada tombol atau ikonnya agar tidak menimpa varian bersama. Aturan ini juga berlaku pada dialog ringkasan, tombol ekspor, dan halaman akun.
 
 | Fungsi | Class warna | Tampilan |
 | --- | --- | --- |
 | Kirim laporan/verifikasi | `.button-primary` | Teal-700, teks putih; hover teal-800 |
 | Simpan Draft | `.button-secondary` | Putih, border teal-600, teks teal-700; hover teal-50 |
 | Kembali ke portal/form | `.button-neutral` | Putih, border slate-300, teks slate-700; hover slate-50 |
-| Riwayat/rekap, catatan cepat, Set Jam Sekarang | `.button-soft` | Teal-50, teks teal-800; hover teal-100 |
+| Riwayat/rekap, ekspor/unduh, catatan cepat, Set Jam Sekarang | `.button-soft` | Teal-50, teks teal-800; hover teal-100 |
 | Reset/Clear Form dan tutup dialog | `.button-ghost` | Transparan, teks slate-500; hover slate-100 |
 | Aksi pada hero hijau tua | `.button-on-dark` | Putih, teks teal-800; hover teal-50 |
 | Hapus berkas | `.button-danger` | Transparan, teks red-700; hover red-50 |
 
-Warna hijau/merah pada pilihan kondisi atau status pengiriman tetap menunjukkan status, terpisah dari warna tombol aksi. Tombol baru harus memiliki tindakan yang tersedia. Perubahan data melalui POST dan token CSRF baru diaktifkan setelah dukungan router dan backend dibuat.
+Cetak memakai `.button-neutral`. Pagination aktif berwarna teal-700 dengan teks putih; halaman lain netral. Warna hijau/merah pada pilihan kondisi atau status pengiriman tetap menunjukkan status, terpisah dari warna tombol aksi. Tombol baru harus memiliki tindakan yang tersedia. Perubahan data mengikuti dukungan router, CSRF, dan backend yang tersedia pada modul masing-masing.
 
 Tampilkan keadaan kosong jika daftar belum berisi data. Jika ada pengambilan data asynchronous, tampilkan status memuat dan error yang bisa dicoba ulang. Dashboard saat ini dirender langsung oleh PHP dan tidak memerlukan indikator loading buatan.
 
 ### 9.1 Form hardware server yang sudah tersedia
 
-Source: `app/Views/forms/hardware-server.php`, `app/Views/components/hardware-condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
+Source: `app/Views/hardware-server/form.php`, `app/Views/components/hardware-condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
 
-Kelompokkan view berdasarkan fungsinya. Semua halaman pengisian berada di `forms/`, semua halaman laporan di `reports/`, dan hanya ada satu folder `components/`. Gunakan struktur berikut untuk halaman selanjutnya:
+Kelompokkan view per modul, seperti CCTV, Clear Desk, dan Suhu. Setiap folder modul memiliki `form.php` dan `rekap.php`. Controller berada langsung di `app/Controllers/` dengan method `form()` dan `rekap()`. Komponen dan layout tetap digunakan bersama.
 
 ```text
 app/Views/
-├── forms/
-│   ├── antrian-online.php
-│   ├── hardware-server.php
-│   └── kesesuaian-user.php
-├── reports/
-│   ├── antrian-online.php
-│   ├── hardware-server.php
-│   └── kesesuaian-user.php
+├── antrian-online/
+│   ├── form.php
+│   └── rekap.php
+├── cctv/
+│   ├── form.php
+│   └── rekap.php
+├── cleardesk/
+│   ├── form.php
+│   └── rekap.php
+├── hardware-server/
+│   ├── form.php
+│   └── rekap.php
+├── kesesuaian-user/
+│   ├── form.php
+│   └── rekap.php
+├── suhu/
+│   ├── form.php
+│   └── rekap.php
 ├── layouts/
 │   ├── main.php
+│   ├── design.php
+│   ├── auth.php
 │   ├── header.php
-│   ├── header-form.php
 │   └── footer.php
 ├── components/
-│   ├── brand.php
-│   ├── breadcrumbs.php
-│   ├── hardware-condition.php
-│   ├── hardware-server-hero.php
-│   ├── portal-card.php
-│   ├── portal-dialog.php
-│   └── progress-summary.php
 ├── home/
 │   └── index.php
 └── errors/
-    ├── 404.php
-    └── unavailable.php
 ```
 
-Tambahkan file halaman pengisian berikutnya ke `forms/` dan halaman riwayat/rekap ke `reports/`. Jangan membuat ulang folder `form/`, `reports/`, atau `components/` di dalam folder bernama modul. `layouts/` hanya untuk kerangka dokumen dan struktur global seperti header serta footer. Bagian konten yang dipakai ulang seperti hero hardware, kartu, dialog, logo, atau pilihan kondisi masuk `components/`, meskipun ukurannya besar. Pembagian mengikuti fungsi, bukan ukuran atau jumlah baris. URL route tetap independen dari lokasi fisik view.
+Tambahkan modul berikutnya sebagai `app/Views/{nama-modul}/form.php` dan `rekap.php`. Jangan membuat folder `forms/`, `reports/`, atau `components/` baru di dalam modul. `layouts/` tetap untuk kerangka global; `components/` tetap satu folder bersama untuk bagian konten yang digunakan ulang. Lokasi view tidak menentukan URL route.
 
-Pola URL: pengisian `/forms/{nama-modul}`, laporan `/reports/{nama-modul}`. Ketiga laporan menggunakan `/reports/hardware-server`, `/reports/kesesuaian-user`, dan `/reports/antrian-online`. Daftarkan laporan hanya pada `/reports/...` dan arahkan semua tautan navigasi ke URL tersebut. Placeholder `{nama-modul}` adalah konvensi penamaan; router saat ini tetap mendaftarkan path statis secara eksplisit.
+URL tetap sama saat file dipindah. Hardware Server, Kesesuaian User, dan Antrian Online memakai `/forms/{modul}` serta `/reports/{modul}`; CCTV, Clear Desk, dan Suhu memakai `/form/{modul}` serta `/rekap/{modul}`. Tidak ada redirect atau route tambahan dalam perubahan struktur ini. Router mendaftarkan semua path secara eksplisit.
 
-- Route: `/forms/hardware-server`; controller: `App\Controllers\Forms\HardwareServerController`.
-- `navbarVariant=form` memilih varian header kompak. Breadcrumb tetap dirender oleh layout di bawah header, sama seperti form dan laporan lainnya. Komponen brand, profil, jam, ikon, dan dialog akun tetap memakai sumber bersama.
+- Route: `/forms/hardware-server`; controller: `App\Controllers\HardwareServerController`.
+- Navbar memakai `layouts/header.php` yang sama dengan home. Breadcrumb tetap dirender oleh layout di bawah header, sama seperti form dan laporan lainnya. Logo, identitas portal, jam WIB, serta menu Password, Users, dan Logout memakai satu sumber bersama.
 - Form, laporan, dan isi hero memakai `.page-shell` yang sama dengan home dan navbar: lebar 90% mulai desktop, maksimal 1440 px, dengan padding mobile 20/32 px. Jangan menambahkan batas 1024 px pada halaman hardware server.
 - `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
 - `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
@@ -384,7 +386,7 @@ Pola URL: pengisian `/forms/{nama-modul}`, laporan `/reports/{nama-modul}`. Keti
 
 ### 9.2 Rekap bulanan hardware server
 
-Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/reports/hardware-server` memakai method `history()` pada controller hardware yang sama. Header dan `components/hardware-server-hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Monitoring Hardware Server IT.
+Source: `app/Views/hardware-server/rekap.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/reports/hardware-server` memakai method `rekap()` pada controller hardware yang sama. Header dan `components/hardware-server-hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Monitoring Hardware Server IT.
 
 - Pertahankan `.page-shell` yang sama dengan home (90% pada desktop, maksimal 1440 px), jarak antarpanel 24 px, radius 16 px. Heading rekap 18 px; isi tabel 12 px; header dan badge tabel 10–11 px, mengikuti HTML referensi.
 - Panel kontrol memakai satu kolom pada mobile, dua mulai `sm`, dan empat mulai `md`. Label terhubung ke setiap input. Kelompok tombol ekspor dapat membungkus ketika ruang menyempit.
@@ -399,7 +401,7 @@ Source: `app/Views/reports/hardware-server.php`, `config/hardware-server-reports
 
 ### 9.3 Form Kesesuaian User HIS
 
-Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::index()` dan view `app/Views/forms/kesesuaian-user.php`. Halaman laporannya berada di `app/Views/reports/kesesuaian-user.php`, tanpa folder modul tambahan. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
+Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::form()` dan view `app/Views/kesesuaian-user/form.php`. Halaman laporannya berada di `app/Views/kesesuaian-user/rekap.php`, tanpa folder modul tambahan. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
 
 - Gunakan navbar global dan breadcrumb bersama dari layout; jangan menulis breadcrumb di view. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
 - Isi memakai satu kolom pada mobile dan grid 12 kolom mulai `lg`: form delapan kolom dan sampel terakhir empat kolom. Panel putih memakai radius 12 px, padding 24/32 px. Field 13 px dengan tinggi 48 px; label 14 px; deskripsi 12 px.
@@ -412,7 +414,7 @@ Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::index()` d
 
 ### 9.4 Laporan Kesesuaian User HIS
 
-Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::history()`, view `app/Views/reports/kesesuaian-user.php`, konfigurasi `config/kesesuaian-user-reports.php`, dan script `public/assets/js/kesesuaian-user-history.js`.
+Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::rekap()`, view `app/Views/kesesuaian-user/rekap.php`, konfigurasi `config/kesesuaian-user-reports.php`, dan script `public/assets/js/kesesuaian-user-history.js`.
 
 - Navbar global, breadcrumb, dan `.page-shell` mengikuti halaman form/home. Hero berwarna hijau dengan judul sans-serif 24/30 px. Empat kartu ringkasan memakai grid satu/dua/empat kolom sesuai breakpoint, padding 20 px, dan angka 30 px.
 - Ringkasan dihitung dari data yang tersedia dan mengikuti filter tabel, termasuk jumlah sesuai/tidak sesuai, persentase, dan sampling terakhir. Data awal tujuh baris referensi menghasilkan 7/5/2 dan 71,4%; jangan memakai 128/122/6 sebagai angka operasional tanpa sumber data.
@@ -424,7 +426,7 @@ Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::history()`, 
 
 ### 9.5 Form Monitoring Antrian Online BPJS
 
-Route `/forms/antrian-online` memakai `AntrianOnlineController::index()`, view `app/Views/forms/antrian-online.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`. Kartu Antrian Online bertipe internal dengan `available=true`. Kedua tautan rekap mengarah ke `/reports/antrian-online`.
+Route `/forms/antrian-online` memakai `AntrianOnlineController::form()`, view `app/Views/antrian-online/form.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`. Kartu Antrian Online bertipe internal dengan `available=true`. Kedua tautan rekap mengarah ke `/reports/antrian-online`.
 
 - Gunakan header, footer, logo, dan `.page-shell` bersama. Hero hijau memakai judul sans-serif 24/30 px dan padding 24/36 px; metadata, dua kelompok cron, endpoint/tiket, serta unggah/catatan mengikuti susunan referensi. Panel isi putih radius 12 px, padding 20/32 px. Permukaan field memakai `#eff4ff`, label utama 14 px, deskripsi 12 px, dan metadata monospace 9–11 px. Jangan membawa CSS global referensi yang menyembunyikan scrollbar atau mengunci ukuran body.
 - Pasangan cron, endpoint/tiket, serta unggah/catatan memakai `.queue-paired-grid` dan `.queue-field-group`. Mulai `lg`, setiap pasangan berbagi tiga track subgrid agar judul, isi, dan keterangan sejajar meskipun teks membungkus. Bagian unggah mengikuti tinggi gabungan catatan dan konfirmasi. Pada layar kecil, masing-masing bagian kembali satu kolom dengan tinggi alami. Jangan menyamakan tinggi memakai angka tetap atau memotong deskripsi.
@@ -439,7 +441,7 @@ Route `/forms/antrian-online` memakai `AntrianOnlineController::index()`, view `
 
 ### 9.6 Rekap Monitoring Antrian Online BPJS
 
-Route `/reports/antrian-online` memakai `AntrianOnlineController::history()`, view `app/Views/reports/antrian-online.php`, konfigurasi `config/antrian-online-reports.php`, dan script `public/assets/js/antrian-online-history.js`. Semua halaman tetap memakai header, footer, logo, dan `.page-shell` bersama, tanpa folder modul atau komponen tambahan.
+Route `/reports/antrian-online` memakai `AntrianOnlineController::rekap()`, view `app/Views/antrian-online/rekap.php`, konfigurasi `config/antrian-online-reports.php`, dan script `public/assets/js/antrian-online-history.js`. Semua halaman tetap memakai header, footer, logo, dan `.page-shell` bersama, tanpa folder modul atau komponen tambahan.
 
 - Hero hijau memiliki judul sans-serif 24/30 px. Empat kartu ringkasan mengikuti grid satu/dua/empat kolom dan menampilkan jumlah sesi, persentase cron antrian, persentase cron bed, serta audit terakhir. Angka dihitung dari seluruh hasil filter, bukan hanya halaman aktif. Tujuh baris referensi menghasilkan 7 sesi, 6 cron antrian terkirim (85,7%), dan 7 cron bed terkirim (100%). Jangan memakai jumlah 62 atau 98,4% tanpa sumber data yang mendukung.
 - Panel log memakai lima filter: bulan, status cron antrian, status cron bed, shift, dan pencarian. Layout kontrol satu/dua/lima kolom mengikuti breakpoint. Pencarian frasa tidak peka huruf besar/kecil dan mencakup tanggal WIB, kode HTTP, nama lampiran, petugas, serta catatan. Filter dapat digabung; perubahan mengembalikan pagination ke halaman pertama. Hasil kosong menampilkan nol dan persentase “—”, lalu menyediakan Reset Filter.
@@ -454,26 +456,23 @@ Route `/forms/hardware-server`, controller, dan view yang disebut di bawah sudah
 
 ### A. Buat controller
 
-Lokasi: `app/Controllers/Forms/HardwareServerController.php`.
+Lokasi: `app/Controllers/HardwareServerController.php`.
 
 ```php
 <?php
 declare(strict_types=1);
 
-namespace App\Controllers\Forms;
+namespace App\Controllers;
 
 use App\Core\View;
 
 final class HardwareServerController
 {
-    public function index(): void
+    public function form(): void
     {
-        View::render('forms/hardware-server', [
+        View::render('hardware-server/form', [
             'pageTitle' => 'Monitoring Hardware Server',
-            'breadcrumbs' => [
-                ['label' => 'Monitoring Harian'],
-                ['label' => 'Form Monitoring Hardware Server IT'],
-            ],
+            'breadcrumbs' => monitoring_breadcrumbs('hardware-server'),
             'profile' => config('dashboard')['profile'],
         ]);
     }
@@ -486,16 +485,16 @@ Tambahkan ke `routes/web.php` setelah deklarasi `use` yang diperlukan. Jika cont
 
 ```php
 <?php
-use App\Controllers\Forms\HardwareServerController;
+use App\Controllers\HardwareServerController;
 
-$router->get('/forms/hardware-server', [new HardwareServerController(), 'index']);
+$router->get('/forms/hardware-server', [new HardwareServerController(), 'form']);
 ```
 
-Router saat ini hanya mendukung `get(path, callable)` dengan path persis. Parameter `{slug}`, `post()`, dan pemanggilan `middleware()` belum tersedia. Jangan menyalin API Laravel atau framework lain ke router ini. Pola nama route form berikutnya mengikuti rancangan arsitektur setelah dukungan router ditambahkan.
+Router mendukung `get()`, `post()`, dan middleware dengan path statis. Folder view tidak menentukan URL; daftarkan route secara eksplisit sesuai kebutuhan modul.
 
 ### C. Buat view
 
-Lokasi: `app/Views/forms/hardware-server.php`.
+Lokasi: `app/Views/hardware-server/form.php`.
 
 ```php
 <main id="main-content" class="page-shell flex-1 space-y-5 py-4">

@@ -14,20 +14,10 @@ ob_start(); ?>
             <span class="text-sm font-bold text-white">Inspeksi Harian (Shift Pagi)</span>
         </div>
     </div>
-    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/cctv'), 'icon' => 'clipboard-list', 'iconClass' => 'text-[#044d36] text-[20px]', 'class' => 'inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white text-[#044d36] hover:bg-emerald-50 text-sm font-bold transition-all whitespace-nowrap shadow-rs']) ?>
+    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/cctv'), 'icon' => 'clipboard-list', 'iconClass' => 'text-[20px]', 'class' => 'button-on-dark module-action inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap shadow-rs']) ?>
 </div>
 <?php $heroAside = ob_get_clean(); ?>
-<main id="main-content" class="page-shell flex-1 py-5 flex flex-col gap-5">
-    <?= partial('breadcrumb', [
-        'class' => 'flex items-center gap-2 text-xs font-medium text-slate-500',
-        'separator' => ['text' => '/', 'class' => 'text-slate-400'],
-        'items' => [
-            ['label' => 'Portal Monitoring Terpadu', 'href' => url('/'), 'class' => 'hover:text-[#b70011] transition-colors'],
-            ['label' => 'Monitoring Harian', 'href' => url('/'), 'class' => 'hover:text-[#b70011] transition-colors', 'separator' => ['text' => '>', 'class' => 'text-slate-400']],
-            ['label' => 'CCTV', 'href' => url('/form/cctv'), 'class' => 'hover:text-[#b70011] transition-colors'],
-            ['label' => 'Form Input Monitoring CCTV', 'class' => 'text-slate-900 font-semibold'],
-        ],
-    ]) ?>
+<main id="main-content" class="page-shell flex-1 pb-5 flex flex-col gap-5">
 
     <?= partial('page-header', [
         'class' => 'relative overflow-hidden rounded-2xl p-6', 'introClass' => 'flex flex-col gap-1.5 max-w-2xl',
@@ -151,13 +141,13 @@ ob_start(); ?>
 
                 <div class="pt-4 border-t flex flex-col sm:flex-row items-center justify-between gap-4 border-rs-line">
                     <div class="flex items-center gap-2 w-full sm:w-auto">
-                        <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-[16px]', 'class' => 'inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors']) ?>
-                        <?= partial('button', ['label' => 'Lihat Riwayat & Rekap', 'href' => url('/rekap/cctv'), 'icon' => 'history', 'iconClass' => 'text-[16px]', 'class' => 'inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors']) ?>
+                        <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-[16px]', 'class' => 'button-neutral module-action inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-bold transition-colors border']) ?>
+                        <?= partial('button', ['label' => 'Lihat Riwayat & Rekap', 'href' => url('/rekap/cctv'), 'icon' => 'history', 'iconClass' => 'text-[16px]', 'class' => 'button-soft module-action inline-flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-colors border']) ?>
                     </div>
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
-                        <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'px-3 py-2 rounded-lg text-slate-500 hover:text-red-700 hover:bg-red-50 text-xs font-bold transition-colors']) ?>
-                        <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'px-3.5 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold transition-colors', 'attrs' => ['data-draft' => true]]) ?>
-                        <?= partial('button', ['label' => 'Kirim Laporan CCTV', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-[18px]', 'class' => 'inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#044d36] hover:bg-[#065f46] text-white text-xs font-bold transition-all shadow-rs']) ?>
+                        <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'button-ghost module-action px-3 py-2 rounded-lg text-xs font-bold transition-colors']) ?>
+                        <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'button-secondary module-action px-3.5 py-2 rounded-lg text-xs font-bold transition-colors border', 'attrs' => ['data-draft' => true]]) ?>
+                        <?= partial('button', ['label' => 'Kirim Laporan CCTV', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-[18px]', 'class' => 'button-primary module-action inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg text-xs font-bold transition-all shadow-rs']) ?>
                     </div>
                 </div>
             </form>

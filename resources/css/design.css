@@ -1,28 +1,12 @@
 @import "tailwindcss" source(none);
 @import "./design-chrome.css";
+@import "./module-ui.css";
 @source "../../app/**/*.php";
 @source "../../config/**/*.php";
 @source "../../database/dummy/*.php";
 @source "../../public/assets/js/*.js";
 
-/* IBM Plex Sans / Mono, self-hosted (SIL OFL 1.1, see public/assets/fonts/LICENSE-IBM-Plex-*.txt) */
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Sans"; font-style: italic; font-weight: 400; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-ext-400-italic.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Sans"; font-style: italic; font-weight: 400; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-400-italic.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-ext-500-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-500-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-ext-600-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-ext-700-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Sans"; font-style: normal; font-weight: 700; font-display: swap; src: url("../fonts/ibm-plex-sans-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-ext-400-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 400; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-ext-500-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 500; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-500-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-ext-600-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
-@font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-
+/* Inter is self-hosted and declared once in design-chrome.css. */
 @theme {
   /* Design tokens from docs/DESIGN/rs-awal-bros-portal theme.css (--rs-*) */
   --color-rs-red: #b70011;
@@ -48,8 +32,8 @@
   --color-rs-err-bg: #fdecea;
   --color-rs-info: #1d4ed8;
   --color-rs-info-bg: #eaf0fd;
-  --font-sans: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
-  --font-mono: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-sans: Inter, Arial, sans-serif;
+  --font-mono: Inter, Arial, sans-serif;
   --radius-rs: 8px;
   --radius-rs-lg: 12px;
   --shadow-rs: 0 1px 2px rgba(16, 32, 30, .05), 0 1px 3px rgba(16, 32, 30, .06);
@@ -334,16 +318,11 @@
   .rs-input input:hover { border-color: #aebbb8; }
   .rs-input input:focus { outline: none; border-color: var(--color-rs-teal-600); box-shadow: 0 0 0 3px rgba(19, 133, 113, .15); }
   .rs-input input[aria-invalid="true"] { border-color: var(--color-rs-err) !important; box-shadow: 0 0 0 3px rgba(180, 35, 24, .1) !important; }
-  .rs-input__toggle { position: absolute; right: 4px; width: 36px; height: 34px; border: 0; background: none; color: #7d8c8a; border-radius: 6px; display: grid; place-items: center; font-size: 17px; }
-  .rs-input__toggle:hover { color: var(--color-rs-ink); background: var(--color-rs-line-2); }
+  .rs-input__toggle { position: absolute; right: 4px; width: 36px; height: 34px; border: 0; border-radius: 6px; display: grid; place-items: center; font-size: 17px; }
   .rs-help { font-size: 12.5px; color: var(--color-rs-muted); margin: 0; }
   .rs-error { font-size: 12.5px; color: var(--color-rs-err); margin: 0; display: flex; align-items: center; gap: 6px; }
   .rs-error[hidden] { display: none !important; }
-  .rs-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: var(--radius-rs); font: inherit; font-size: 14px; font-weight: 600; border: 1px solid transparent; text-decoration: none; white-space: nowrap; transition: background-color .15s, border-color .15s; }
-  .rs-btn--primary { background: var(--color-rs-teal-700); color: #fff; }
-  .rs-btn--primary:hover { background: var(--color-rs-teal-800); }
-  .rs-btn--ghost { background: #fff; color: var(--color-rs-ink-2); border-color: var(--color-rs-line); }
-  .rs-btn--ghost:hover { background: var(--color-rs-line-2); color: var(--color-rs-ink); }
+  .rs-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border-radius: var(--radius-rs); font: inherit; font-size: 14px; font-weight: 600; border-width: 1px; border-style: solid; text-decoration: none; white-space: nowrap; transition: background-color .15s, border-color .15s; }
   .rs-kv { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px 16px; margin: 0; font-size: 14px; }
   .rs-kv dt { color: var(--color-rs-muted); }
   .rs-kv dd { margin: 0; color: var(--color-rs-ink); font-weight: 500; }
@@ -386,8 +365,7 @@
   .rs-modal__icon { width: 52px; height: 52px; margin: 0 auto; border-radius: 999px; background: var(--color-rs-ok-bg); color: var(--color-rs-ok); display: flex; align-items: center; justify-content: center; }
   .rs-modal__box h3 { font-size: 18px; font-weight: 600; color: var(--color-slate-900); }
   .rs-modal__box p { font-size: 14px; color: var(--color-rs-ink-2); line-height: 1.6; }
-  .rs-modal__btn { font-size: 14px; font-weight: 700; padding: 10px 18px; border-radius: var(--radius-rs); background: var(--color-rs-teal-700); color: #fff; }
-  .rs-modal__btn:hover { background: var(--color-rs-teal-800); }
+  .rs-modal__btn { padding: 10px 18px; border-radius: var(--radius-rs); }
 
   /* Rekap filter results */
   .rs-filter-empty td { padding: 32px 16px !important; text-align: center; color: var(--color-rs-muted); font-size: 13px; }

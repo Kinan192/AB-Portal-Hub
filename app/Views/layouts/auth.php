@@ -7,7 +7,7 @@
     <meta name="theme-color" content="#ffffff">
     <title><?= e($pageTitle ?? config('app')['name']) ?> | RS Awal Bros Botania</title>
     <link rel="icon" href="data:,">
-    <link rel="preload" href="<?= e(asset('fonts/ibm-plex-sans-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
+    <link rel="preload" href="<?= e(asset('fonts/inter-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
     <link rel="preload" href="<?= e(asset('images/login-hero.webp')) ?>" as="image" type="image/webp" media="(min-width: 1024px)">
     <link rel="stylesheet" href="<?= e(asset_v('css/design.css')) ?>">
     <script src="<?= e(asset_v('js/login.js')) ?>" defer></script>
