@@ -24,7 +24,7 @@ Halaman rekap bulanan tersedia di http://127.0.0.1:8080/reports/hardware-server,
 
 Perintah `npm run dev` menjalankan server PHP lokal. Hentikan dengan Ctrl+C. Untuk menjalankan tanpa npm, gunakan `php -S 127.0.0.1:8080 -t public public/index.php`.
 
-CSS Tailwind dan font sudah tersedia di `public/assets/`, sehingga dashboard tidak bergantung pada CDN maupun Node.js saat dijalankan. Inter dan Playfair Display disajikan secara lokal beserta lisensinya.
+CSS Tailwind dan font sudah tersedia di `public/assets/`, sehingga portal tidak bergantung pada CDN maupun Node.js saat dijalankan. IBM Plex Sans dan IBM Plex Mono (woff2, subset latin dan latin-ext) disajikan secara lokal beserta lisensinya.
 
 ## Mengembangkan tampilan
 
@@ -41,7 +41,29 @@ npm ci
 npm run build
 ```
 
-Gunakan `npm run watch` selama mengubah view. Node.js hanya dipakai untuk membangun CSS. Sumber CSS berada di `resources/css/app.css`, hasil build di `public/assets/css/app.css`. `package-lock.json` mengunci dependensi frontend. Panduan CLI: https://tailwindcss.com/docs/installation/tailwind-cli.
+Gunakan `npm run watch` (dashboard dan halaman `main.php`) atau `npm run watch:design` (halaman design system) selama mengubah view. Node.js hanya dipakai untuk membangun CSS. Ada dua bundel: `resources/css/app.css` → `public/assets/css/app.css` untuk dashboard `/` serta form dan rekap hardware server, kesesuaian user, dan antrian online, dan `resources/css/design.css` → `public/assets/css/design.css` untuk halaman design system (login, akun, suhu, CCTV, Clear Desk) agar token desain tidak mengubah tampilan dashboard. `npm run build` membangun keduanya. `package-lock.json` mengunci dependensi frontend. Panduan CLI: https://tailwindcss.com/docs/installation/tailwind-cli.
+
+## Halaman
+
+Halaman design system mengikuti desain statis di `docs/DESIGN/rs-awal-bros-portal/` (file desain tidak diubah). Semua data masih dummy.
+
+| Route | Controller | View |
+| --- | --- | --- |
+| `/login` (publik), `POST /logout` | `AuthController` | `auth/login.php` (layout `auth`) |
+| `/` | `HomeController::index` | `home/index.php` (dashboard portal, layout `main`) |
+| `/forms/hardware-server`, `/reports/hardware-server` | `Forms\HardwareServerController` | `forms/hardware-server.php`, `reports/hardware-server.php` (layout `main`) |
+| `/forms/kesesuaian-user`, `/reports/kesesuaian-user` | `Forms\KesesuaianUserController` | `forms/kesesuaian-user.php`, `reports/kesesuaian-user.php` (layout `main`) |
+| `/forms/antrian-online`, `/reports/antrian-online` | `Forms\AntrianOnlineController` | `forms/antrian-online.php`, `reports/antrian-online.php` (layout `main`) |
+| `/password`, `/users` | `AccountController` | `account/password.php`, `account/users.php` (layout `design`) |
+| `/form/suhu`, `/rekap/suhu` (`/form/temperature` dialihkan ke `/form/suhu`) | `SuhuController` | `suhu/form.php`, `suhu/rekap.php` (layout `design`) |
+| `/form/cctv`, `/rekap/cctv` | `CctvController` | `cctv/form.php`, `cctv/rekap.php` (layout `design`) |
+| `/form/cleardesk`, `/rekap/cleardesk` | `ClearDeskController` | `cleardesk/form.php`, `cleardesk/rekap.php` (layout `design`) |
+
+Halaman design system (suhu, CCTV, Clear Desk) masih memakai `/form/...` dan `/rekap/...`, berbeda dari pola `/forms/...` dan `/reports/...` di atas.
+
+Semua route kecuali `/login` memerlukan sesi login (middleware `app/Core/RequireLogin.php`); pengunjung yang belum login diarahkan ke `/login` dengan HTTP 302, lalu kembali ke halaman yang diminta setelah login. File di `public/assets/` tidak diblokir. Kartu dashboard dengan `'available' => true` di `config/portal.php` menuju form modulnya; kartu lain menampilkan dialog informasi.
+
+Setiap form dikirim (POST) ke route rekap modulnya, lalu diarahkan kembali ke halaman rekap dengan notifikasi. Belum ada data yang disimpan. Filter dan pencarian rekap berjalan di browser (`public/assets/js/design.js`). Tombol Export dan Cetak masih berupa tampilan.
 
 Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `button-secondary` untuk draft, `button-neutral` untuk kembali, `button-soft` untuk rekap/bantuan, `button-ghost` untuk reset/tutup, `button-on-dark` untuk aksi hero, dan `button-danger` untuk hapus berkas. Pasangkan dengan class ukuran seperti `inspection-button`. Detail ada di Design System bagian 9. Breadcrumb laporan menyebut nama modul secara lengkap agar tujuan rekap jelas.
 
@@ -50,7 +72,7 @@ Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `
 | Lokasi | Fungsi |
 | --- | --- |
 | `public/index.php` | Front controller dan router untuk server lokal |
-| `bootstrap/app.php` | Autoload dan konfigurasi zona waktu |
+| `bootstrap/app.php` | Autoload, `.env`, dan zona waktu |
 | `routes/web.php` | Route aplikasi |
 | `app/Controllers/HomeController.php` | Data dashboard dan pengelompokan menu |
 | `app/Views/home/index.php` | Dashboard portal |
@@ -68,10 +90,22 @@ Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `
 | `app/Views/components/` | Komponen UI bersama: brand, kartu, progres, dialog, pilihan kondisi, dan hero hardware |
 | `app/Views/components/breadcrumbs.php` | Breadcrumb bersama berdasarkan data controller |
 | `config/portal.php` | Daftar 15 kartu, kategori, target, serta urutannya |
-| `config/dashboard.php` | Identitas tampilan dan nilai progres awal sebelum integrasi backend |
+| `config/dashboard.php` | Identitas tampilan (`profile`, serta `account` untuk navbar design system) dan nilai progres awal sebelum integrasi backend |
 | `config/database.php` | Parameter koneksi MySQL dari environment |
 | `app/Core/Database.php` | Koneksi PDO dengan prepared statements native |
 | `docs/design.md` | Alasan desain dan batas implementasi |
+| `app/Controllers/` | Controller halaman design system; `Controller.php` berisi penjaga `APP_ENV` dan memakai layout `design` secara default |
+| `app/Core/Auth.php`, `app/Core/RequireLogin.php` | Sesi login, token CSRF, dan middleware login |
+| `app/Views/layouts/design.php`, `app/Views/layouts/auth.php` | Layout design system (login, akun, suhu, CCTV, Clear Desk): `design-navbar` (jam WIB), breadcrumb, `design-footer`, toast |
+| `app/Views/components/design-navbar.php`, `design-footer.php`, `page-header`, `card`, `badge`, `button`, `field`, `table`, `rows/`, `submit-modal`, `toast` | Partial design system |
+| `app/Views/errors/design-404.php`, `design-unavailable.php` | Halaman 404 dan 503 versi design system (router dan `Controller.php`) |
+| `app/Helpers/functions.php` | `e()`, `partial()`, `icon()` (ikon dashboard dan halaman `main.php`), `design_icon()` (ikon design system), `csrf_field()`, `url()`, `asset_v()`, `dummy()` |
+| `app/Helpers/icons.php` | Ikon Lucide (ISC) untuk `design_icon()` |
+| `database/dummy/` | Data dummy modul suhu, CCTV, dan Clear Desk |
+| `resources/css/app.css` | Gaya dashboard serta form dan rekap hardware server, kesesuaian user, antrian online |
+| `resources/css/design.css` | Token design system (`@theme`), gaya dasar, dan komponen halaman design system |
+| `public/assets/js/app.js` | Jam, dialog, dan menu dashboard serta halaman `main.php` |
+| `public/assets/js/design.js`, `login.js` | Perilaku halaman design system (jam, menu, toast, form, filter rekap, login) |
 
 ## Perilaku tahap pertama
 
@@ -83,9 +117,9 @@ Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `
 - Proporsi kartu berangkat dari `code.html`, lalu disesuaikan berdasarkan arahan pengguna: judul 11.7 px, deskripsi 10.8 px, badge 9 px, padding 16 px, dan ikon 48 px. Grid enam/tujuh kolom aktif mulai lebar 1024 px.
 - Halaman memakai alur vertikal alami, tanpa tinggi tetap 100vh atau pemadatan kartu berdasarkan tinggi layar. Semua kartu kembali vertikal dengan ikon 48 px. Container desktop memakai lebar 90%, maksimal 1440 px, agar margin kiri dan kanan lebih lapang. Navbar, banner, dan hero tetap ringkas; bagian Sistem berada setelah Monitoring & Laporan dan dapat dijangkau dengan scroll.
 - Semua kartu memakai tiga baris subgrid bersama untuk ikon, judul, dan deskripsi. Judul diratakan ke atas dan tinggi barisnya mengikuti judul terpanjang pada satu baris kartu, tanpa minimum dua baris. Deskripsi memakai margin atas 2 px dan tetap sejajar antar kartu; ruang tersisa di bawah judul pendek menjaga perataan kedua teks. Padding serta kotak ikon 48 px tetap sama; hover tidak menggeser kartu atau memperbesar ikon.
-- Kartu Hardware Server, Kesesuaian User, dan Antrian Online berlabel `Form` dan membuka halaman pengisian. Kartu internal yang belum tersedia masih berlabel `Segera` dan menampilkan keterangan modul. Properti `available=true` digunakan hanya setelah route dan halamannya tersedia.
+- Kartu Hardware Server, Kesesuaian User, Antrian Online, Rata-rata Suhu Server, Monitoring CCTV, dan Clear Desk berlabel `Form` dan membuka halaman pengisian. Kartu internal yang belum tersedia masih berlabel `Segera` dan menampilkan keterangan modul. Properti `available=true` digunakan hanya setelah route dan halamannya tersedia.
 - Kartu eksternal berlabel `Atur URL` sampai target dikonfigurasi di `config/portal.php`. URL HTTPS yang valid dibuka di tab baru dengan `noopener noreferrer`.
-- Password, Users, dan Logout menampilkan penjelasan bahwa autentikasi belum tersedia. Tidak ada password atau data akun yang dikumpulkan.
+- Password dan Users membuka halaman akun; Logout mengirim `POST /logout` (dengan token CSRF) dan kembali ke `/login`. Header form memakai tombol Logout yang sama.
 - Badge `Portal aktif` merujuk pada halaman portal, bukan uptime sistem eksternal.
 - Dialog bisa ditutup menggunakan Escape, tombol tutup, tombol kembali, atau klik di luar dialog. Fokus dikelola oleh elemen `<dialog>` browser.
 - Daftar kategori tanpa menu memiliki empty state; route yang tidak ada mengembalikan 404, kegagalan render mengembalikan 500.
@@ -93,11 +127,29 @@ Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `
 
 ## Batas pengembangan backend
 
-Autentikasi Delight PHP-Auth, middleware, pengelolaan pengguna, database operasional, migrasi, formulir resmi, dan perhitungan progres adalah tahap berikutnya. Tidak ada SQL migrasi asumsi atau autentikasi tiruan yang dipasang. `composer.json` menyiapkan autoload PSR-4; tambahkan dependensi auth dan kunci `composer.lock` ketika implementasi backend dimulai.
+Login memeriksa tabel `users`: isian Username dicocokkan dengan kolom `email` (akun `role = admin`, `is_active = 1`), lalu password diperiksa dengan `password_verify`. Pembatasan percobaan login dan audit log masih TODO di `AuthController`.
 
 Dashboard, form hardware server, dan halaman rekap saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, halaman tersebut mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
 
-Pada Apache, arahkan document root ke `public/` dan aktifkan `mod_rewrite`. `APP_URL` dapat diatur menjadi origin portal tanpa trailing slash. `.env` tidak dibaca otomatis. Struktur saat ini menggunakan path absolut dari origin dan ditujukan untuk root domain atau virtual host, bukan subfolder URL.
+**Mode pengembangan (login bebas).** Jika `APP_ENV=local` **dan** `AUTH_DEV_BYPASS=true` di `.env`, username dan password apa pun yang tidak kosong diterima sebagai admin dummy. Halaman login menampilkan banner "Mode pengembangan: login bebas", dan setiap login bebas dicatat di `storage/logs/auth-dev-bypass.log` (waktu, username, IP, user agent; tanpa password). Jika salah satu syarat tidak terpenuhi, mode ini mati otomatis. `.env.example` memakai `AUTH_DEV_BYPASS=false`; jangan pernah mengaktifkannya di server RS.
+
+Autentikasi Delight PHP-Auth, pengelolaan pengguna, database operasional, migrasi, formulir resmi, dan perhitungan progres adalah tahap berikutnya. Tidak ada SQL migrasi asumsi yang dipasang. `composer.json` menyiapkan autoload PSR-4; tambahkan dependensi auth dan kunci `composer.lock` ketika implementasi backend dimulai.
+
+Dashboard saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, semua halaman mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
+
+Pada Apache, arahkan document root ke `public/` dan aktifkan `mod_rewrite`. `APP_URL` dapat diatur menjadi origin portal tanpa trailing slash. `.env` di root project dibaca otomatis oleh `bootstrap/app.php`; variabel environment server tetap diutamakan. Struktur saat ini menggunakan path absolut dari origin dan ditujukan untuk root domain atau virtual host, bukan subfolder URL.
+
+## Database
+
+1. Salin `.env.example` menjadi `.env`, lalu isi koneksi MySQL lokal. `.env` tidak boleh di-commit.
+2. Aktifkan `extension=pdo_mysql` pada `php.ini`.
+3. Buat tabel dengan `php bin/migrate.php` (atau `composer db:migrate`), atau impor `database/schema.sql` melalui phpMyAdmin. Skrip aman dijalankan berulang.
+4. Periksa koneksi dan daftar tabel dengan `php bin/db-check.php` (atau `composer db:check`).
+5. Buat akun admin (atau ganti passwordnya) dengan `php bin/create-admin.php` (atau `composer admin:create`). Skrip menanyakan email, nama, dan password; password diketik tersembunyi dan diulang untuk konfirmasi, minimal 12 karakter, dan tidak boleh sama dengan email. Password disimpan dengan `password_hash` (bcrypt, cost 12), akun dibuat dengan `role = admin` dan `is_active = 1`, dan setiap pembuatan atau penggantian password dicatat di `audit_logs`. Jika email sudah terdaftar, skrip menanyakan apakah password ingin diganti, sehingga aman dijalankan berulang. Portal hanya memakai satu admin: skrip menolak membuat admin kedua dengan email lain.
+
+   Jalankan dari PowerShell atau CMD. Di Git Bash, pakai `winpty php bin/create-admin.php` agar password tidak terlihat. Saat login, isi kolom **Username** dengan **email** akun ini, lalu set `AUTH_DEV_BYPASS=false` di `.env` untuk memakai login sebenarnya.
+
+Koneksi dibuat melalui `App\Core\Database::connection()` dengan zona waktu sesi `+07:00`.
 
 ## Verifikasi
 

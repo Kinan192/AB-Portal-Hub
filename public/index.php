@@ -15,6 +15,7 @@ header('X-Frame-Options: SAMEORIGIN');
 header('Cache-Control: no-store');
 try {
     $router = require dirname(__DIR__) . '/bootstrap/app.php';
+    App\Core\Auth::startSession();
     require BASE_PATH . '/routes/web.php';
     $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);
 } catch (Throwable $exception) {

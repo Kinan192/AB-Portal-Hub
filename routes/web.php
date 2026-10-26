@@ -1,15 +1,54 @@
 <?php
 declare(strict_types=1);
 
-use App\Controllers\HomeController;
+use App\Controllers\AccountController;
+use App\Controllers\AuthController;
+use App\Controllers\CctvController;
+use App\Controllers\ClearDeskController;
+use App\Controllers\Forms\AntrianOnlineController;
 use App\Controllers\Forms\HardwareServerController;
 use App\Controllers\Forms\KesesuaianUserController;
-use App\Controllers\Forms\AntrianOnlineController;
+use App\Controllers\HomeController;
+use App\Controllers\SuhuController;
+use App\Core\RequireLogin;
 
-$router->get('/', [new HomeController(), 'index']);
-$router->get('/forms/hardware-server', [new HardwareServerController(), 'index']);
-$router->get('/reports/hardware-server', [new HardwareServerController(), 'history']);
-$router->get('/forms/kesesuaian-user', [new KesesuaianUserController(), 'index']);
-$router->get('/reports/kesesuaian-user', [new KesesuaianUserController(), 'history']);
-$router->get('/forms/antrian-online', [new AntrianOnlineController(), 'index']);
-$router->get('/reports/antrian-online', [new AntrianOnlineController(), 'history']);
+$home = new HomeController();
+$auth = new AuthController();
+$account = new AccountController();
+$suhu = new SuhuController();
+$cctv = new CctvController();
+$clearDesk = new ClearDeskController();
+$hardwareServer = new HardwareServerController();
+$kesesuaianUser = new KesesuaianUserController();
+$antrianOnline = new AntrianOnlineController();
+
+// Every route below needs a signed-in session unless it is marked public.
+$router->middleware(new RequireLogin());
+
+$router->get('/login', [$auth, 'showLogin'], public: true);
+$router->post('/login', [$auth, 'login'], public: true);
+$router->post('/logout', [$auth, 'logout']);
+
+$router->get('/', [$home, 'index']);
+$router->get('/password', [$account, 'password']);
+$router->get('/users', [$account, 'users']);
+
+$router->get('/form/suhu', [$suhu, 'form']);
+$router->get('/form/temperature', static fn () => redirect('/form/suhu', 302));
+$router->get('/rekap/suhu', [$suhu, 'rekap']);
+$router->post('/rekap/suhu', [$suhu, 'submit']);
+
+$router->get('/form/cctv', [$cctv, 'form']);
+$router->get('/rekap/cctv', [$cctv, 'rekap']);
+$router->post('/rekap/cctv', [$cctv, 'submit']);
+
+$router->get('/form/cleardesk', [$clearDesk, 'form']);
+$router->get('/rekap/cleardesk', [$clearDesk, 'rekap']);
+$router->post('/rekap/cleardesk', [$clearDesk, 'submit']);
+
+$router->get('/forms/hardware-server', [$hardwareServer, 'index']);
+$router->get('/reports/hardware-server', [$hardwareServer, 'history']);
+$router->get('/forms/kesesuaian-user', [$kesesuaianUser, 'index']);
+$router->get('/reports/kesesuaian-user', [$kesesuaianUser, 'history']);
+$router->get('/forms/antrian-online', [$antrianOnline, 'index']);
+$router->get('/reports/antrian-online', [$antrianOnline, 'history']);

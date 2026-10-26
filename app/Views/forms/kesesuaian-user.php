@@ -5,7 +5,7 @@
 /** @var string $loginTime */
 ?>
 <main id="main-content" class="page-shell flex-1 pb-4">
-    <section class="hero-pattern mb-6 rounded-xl border border-teal-800 bg-brand-dark px-6 py-6 text-white shadow-sm sm:px-8" aria-labelledby="compliance-title">
+    <section class="module-hero mb-6" aria-labelledby="compliance-title">
         <div class="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
             <div class="min-w-0 space-y-2">
                 <p class="inline-flex items-center gap-2 rounded bg-emerald-950/60 px-2.5 py-1 text-[11px] font-bold tracking-wide text-emerald-200 uppercase"><span class="size-1.5 rounded-full bg-emerald-400" aria-hidden="true"></span>RS AWAL BROS GROUP • IT BOTANIA</p>

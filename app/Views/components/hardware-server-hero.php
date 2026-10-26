@@ -2,11 +2,12 @@
 /** @var array{unit: string, period: string} $inspection */
 /** @var string|null $hardwarePage */
 ?>
-<section class="inspection-hero relative bg-[#0a382c] pb-9 pt-8 text-white" aria-labelledby="inspection-title">
-    <div class="page-shell relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
+<div class="page-shell">
+<section class="inspection-hero module-hero" aria-labelledby="inspection-title">
+    <div class="relative flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
         <div class="min-w-0">
             <p class="mb-3 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-semibold text-teal-200"><?= icon('server', 'size-3.5') ?>Checklist Inspeksi Ruang Server • Unit <?= e($inspection['unit']) ?></p>
-            <h1 id="inspection-title" class="font-serif text-2xl font-bold tracking-tight lg:text-3xl">Form Monitoring Hardware Server IT</h1>
+            <h1 id="inspection-title">Form Monitoring Hardware Server IT</h1>
             <p class="mt-1 max-w-2xl text-sm leading-relaxed text-teal-100/80">Pencatatan kondisi fisik dan operasional hardware server, rak, konsol CPU, display central, serta perangkat pendukung IT secara harian dan berkala.</p>
         </div>
         <div class="flex shrink-0 flex-wrap items-center gap-3">
@@ -22,3 +23,4 @@
         </div>
     </div>
 </section>
+</div>

@@ -1,0 +1,103 @@
+/*
+ * Design-system page chrome shared by resources/css/design.css and resources/css/module-pages.css:
+ * icon boxes of design_icon(), the navbar (components/design-navbar.php), the breadcrumb
+ * (components/breadcrumb.php) and the footer (components/design-footer.php). Colours come from the
+ * --color-rs-* tokens.
+ */
+@layer base {
+  /* Reserve the scrollbar space on every page, so short pages centre .page-shell exactly like long ones */
+  html { scrollbar-gutter: stable; }
+
+  /* Footer */
+  :is(.rs-body, .module-page) > footer { background: transparent !important; border-top: 1px solid var(--color-rs-line) !important; box-shadow: none !important; color: var(--color-rs-muted) !important; }
+  :is(.rs-body, .module-page) > footer, :is(.rs-body, .module-page) > footer * { font-size: 12.5px !important; }
+}
+
+@layer components {
+  /* Page container used by every page (values of the "/" dashboard): navbar, breadcrumb, page header,
+     content and footer all sit in .page-shell so their left and right edges line up. */
+  .page-shell { box-sizing: border-box; width: 100%; max-width: 1440px; margin-inline: auto; padding-inline: 1.25rem; }
+  @media (width >= 40rem) { .page-shell { padding-inline: 2rem; } }
+  @media (width >= 64rem) { .page-shell { width: 90%; padding-inline: 0; } }
+
+  /* Icons */
+  .rs-ic { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; line-height: 1 !important; vertical-align: -0.15em !important; font-style: normal; }
+  .rs-ic > svg { width: min(1em, 22px); height: min(1em, 22px); stroke-width: 2; }
+  button .rs-ic > svg, a .rs-ic > svg { width: min(1em, 18px); height: min(1em, 18px); }
+  .animate-spin.rs-ic { animation: rs-spin 1s linear infinite; }
+
+  /* Navbar */
+  .rsab-nav { position: relative; top: 0; z-index: 60; background: rgba(255, 255, 255, .97); border-bottom: 1px solid var(--color-rs-line); backdrop-filter: saturate(1.2) blur(6px); }
+  .rsab-nav__inner { height: 60px; display: flex; align-items: center; gap: 20px; }
+  .rsab-brand { display: flex; align-items: center; gap: 12px; text-decoration: none; flex-shrink: 0; border-radius: 6px; }
+  .rsab-brand__mark { color: var(--color-rs-red); font-weight: 700; font-size: 18px; letter-spacing: -0.01em; white-space: nowrap; }
+  .rsab-brand__sep { width: 1px; height: 26px; background: var(--color-rs-line); }
+  .rsab-brand__text { display: flex; flex-direction: column; line-height: 1.25; }
+  .rsab-brand__text b { font-size: 13px; font-weight: 600; color: var(--color-rs-ink); white-space: nowrap; }
+  .rsab-brand__text small { font-size: 12px; color: var(--color-rs-muted); white-space: nowrap; }
+  .rsab-nav__links { display: flex; align-items: stretch; gap: 4px; height: 100%; margin-left: 8px; }
+  .rsab-nav__links a {
+    position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 0 12px;
+    font-size: 14px; font-weight: 500; color: var(--color-rs-ink-2); text-decoration: none; white-space: nowrap;
+  }
+  .rsab-nav__links a .rs-ic { color: #7d8c8a; font-size: 16px; }
+  .rsab-nav__links a:hover { color: var(--color-rs-ink); background: var(--color-rs-teal-50); }
+  .rsab-nav__links a.is-active { color: var(--color-rs-teal-700); font-weight: 600; }
+  .rsab-nav__links a.is-active .rs-ic { color: var(--color-rs-teal-700); }
+  .rsab-nav__links a.is-active::after { content: ""; position: absolute; left: 12px; right: 12px; bottom: -1px; height: 2px; background: var(--color-rs-teal-700); border-radius: 2px 2px 0 0; }
+  .rsab-nav__meta { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+  .rsab-clock { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--color-rs-ink-2); white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .rsab-clock .rs-ic { color: #8a9896; font-size: 14px; }
+  .rsab-status { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--color-rs-ok); background: var(--color-rs-ok-bg); padding: 3px 10px; border-radius: 999px; text-transform: capitalize; white-space: nowrap; }
+  .rsab-status::first-letter { text-transform: uppercase; }
+  .rsab-status i { width: 7px; height: 7px; border-radius: 50%; background: #22a06b; box-shadow: 0 0 0 3px rgba(34, 160, 107, .18); }
+  .rsab-divider { width: 1px; height: 24px; background: var(--color-rs-line); }
+  .rsab-user { display: flex; align-items: center; gap: 10px; }
+  .rsab-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--color-rs-teal-900); color: #fff; font-size: 12px; font-weight: 600; display: grid; place-items: center; flex-shrink: 0; }
+  .rsab-user__text { display: flex; flex-direction: column; line-height: 1.25; }
+  .rsab-user__text b { font-size: 13px; font-weight: 600; color: var(--color-rs-ink); white-space: nowrap; }
+  .rsab-user__text small { font-size: 12px; color: var(--color-rs-muted); }
+  .rsab-logout { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border: 1px solid var(--color-rs-line); border-radius: var(--radius-rs); font-size: 13px; font-weight: 500; color: var(--color-rs-ink-2); text-decoration: none; background: #fff; white-space: nowrap; }
+  .rsab-logout:hover { color: var(--color-rs-err); border-color: #f2c4bf; background: var(--color-rs-err-bg); }
+  .rsab-menu-btn { display: none; width: 38px; height: 38px; border: 1px solid var(--color-rs-line); border-radius: var(--radius-rs); background: #fff; color: var(--color-rs-ink); align-items: center; justify-content: center; font-size: 18px; }
+
+  /* Breadcrumb */
+  .rsab-crumbs { font-size: 13px !important; color: var(--color-rs-muted) !important; gap: 6px !important; row-gap: 4px !important; flex-wrap: wrap; display: flex; align-items: center; }
+  .rsab-crumbs > * { margin: 0 !important; }
+  .rsab-crumbs a { color: var(--color-rs-muted) !important; text-decoration: none; border-radius: 4px; }
+  .rsab-crumbs a:hover { color: var(--color-rs-teal-700) !important; text-decoration: underline; text-underline-offset: 3px; }
+  .rsab-crumbs > :last-child:not(a) { color: var(--color-rs-ink) !important; font-weight: 600 !important; background: none !important; border: 0 !important; padding: 0 !important; }
+  .rsab-crumbs .rs-ic { color: #9aa8a6 !important; }
+  .rsab-crumbbar { background: var(--color-rs-surface); border-bottom: 1px solid var(--color-rs-line); }
+  .rsab-crumbbar > div { padding-block: 10px; display: flex; align-items: center; }
+}
+
+@keyframes rs-spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 1439px) { .rsab-clock { display: none; } }
+/* The full navbar needs about 1040px; below 1280px (where .page-shell is narrower) the links move into the menu */
+@media (max-width: 1279px) {
+  .rsab-menu-btn { display: inline-flex; }
+  .rsab-nav__links {
+    display: none; position: absolute; top: 60px; left: 0; right: 0; height: auto; margin: 0; flex-direction: column; gap: 0;
+    background: #fff; border-bottom: 1px solid var(--color-rs-line); box-shadow: var(--shadow-rs-pop);
+    padding: 8px 1.25rem 12px;
+  }
+  .rsab-nav.is-open .rsab-nav__links { display: flex; }
+  .rsab-nav__links a { height: 46px; padding: 0 12px; border-radius: var(--radius-rs); }
+  .rsab-nav__links a.is-active { background: var(--color-rs-teal-50); }
+  .rsab-nav__links a.is-active::after { display: none; }
+}
+/* The opened menu lines up with .page-shell (2rem padding, then 5% on each side of the 90% width) */
+@media (min-width: 640px) and (max-width: 1023px) { .rsab-nav__links { padding-inline: 2rem; } }
+@media (min-width: 1024px) and (max-width: 1279px) { .rsab-nav__links { padding-inline: 5%; } }
+@media (max-width: 767px) {
+  .rsab-brand__sep, .rsab-brand__text, .rsab-user__text, .rsab-divider { display: none; }
+  .rsab-logout > span:not(.rs-ic) { display: none; }
+  .rsab-logout { width: 38px; padding: 0; justify-content: center; height: 38px; }
+  .rsab-nav__inner { gap: 10px; }
+}
+@media (max-width: 399px) { .rsab-status { display: none; } }
+@media print {
+  .rsab-nav, .rsab-crumbbar { display: none !important; }
+}

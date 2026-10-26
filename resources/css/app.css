@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./module-pages.css";
 @source "../../app/**/*.php";
 @source "../../config/**/*.php";
 @source "../../public/assets/js/*.js";
@@ -69,7 +70,7 @@
 }
 
 @layer components {
-  .page-shell { @apply mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:w-[90%] lg:px-0; }
+  /* .page-shell is defined once in design-chrome.css (imported through module-pages.css) */
   .header-action { @apply inline-flex items-center justify-center gap-1 rounded border border-slate-300 bg-white px-3 py-1.5 text-[11.7px] font-medium text-slate-600 transition-colors hover:bg-slate-50; }
   .portal-card {
     @apply relative grid min-w-0 items-start justify-items-center rounded-xl border border-slate-200/90 bg-white p-4 text-center transition-[border-color,box-shadow] duration-200 hover:border-slate-300 hover:shadow-md;

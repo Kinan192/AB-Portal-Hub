@@ -26,10 +26,9 @@ if (($navbarVariant ?? '') === 'form') {
                 <span class="flex flex-col"><span class="text-[11.7px] font-bold leading-none"><?= e($profile['name'] ?? 'Portal IT') ?></span><span class="text-[9.9px] font-medium leading-tight text-slate-500"><?= e($profile['subtitle'] ?? 'IT Division') ?></span></span>
             </div>
             <nav aria-label="Menu akun" class="flex flex-wrap gap-2.5">
-                <!-- TODO: Enable authenticated account routes in implementation stage 2. -->
-                <button type="button" class="header-action" data-account="password" aria-haspopup="dialog"><?= icon('lock', 'size-3') ?><span>Password<span class="sr-only">, belum tersedia</span></span></button>
-                <button type="button" class="header-action" data-account="users" aria-haspopup="dialog"><?= icon('users', 'size-3') ?><span>Users<span class="sr-only">, belum tersedia</span></span></button>
-                <button type="button" class="header-action hover:border-red-300 hover:bg-red-50 hover:text-red-700" data-account="logout" aria-haspopup="dialog"><?= icon('logout', 'size-3') ?><span>Logout<span class="sr-only">, belum tersedia</span></span></button>
+                <a class="header-action" href="<?= e(url('/password')) ?>"><?= icon('lock', 'size-3') ?><span>Password</span></a>
+                <a class="header-action" href="<?= e(url('/users')) ?>"><?= icon('users', 'size-3') ?><span>Users</span></a>
+                <form method="post" action="<?= e(url('/logout')) ?>" class="contents"><?= csrf_field() ?><button type="submit" class="header-action hover:border-red-300 hover:bg-red-50 hover:text-red-700"><?= icon('logout', 'size-3') ?><span>Logout</span></button></form>
             </nav>
         </div>
     </div>

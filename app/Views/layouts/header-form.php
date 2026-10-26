@@ -19,7 +19,7 @@
                 <span class="flex size-8 items-center justify-center rounded-lg bg-brand-dark text-xs font-bold text-white"><?= e($profile['initials']) ?></span>
                 <span class="flex flex-col"><span class="text-xs font-bold text-slate-800"><?= e($profile['name']) ?></span><span class="text-[10px] text-teal-700"><?= e($profile['subtitle']) ?></span></span>
             </div>
-            <button type="button" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-rose-700" data-account="logout" aria-label="Logout, belum tersedia" aria-haspopup="dialog"><?= icon('logout', 'size-4') ?></button>
+            <form method="post" action="<?= e(url('/logout')) ?>" class="contents"><?= csrf_field() ?><button type="submit" class="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-rose-700" aria-label="Logout"><?= icon('logout', 'size-4') ?></button></form>
         </div>
     </div>
 </header>

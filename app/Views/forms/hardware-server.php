@@ -12,10 +12,10 @@
  * } $inspection
  */
 ?>
-<main id="main-content" class="flex-1 bg-slate-100">
+<main id="main-content" class="flex-1">
     <?php require BASE_PATH . '/app/Views/components/hardware-server-hero.php'; ?>
 
-    <div class="page-shell relative -mt-4 pb-16">
+    <div class="page-shell relative mt-6 pb-16">
         <form id="hardware-monitoring-form" method="post" class="space-y-6" data-inspector="<?= e($profile['name']) ?>">
             <input type="hidden" name="recorded_at" value="<?= e($recordedAt) ?>">
             <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
