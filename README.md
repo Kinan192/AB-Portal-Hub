@@ -16,9 +16,9 @@ Buka http://127.0.0.1:8080. PHP 8.3 atau lebih baru dapat menjalankan frontend; 
 
 URL pengisian menggunakan `/forms/{nama-modul}`, sedangkan laporan menggunakan `/reports/{nama-modul}`. Route laporan hanya didaftarkan pada `/reports/...`.
 
-Semua form dan laporan memakai breadcrumb bersama di bawah header: `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya portal menuju `/`; kategori, nama modul, dan halaman aktif tidak ditautkan. Controller memakai helper `monitoring_breadcrumbs()` dengan nama dari `config/monitoring-navigation.php`. Kedua layout merender `app/Views/components/breadcrumbs.php`; jangan menulis ulang navigasi pada view atau navbar.
+Di bawah header, semua form menampilkan tombol **Kembali ke Dashboard** menuju `/` (controller mengirim `'backToDashboard' => true`), sedangkan semua laporan memakai breadcrumb bersama: `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya portal menuju `/`; kategori, nama modul, dan halaman aktif tidak ditautkan. Controller laporan memakai helper `monitoring_breadcrumbs()` dengan nama dari `config/monitoring-navigation.php`. Kedua layout merender `app/Views/components/breadcrumbs.php`; jangan menulis ulang navigasi pada view atau navbar.
 
-Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Simpan Draft menyimpan data di browser perangkat yang sama dan memuatnya kembali saat halaman dibuka; pengiriman ke server masih menunggu integrasi backend.
+Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Pengiriman ke server masih menunggu integrasi backend.
 
 Halaman rekap bulanan tersedia di http://127.0.0.1:8080/reports/hardware-server, juga melalui tombol Lihat Riwayat & Rekap Laporan pada form. Filter bulan/rak/status, pencarian, rincian laporan, pagination, serta Cetak Rekap sudah berfungsi di frontend. Tujuh baris awal berasal dari HTML referensi dan ditandai sebagai data referensi di halaman. Jumlah hasil dihitung dari data yang tersedia. Ekspor Excel/PDF dan unduh lembar menjelaskan bahwa integrasi laporan server belum tersedia; tidak ada unduhan atau persetujuan operasional yang diklaim berasal dari backend.
 
@@ -28,11 +28,11 @@ CSS Tailwind dan font Inter sudah tersedia di `public/assets/`, sehingga portal 
 
 ## Mengembangkan tampilan
 
-Form Monitoring Antrian Online BPJS tersedia di http://127.0.0.1:8080/forms/antrian-online. View: `app/Views/antrian-online/form.php`; controller: `AntrianOnlineController`; konfigurasi: `config/antrian-online.php`. Isian berfokus pada status cron antrian dan cron bed MJKN, catatan tindak lanjut, serta konfirmasi pemeriksaan. Petugas dan waktu pencatatan ditampilkan otomatis. Draft, reset, validasi, dan ringkasan berjalan di frontend. Shift, endpoint/status koneksi, jumlah tiket, dan unggah bukti sudah dihapus. Pengiriman laporan ke server menunggu integrasi backend.
+Form Monitoring Antrian Online BPJS tersedia di http://127.0.0.1:8080/forms/antrian-online. View: `app/Views/antrian-online/form.php`; controller: `AntrianOnlineController`; konfigurasi: `config/antrian-online.php`. Isian berfokus pada status cron antrian dan cron bed MJKN, catatan tindak lanjut, serta konfirmasi pemeriksaan. Petugas dan waktu pencatatan ditampilkan otomatis. Reset, validasi, dan ringkasan berjalan di frontend. Shift, endpoint/status koneksi, jumlah tiket, dan unggah bukti sudah dihapus. Pengiriman laporan ke server menunggu integrasi backend.
 
 Rekap BPJS tersedia di http://127.0.0.1:8080/reports/antrian-online. View: `app/Views/antrian-online/rekap.php`; data referensi: `config/antrian-online-reports.php`; script: `public/assets/js/antrian-online-history.js`. Filter periode/status kedua cron, pencarian, rincian, pagination, dan cetak tersedia. Tabel memiliki lima kolom: waktu audit, cron antrian, cron bed, catatan, dan petugas. Filter shift, transaksi tiket, dan bukti log sudah dihapus. Tujuh baris referensi menghasilkan 7 sesi, cron antrian 85,7%, dan cron bed 100%. SOP serta ekspor Excel/PDF menunggu integrasi.
 
-Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/kesesuaian-user/form.php`, controller di `app/Controllers/KesesuaianUserController.php`, serta konfigurasi alasan verifikasi di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB; draft disimpan di browser. Konfirmasi pemeriksaan tidak dipulihkan dari draft dan harus dicentang kembali. Pengiriman ke server masih menunggu integrasi.
+Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/kesesuaian-user/form.php`, controller di `app/Controllers/KesesuaianUserController.php`, serta konfigurasi alasan verifikasi di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB. Pengiriman ke server masih menunggu integrasi.
 
 Laporan Kesesuaian User tersedia di http://127.0.0.1:8080/reports/kesesuaian-user melalui kedua tombol rekap pada form. View berada di `app/Views/kesesuaian-user/rekap.php`, data referensi di `config/kesesuaian-user-reports.php`, dan interaksi di `public/assets/js/kesesuaian-user-history.js`. Filter periode/status/unit dan pencarian memperbarui tabel serta ringkasannya. Klik username untuk rincian; Cetak Rekap mencetak semua hasil filter lintas halaman. Ekspor Excel/PDF menunggu backend. Tujuh baris referensi menghasilkan ringkasan awal 7 user, 5 sesuai, 2 tidak sesuai, dan kepatuhan 71,4%, tanpa jumlah 128 yang tidak didukung data tabel.
 
@@ -65,7 +65,7 @@ Semua route kecuali `/login` memerlukan sesi login (middleware `app/Core/Require
 
 Setiap form dikirim (POST) ke route rekap modulnya, lalu diarahkan kembali ke halaman rekap dengan notifikasi. Belum ada data yang disimpan. Filter dan pencarian rekap berjalan di browser (`public/assets/js/design.js`). Tombol Export dan Cetak masih berupa tampilan.
 
-Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `button-secondary` untuk draft, `button-neutral` untuk kembali, `button-soft` untuk rekap/bantuan, `button-ghost` untuk reset/tutup, `button-on-dark` untuk aksi hero, dan `button-danger` untuk hapus berkas. Pasangkan dengan class ukuran seperti `inspection-button`. Detail ada di Design System bagian 9. Breadcrumb laporan menyebut nama modul secara lengkap agar tujuan rekap jelas.
+Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `button-secondary` untuk Kembali ke Dashboard, `button-neutral` untuk kembali, `button-soft` untuk rekap/bantuan, `button-ghost` untuk reset/tutup, `button-on-dark` untuk aksi hero, dan `button-danger` untuk hapus berkas. Pasangkan dengan class ukuran seperti `inspection-button`. Detail ada di Design System bagian 9. Breadcrumb laporan menyebut nama modul secara lengkap agar tujuan rekap jelas.
 
 Seluruh form dan rekap memakai warna tombol tersebut melalui `resources/css/module-ui.css`, yang dibangun ke kedua bundle CSS. Jenis font adalah Inter dengan ukuran berdasarkan peran: judul panel 20 px, judul bagian 17 px, label/input/tombol 14 px, aksi kecil/tabel 13 px, keterangan 12 px. Gunakan `ui-panel-title`, `ui-section-title`, `ui-field-label`, `ui-body`, dan `ui-caption` untuk tipografi; `module-action` atau `module-action-small` untuk tombol; serta `module-page-button` untuk pagination. Navbar tetap memakai sumber bersama dari home.
 
@@ -82,7 +82,7 @@ Seluruh form dan rekap memakai warna tombol tersebut melalui `resources/css/modu
 | `app/Views/hardware-server/form.php` | Halaman pengisian pemeriksaan hardware |
 | `app/Views/kesesuaian-user/form.php` | Halaman pengisian verifikasi user HIS |
 | `config/hardware-server.php` | Lokasi, periode, pilihan rak, dan teks pemeriksaan |
-| `public/assets/js/hardware-server.js` | Interaksi form, validasi, dan draft lokal |
+| `public/assets/js/hardware-server.js` | Interaksi form dan validasi |
 | `app/Views/hardware-server/rekap.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
 | `app/Views/kesesuaian-user/rekap.php` | Rekap dan riwayat verifikasi user HIS |
 | `app/Views/antrian-online/rekap.php` | Rekap cron, tiket, bukti, dan tindak lanjut antrian BPJS |

@@ -1,6 +1,7 @@
 @import "tailwindcss";
 @import "./module-pages.css";
 @import "./module-ui.css";
+@import "./gform.css";
 @source "../../app/**/*.php";
 @source "../../config/**/*.php";
 @source "../../public/assets/js/*.js";

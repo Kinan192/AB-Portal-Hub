@@ -12,14 +12,17 @@ function config(string $name): array
     return $loaded[$name] ??= require BASE_PATH . '/config/' . $name . '.php';
 }
 
-/** @return list<array{label: string}> */
-function monitoring_breadcrumbs(string $module, bool $report = false): array
+/**
+ * Breadcrumb trail of a rekap page (form pages show a "Kembali ke Dashboard" button instead).
+ * @return list<array{label: string}>
+ */
+function monitoring_breadcrumbs(string $module): array
 {
     $page = config('monitoring-navigation')[$module];
     return [
         ['label' => 'Monitoring Harian'],
         ['label' => $page['module']],
-        ['label' => $page[$report ? 'report' : 'form']],
+        ['label' => $page['report']],
     ];
 }
 
@@ -146,7 +149,6 @@ function icon(string $name, string $class = 'size-5'): string
         'cube' => '<path d="m12 3 9 5v9l-9 5-9-5V8Zm0 10v9M3 8l9 5 9-5M7.5 5.5l9 5V15"/>',
         'warning' => '<path d="m12 3 10 18H2Zm0 6v5m0 3h.01"/>',
         'arrow-left' => '<path d="m10 5-7 7 7 7M3 12h18"/>',
-        'bookmark' => '<path d="M6 3h12v18l-6-4-6 4Z"/>',
         'send' => '<path d="m22 2-7 20-4-9-9-4Zm0 0L11 13"/>',
         'chart-search' => '<path d="m3 15 5-6 4 3 5-8m-4 0h4v4M3 21h8"/><circle cx="17" cy="17" r="4"/><path d="m20 20 2 2"/>',
         'table' => '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 9v12m6-12v12M3 15h18"/>',

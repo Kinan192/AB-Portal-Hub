@@ -20,9 +20,9 @@ Dokumen ini mencatat implementasi terakhir pada 26 Oktober 2026. Ukuran di bawah
 
 Dokumen arsitektur awal diberikan sebagai berkas terpisah bernama `architecture Portal Hub.md`. Saat panduan ini dibuat, tidak ada `architecture.md` di root repository. Panduan frontend ini dapat digunakan langsung; tim perlu menyertakan dokumen arsitektur tersebut dalam repository sebelum memulai integrasi backend.
 
-Project ini adalah frontend aplikasi yang sedang dikembangkan langsung. Gunakan bahasa operasional seperti “Riwayat pemeriksaan”, “Simpan draft”, dan “Informasi portal”. Fitur yang belum tersedia harus dijelaskan sesuai kondisinya, tanpa mengklaim sudah tersambung ke backend.
+Project ini adalah frontend aplikasi yang sedang dikembangkan langsung. Gunakan bahasa operasional seperti “Riwayat pemeriksaan”, “Kirim laporan”, dan “Informasi portal”. Fitur yang belum tersedia harus dijelaskan sesuai kondisinya, tanpa mengklaim sudah tersambung ke backend.
 
-Controller, View, router GET statis, konfigurasi, dan helper sudah digunakan. Form hardware server memiliki draft lokal di browser. Model operasional, autentikasi, middleware, serta penyimpanan form ke server belum diimplementasikan. Angka progres 5/6 (83%) saat ini berasal dari konfigurasi frontend dan akan diganti sumbernya saat integrasi backend.
+Controller, View, router GET statis, konfigurasi, dan helper sudah digunakan. Model operasional, autentikasi, middleware, serta penyimpanan form ke server belum diimplementasikan. Angka progres 5/6 (83%) saat ini berasal dari konfigurasi frontend dan akan diganti sumbernya saat integrasi backend.
 
 ## 2. Menjalankan hasil clone
 
@@ -182,19 +182,19 @@ Layout menambahkan class `portal-page` ketika data `$groups` tersedia pada dashb
 
 ID `main-content` harus ada satu kali pada setiap halaman agar skip link berfungsi. Judul dokumen berasal dari `$pageTitle`.
 
-### 8.1.1 Breadcrumb bersama
+### 8.1.1 Tombol kembali dan breadcrumb bersama
 
-Source: `config/monitoring-navigation.php`, helper `monitoring_breadcrumbs()`, serta `app/Views/components/breadcrumbs.php` dan `breadcrumb.php`. Semua form dan laporan mengirim array `breadcrumbs` dari controller. Layout `main.php` dan `design.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding vertikal 20 px. Jangan membuat breadcrumb lagi di navbar atau view halaman.
+Source: `config/monitoring-navigation.php`, helper `monitoring_breadcrumbs()`, serta `app/Views/components/breadcrumbs.php` dan `breadcrumb.php`. Semua form mengirim `'backToDashboard' => true` dan menampilkan tombol outline **Kembali ke Dashboard** (ikon panah kiri, tinggi minimal 44 px, `aria-label`, focus ring) menuju `/`; view boleh mengisi `$breadcrumbAside` untuk konten di kanan baris yang sama, misalnya badge ISO 27001 pada Clear Desk. Semua laporan mengirim array `breadcrumbs` dari controller. Layout `main.php` dan `design.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding vertikal 20 px. Jangan membuat breadcrumb lagi di navbar atau view halaman.
 
-Urutan selalu `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya Portal Monitoring Terpadu memiliki tautan `/`. Kategori, nama modul, dan halaman aktif berupa teks tanpa tautan maupun cursor pointer, termasuk pada halaman rekap. Halaman aktif memiliki `aria-current=page`. Home dan halaman error tidak menampilkan breadcrumb monitoring.
+Urutan selalu `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya Portal Monitoring Terpadu memiliki tautan `/`. Kategori, nama modul, dan halaman aktif berupa teks tanpa tautan maupun cursor pointer, pada halaman rekap. Halaman aktif memiliki `aria-current=page`. Home dan halaman error tidak menampilkan breadcrumb monitoring.
 
 Contoh data halaman laporan:
 
 ```php
-'breadcrumbs' => monitoring_breadcrumbs('suhu', true),
+'breadcrumbs' => monitoring_breadcrumbs('suhu'),
 ```
 
-Untuk form gunakan `monitoring_breadcrumbs('suhu')`, yang menghasilkan `Monitoring Harian / Suhu Server / Form Input Suhu Bulanan` sesudah portal. Untuk rekap gunakan argumen kedua `true`; nama halaman rekap tetap menyebut modulnya. Keenam modul memakai pola yang sama. Breadcrumb memakai font 13 px, separator `/` yang disembunyikan dari pembaca layar, dukungan wrap, dan focus ring global. Komponen berada di luar `<main>` dan disembunyikan saat cetak.
+Helper menghasilkan `Monitoring Harian / Suhu Server / Rekap Suhu Server Bulanan` sesudah portal; nama halaman rekap tetap menyebut modulnya. Keenam modul memakai pola yang sama. Breadcrumb memakai font 13 px, separator `/` yang disembunyikan dari pembaca layar, dukungan wrap, dan focus ring global. Komponen berada di luar `<main>` dan disembunyikan saat cetak.
 
 ### 8.2 Navbar
 
@@ -319,7 +319,7 @@ Warna aksi form dan rekap memakai class bersama di `resources/css/module-ui.css`
 | Fungsi | Class warna | Tampilan |
 | --- | --- | --- |
 | Kirim laporan/verifikasi | `.button-primary` | Teal-700, teks putih; hover teal-800 |
-| Simpan Draft | `.button-secondary` | Putih, border teal-600, teks teal-700; hover teal-50 |
+| Kembali ke Dashboard | `.button-secondary` | Putih, border teal-600, teks teal-700; hover teal-50 |
 | Kembali ke portal/form | `.button-neutral` | Putih, border slate-300, teks slate-700; hover slate-50 |
 | Riwayat/rekap, ekspor/unduh, catatan cepat, Set Jam Sekarang | `.button-soft` | Teal-50, teks teal-800; hover teal-100 |
 | Reset/Clear Form dan tutup dialog | `.button-ghost` | Transparan, teks slate-500; hover slate-100 |
@@ -378,8 +378,7 @@ URL tetap sama saat file dipindah. Hardware Server, Kesesuaian User, dan Antrian
 - `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
 - `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
 - Kelompok CPU/monitor memakai partial `components/hardware-condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
-- Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal serta menghapus draft setelah konfirmasi.
-- Simpan Draft menggunakan `localStorage` dengan versi format dan nama profil, lalu memuat draft pada pembukaan berikutnya di browser yang sama. Ini belum merupakan penyimpanan lintas akun/perangkat; sumber identitas dan penyimpanan harus diganti saat autentikasi/backend diintegrasikan.
+- Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal setelah konfirmasi.
 - Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Lihat Riwayat & Rekap Laporan mengarah ke `/reports/hardware-server`. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
 - Script khusus halaman didaftarkan melalui array `pageScripts` di controller. Layout memuatnya dengan `defer` dan versi `filemtime`; jangan memasukkan script inline ke view.
 - Controller mempertahankan pembatasan `APP_ENV=local` sampai autentikasi tersedia.
@@ -409,7 +408,6 @@ Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::form()` da
 - Isi memakai satu kolom pada mobile dan grid 12 kolom mulai `lg`: form delapan kolom dan sampel terakhir empat kolom. Panel putih memakai radius 12 px, padding 24/32 px. Field 13 px dengan tinggi 48 px; label 14 px; deskripsi 12 px.
 - Pilihan kesesuaian memakai radio native, dengan `.compliance-option`, `.compliance-radio`, dan fokus keyboard yang terlihat. Pilihan Tidak Sesuai membuka alasan dan catatan. Alasan wajib terisi untuk status tersebut; catatan wajib untuk alasan Lainnya. Field tersembunyi dinonaktifkan agar tidak menghalangi validasi.
 - Username wajib terisi dan tidak boleh mengandung spasi. Tanggal/jam login wajib terisi; Set Jam Sekarang menggunakan `Intl.DateTimeFormat` dengan zona Asia/Jakarta, tanpa mencampur tanggal UTC dengan jam lokal.
-- Draft lokal memiliki versi format dan nama profil. Draft dapat memuat isian belum lengkap; format, panjang teks, alasan, dan tanggal/jam diverifikasi saat dimuat kembali. Checkbox konfirmasi tidak dipulihkan dari draft agar pemeriksaan harus dikonfirmasi kembali.
 - Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Kedua tombol rekap membuka `/reports/kesesuaian-user`; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
 - Sidebar memakai tiga sampel dari HTML referensi, ditandai sebagai data referensi. Jumlah badge mengikuti array, tanpa mengklaim Hari Ini (4). Ganti sumber data melalui Model setelah backend tersedia.
 - View memiliki anotasi PHPDoc untuk variabel yang dikirim controller. Ikon `user-search` dan `history` menggunakan helper yang sama. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi tersedia.
@@ -431,11 +429,10 @@ Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::rekap()`, vi
 Route `/forms/antrian-online` memakai `AntrianOnlineController::form()`, view `app/Views/antrian-online/form.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`.
 
 - Form berisi status cron antrian dan cron bed MJKN, catatan tindak lanjut, serta checkbox konfirmasi. Identitas petugas dan waktu WIB ditampilkan sebagai metadata. Periode hero cukup bertuliskan Inspeksi Harian.
-- Pilihan shift, endpoint/status koneksi bridging, jumlah tiket, serta unggah bukti sudah dihapus dari view, konfigurasi, validasi, draft, reset, dan ringkasan.
+- Pilihan shift, endpoint/status koneksi bridging, jumlah tiket, serta unggah bukti sudah dihapus dari view, konfigurasi, validasi, reset, dan ringkasan.
 - Dua card cron tetap memakai subgrid bersama agar judul, deskripsi, dan pilihan sejajar. Catatan dan konfirmasi memakai lebar penuh tanpa kolom unggah kosong.
 - Jika salah satu cron tidak terkirim, catatan wajib terisi dan tidak boleh hanya spasi. Konfirmasi tetap wajib dicentang sebelum ringkasan dibuka.
-- Draft hanya menyimpan kedua status cron, catatan, dan waktu. Konfirmasi harus diulang. Draft lama dapat dimuat untuk field yang masih ada; field tambahan yang sudah dihapus tidak dipakai dan tidak disimpan kembali.
-- Reset meminta konfirmasi, menghapus draft, mengembalikan status awal, mengosongkan catatan/konfirmasi, serta memperbarui waktu WIB. Kirim membuka ringkasan dengan keterangan bahwa pengiriman server belum tersedia.
+- Reset meminta konfirmasi, mengembalikan status awal, mengosongkan catatan/konfirmasi, serta memperbarui waktu WIB. Kirim membuka ringkasan dengan keterangan bahwa pengiriman server belum tersedia.
 
 ### 9.6 Rekap Monitoring Antrian Online BPJS
 
@@ -469,7 +466,7 @@ final class HardwareServerController
     {
         View::render('hardware-server/form', [
             'pageTitle' => 'Monitoring Hardware Server',
-            'breadcrumbs' => monitoring_breadcrumbs('hardware-server'),
+            'backToDashboard' => true,
             'profile' => config('dashboard')['profile'],
         ]);
     }

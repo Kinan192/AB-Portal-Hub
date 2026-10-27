@@ -5,15 +5,6 @@ declare(strict_types=1);
 return [
     'inspected_at' => '15/10/2026 10:18 WIB',
     'cameras' => ['active' => 64, 'total' => 68, 'online' => '94.1%', 'ring' => 94],
-    'issues' => [
-        ['label' => '2 Unit Offline / Putus Jaringan', 'zone' => 'UGD & Parkir Timur', 'tone' => 'red'],
-        ['label' => '1 Unit Buram / Kaca Berembun', 'zone' => 'Lobby Farmasi', 'tone' => 'amber'],
-    ],
-    'shifts' => [
-        ['name' => 'Shift Pagi', 'icon' => 'notebook-pen', 'meta' => 'SEDANG DIINPUT', 'note' => 'Petugas: IT Botania (07:00 - 14:00 WIB)', 'current' => true],
-        ['name' => 'Shift Siang', 'icon' => 'clock', 'meta' => '14:00 WIB', 'note' => 'Menunggu rotasi personel', 'current' => false],
-        ['name' => 'Shift Malam', 'icon' => 'moon', 'meta' => '21:00 WIB', 'note' => 'Pemeriksaan perimeter & area parkir', 'current' => false],
-    ],
     'filters' => [
         'month' => ['2026-10' => 'Oktober 2026 (Aktif)', '2026-09' => 'September 2026', '2026-08' => 'Agustus 2026', '2026-07' => 'Juli 2026'],
         'ntp' => ['' => 'Semua Status Jam', 'sesuai' => 'Sesuai NTP Server (Tepat)', 'drift' => 'Tidak Sesuai / Drift Waktu', 'kalibrasi' => 'Sudah Dikalibrasi Ulang'],

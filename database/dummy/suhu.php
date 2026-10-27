@@ -12,11 +12,6 @@ return [
         'ups-room' => ['name' => 'Ruang UPS & Backup Power', 'sensor' => 'SNS-UPS-02'],
     ],
     // Latest readings shown beside the form
-    'recent' => [
-        ['location' => 'Ruang Server Utama', 'time' => '14 Okt 2026 • 09:30 WIB', 'icon' => 'server', 'temp' => '21.4°C', 'status' => 'Normal', 'warning' => false],
-        ['location' => 'Rak Server 1', 'time' => '13 Okt 2026 • 15:45 WIB', 'icon' => 'box', 'temp' => '22.1°C', 'status' => 'Normal', 'warning' => false],
-        ['location' => 'Ruang UPS & Battery', 'time' => '12 Okt 2026 • 11:20 WIB', 'icon' => 'plug', 'temp' => '24.3°C', 'status' => 'Perhatian', 'warning' => true],
-    ],
     'filters' => [
         'month' => ['2026-10' => 'Oktober 2026 (Aktif)', '2026-09' => 'September 2026', '2026-08' => 'Agustus 2026', '2026-07' => 'Juli 2026'],
         'status' => ['' => 'Semua Status Suhu', 'normal' => 'Normal (18°C - 24°C)', 'warning' => 'Perhatian (> 24°C)', 'critical' => 'Kritis (> 27°C)'],

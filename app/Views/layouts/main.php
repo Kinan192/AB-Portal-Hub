@@ -21,7 +21,7 @@ $modulePage = !isset($groups);
 <body class="flex min-h-screen flex-col<?= $modulePage ? ' module-page' : ' portal-page' ?>">
     <a href="#main-content" class="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-teal-800 px-4 py-3 text-sm text-white focus:translate-y-0">Langsung ke konten</a>
     <?php require __DIR__ . '/header.php'; ?>
-    <?php if (!empty($breadcrumbs)): ?>
+    <?php if (!empty($breadcrumbs) || !empty($backToDashboard)): ?>
     <div class="breadcrumb-shell page-shell py-5">
         <?php require BASE_PATH . '/app/Views/components/breadcrumbs.php'; ?>
     </div>

@@ -47,7 +47,7 @@
   /* Links and buttons without a destination yet                       */
   /* ---------------------------------------------------------------- */
   document.addEventListener('click', (event) => {
-    const target = event.target.closest('[data-unavailable], a[href="#"], [data-page-btn], [data-export], [data-print], [data-draft], [data-fill-target]');
+    const target = event.target.closest('[data-unavailable], a[href="#"], [data-page-btn], [data-export], [data-print], [data-fill-target]');
     if (!target) return;
     if (target.matches('[data-fill-target]')) {
       const input = document.getElementById(target.dataset.fillTarget);
@@ -58,7 +58,6 @@
     if (target.matches('[data-print]')) window.print();
     else if (target.dataset.export === 'xlsx') showToast('Mengunduh Laporan Format Excel (.xlsx)...', 'Ekspor masih berupa tampilan; berkas belum dibuat.', 'info');
     else if (target.dataset.export === 'pdf') showToast('Mengunduh Laporan Format PDF...', 'Ekspor masih berupa tampilan; berkas belum dibuat.', 'info');
-    else if (target.matches('[data-draft]')) showToast('Draft berhasil disimpan!', 'Data belum dikirim ke rekap.');
     else if (target.matches('[data-page-btn]')) notAvailable(target.textContent.trim() ? `Halaman ${target.textContent.trim()}` : target.getAttribute('aria-label'));
     else notAvailable(target.dataset.unavailable || target.textContent.trim());
   });

@@ -18,11 +18,6 @@ return [
         ['name' => 'chk_screen', 'title' => 'Kepatuhan Clear Screen (Penguncian Layar Monitor)', 'description' => 'Layar komputer terkunci otomatis (Win + L / Inactivity screen-lock timeout ≤ 3-5 menit) saat ditinggalkan oleh staf unit kerja.'],
         ['name' => 'chk_media', 'title' => 'Keamanan Media Penyimpanan Eksternal', 'description' => 'Flashdisk, hard disk eksternal, atau token USB tidak tercolok di workstation tanpa izin resmi IT Security RS Awal Bros.'],
     ],
-    'daily' => ['rate' => '96.2%', 'inspected' => 48, 'target' => 50, 'remaining' => 2, 'ring_offset' => 12, 'findings' => 2],
-    'findings_today' => [
-        ['location' => 'Meja Kasir Poli Lt. 2', 'note' => 'Sticky note kredensial login SIMRS tertempel di bezel monitor. Kertas diamankan verifikator.', 'time' => 'Pukul 08:42 WIB', 'auditor' => 'Audit: Verifikator IT 01'],
-        ['location' => 'Nurse Station 3 (Rawat Inap)', 'note' => 'Layar komputer rekam medis aktif ditinggalkan >7 menit tanpa lock screen saat operan jaga.', 'time' => 'Pukul 09:15 WIB', 'auditor' => 'Audit: Verifikator IT 02'],
-    ],
     'filters' => [
         'month' => ['2026-10' => 'Oktober 2026 (Aktif)', '2026-09' => 'September 2026', '2026-08' => 'Agustus 2026', '2026-07' => 'Juli 2026'],
         'status' => ['' => 'Semua Status (Patuh / Temuan)', 'patuh' => '✓ Patuh Lengkap', 'temuan' => '⚠️ Temuan Catatan Fisik', 'screen' => '⚠️ Layar Belum Terkunci'],

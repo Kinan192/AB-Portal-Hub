@@ -6,7 +6,6 @@
   const feedback = document.getElementById('compliance-feedback');
   const review = document.getElementById('compliance-review');
   const names = ['username', 'status', 'reason', 'notes', 'login_date', 'login_time'];
-  const storageKey = `ab-portal:kesesuaian-user:draft:v1:${form.dataset.inspector}`;
   const readValues = () => Object.fromEntries(names.map((name) => [name, field(name).value]));
   const tell = (message) => { feedback.textContent = message; feedback.classList.remove('hidden'); };
   const syncValidation = () => {
@@ -37,32 +36,6 @@
     period.dateTime = field('login_date').value;
     period.textContent = dateFormatter.format(now);
   };
-  const validDate = (value) => {
-    if (!/^[1-9]\d{3}-\d{2}-\d{2}$/.test(value)) return false;
-    const parsed = new Date(`${value}T00:00:00Z`);
-    return Number.isFinite(parsed.getTime()) && parsed.toISOString().slice(0, 10) === value;
-  };
-  const validDraft = (draft) => {
-    if (!draft || draft.version !== 1 || !draft.values || typeof draft.savedAt !== 'string' || !Number.isFinite(Date.parse(draft.savedAt))) return false;
-    const values = draft.values;
-    return names.every((name) => typeof values[name] === 'string')
-      && values.username.length <= 100 && values.notes.length <= 1000
-      && ['sesuai', 'tidak_sesuai'].includes(values.status)
-      && Array.from(field('reason').options).some((option) => option.value === values.reason)
-      && (!values.login_date || validDate(values.login_date))
-      && (!values.login_time || /^(?:[01]\d|2[0-3]):[0-5]\d$/.test(values.login_time));
-  };
-  try {
-    const stored = localStorage.getItem(storageKey);
-    if (stored) {
-      const draft = JSON.parse(stored);
-      if (validDraft(draft)) {
-        names.forEach((name) => { field(name).value = draft.values[name]; });
-        field('confirmed').checked = false;
-        tell('Draft dimuat dari browser perangkat ini. Konfirmasi pemeriksaan kembali sebelum mengirim verifikasi. Data belum dikirim ke server.');
-      } else tell('Draft sebelumnya tidak dapat dimuat karena format datanya tidak sesuai. Silakan isi form kembali.');
-    }
-  } catch { tell('Draft tidak dapat dibaca dari browser ini. Anda tetap dapat mengisi form.'); }
   syncValidation();
   let baseline = JSON.stringify(readValues());
   form.addEventListener('input', syncValidation);
@@ -71,18 +44,6 @@
     setNow();
     tell('Tanggal dan jam login diperbarui menggunakan waktu Asia/Jakarta (WIB).');
   });
-  document.querySelectorAll('[data-compliance-save]').forEach((button) => button.addEventListener('click', () => {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify({ version: 1, savedAt: new Date().toISOString(), values: readValues() }));
-      baseline = JSON.stringify(readValues());
-      if (review.open) review.close();
-      tell('Draft tersimpan di browser perangkat ini. Data belum dikirim ke server.');
-    } catch {
-      if (review.open) review.close();
-      tell('Draft gagal disimpan. Penyimpanan browser mungkin penuh atau diblokir. Isian form tetap tersedia di halaman ini.');
-    }
-    feedback.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-  }));
   form.addEventListener('submit', (event) => {
     event.preventDefault();
     syncValidation();

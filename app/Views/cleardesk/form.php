@@ -1,245 +1,137 @@
 <?php
-$daily = $module['daily'];
 $fieldLabel = static fn (string $for, string $text, bool $required = true): string =>
-    '<label class="text-headline-sm font-bold text-on-surface flex items-center gap-1.5"' . attrs(['for' => $for]) . '><span>' . e($text) . '</span>' . ($required ? '<span class="text-primary">*</span>' : '') . '</label>';
-$iconInput = static fn (string $icon, array $attributes): string =>
-    '<div class="relative"><div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">' . design_icon($icon, 'text-on-surface-variant text-lg') . '</div>'
-    . '<input' . attrs($attributes + ['required' => true, 'type' => 'text']) . '></div>';
-ob_start(); ?>
-<div class="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end gap-3 shrink-0">
-    <div class="bg-surface-container-lowest/10 backdrop-blur-md px-4 py-3 rounded-lg flex items-center gap-3 text-on-tertiary shadow-rs">
-        <?= design_icon('calendar-check', 'text-secondary-fixed text-2xl') ?>
-        <div>
-            <div class="text-label-sm text-secondary-container tracking-wider uppercase">PERIODE LAPORAN</div>
-            <div class="text-headline-sm font-semibold">Inspeksi Harian (Shift Pagi)</div>
-        </div>
-    </div>
-    <?= partial('button', ['label' => 'Lihat Rekap & Unduh Laporan', 'href' => url('/rekap/cleardesk'), 'icon' => 'file-text', 'iconClass' => 'text-lg', 'class' => 'button-on-dark module-action inline-flex items-center gap-2 px-4 py-2.5 rounded-full text-body-sm font-semibold transition-all shadow-rs whitespace-nowrap']) ?>
-</div>
-<?php $heroAside = ob_get_clean(); ?>
-<main id="main-content" class="w-full bg-surface min-h-[calc(100vh-56px)]">
-<div class="flex flex-col w-full">
-    <div class="w-full bg-surface-container-low py-3 border-b-0 shadow-rs">
-        <div class="page-shell flex flex-wrap items-center justify-between gap-3">
-        <?= partial('badge', ['tag' => 'div', 'label' => 'ISO 27001 ISMS Compliance', 'labelClass' => 'text-label-sm uppercase tracking-wider text-secondary', 'icon' => 'shield-check', 'iconClass' => 'text-tertiary text-base', 'class' => 'flex items-center gap-2 bg-surface-container-lowest px-3 py-1 rounded-full text-on-surface shadow-rs whitespace-nowrap']) ?>
-        </div>
-    </div>
-
-    <div class="page-shell py-space-lg space-y-6">
-        <?= partial('page-header', [
-            'class' => 'relative overflow-hidden rounded-xl p-6 lg:p-8', 'introClass' => 'max-w-3xl space-y-3',
-            'eyebrow' => partial('badge', ['tag' => 'div', 'label' => 'RS AWAL BROS GROUP • IT BOTANIA', 'dot' => 'w-2 h-2 rounded-full bg-secondary-fixed animate-ping', 'class' => 'inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-lowest/15 backdrop-blur-xs text-on-tertiary text-label-sm tracking-wider uppercase whitespace-nowrap']),
+    '<label class="gf-q-title"' . attrs(['for' => $for]) . '><span>' . e($text) . '</span>' . ($required ? '<span class="gf-req">*</span>' : '') . '</label>';
+$textInput = static fn (array $attributes): string => '<input' . attrs($attributes + ['required' => true, 'type' => 'text']) . '>';
+?>
+<?php $breadcrumbAside = partial('badge', ['tag' => 'div', 'label' => 'ISO 27001 ISMS Compliance', 'labelClass' => 'text-label-sm uppercase tracking-wider text-secondary', 'icon' => 'shield-check', 'iconClass' => 'text-tertiary text-base', 'class' => 'flex items-center gap-2 bg-surface-container-lowest px-3 py-1 rounded-full text-on-surface shadow-rs whitespace-nowrap']); ?>
+<main id="main-content" class="gf-page">
+    <form class="gf-form" id="clearDeskForm" method="post" action="<?= e(url('/rekap/cleardesk')) ?>" enctype="multipart/form-data" data-module-form novalidate>
+        <?= partial('gf-header', [
+            'eyebrow' => 'RS AWAL BROS GROUP • IT BOTANIA',
             'title' => 'Form Monitoring Clear Desk & Clear Screen',
             'description' => 'Pencatatan kepatuhan keamanan informasi fisik, penataan meja kerja (Clear Desk) dan penguncian layar monitor (Clear Screen) di lingkungan RS Awal Bros Botania sesuai standar ISO 27001 dan keamanan data rekam medis elektronik.',
-            'descriptionClass' => 'text-body-md text-on-tertiary/90',
-            'aside' => $heroAside,
+            'meta' => [
+                ['label' => 'PERIODE LAPORAN', 'value' => 'Inspeksi Harian (Shift Pagi)'],
+                ['label' => 'Akun Verifikator IT', 'value' => '<span class="truncate">' . e(config('dashboard')['account']['email']) . '</span>'
+                    . design_icon('circle-check', 'text-tertiary', ['title' => 'Verified Domain Account'])],
+                ['label' => 'Waktu Inspeksi', 'labelFor' => 'inspectedAt', 'value' => '<input id="inspectedAt" name="started_at" readonly type="text" value="' . e($module['inspected_at']) . '">'],
+            ],
+            'required' => '<span class="gf-required-note">* WAJIB DIISI</span>',
+            'links' => [
+                '<a class="gf-link" href="' . e(url('/rekap/cleardesk')) . '">' . design_icon('file-text') . '<span>Lihat Rekap &amp; Unduh Laporan</span></a>',
+                '<a class="gf-link" href="' . e(url('/rekap/cleardesk')) . '">' . design_icon('history') . 'Lihat Riwayat</a>',
+            ],
         ]) ?>
 
-        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6 items-start">
-            <div class="xl:col-span-8 flex flex-col gap-6">
-                <form class="bg-surface-container-lowest rounded-xl p-6 lg:p-8 space-y-8 shadow-rs" id="clearDeskForm" method="post" action="<?= e(url('/rekap/cleardesk')) ?>" enctype="multipart/form-data" data-module-form novalidate>
-                    <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 bg-surface-container-low/50 -mx-6 lg:-mx-8 -mt-6 lg:-mt-8 p-6 lg:p-8 rounded-t-[12px] gap-4">
-                        <div>
-                            <div class="flex items-center gap-2 mb-1"><?= design_icon('shield', 'text-primary text-xl') ?><span class="text-headline-md font-bold text-on-surface">Data Pemeriksaan Clear Desk &amp; Screen</span></div>
-                            <p class="text-body-sm text-on-surface-variant">Formulir Log Kepatuhan Keamanan Fisik IT • Standar ISO/IEC 27001:2022 A.7.7</p>
-                        </div>
-                        <?= partial('badge', ['label' => '* WAJIB DIISI', 'class' => 'inline-flex items-center px-3 py-1 rounded-full bg-error-container text-on-error-container text-label-sm font-semibold tracking-wider self-start sm:self-center whitespace-nowrap']) ?>
-                    </div>
+        <?= partial('gf-section', ['number' => 1, 'title' => 'Data Pemeriksaan Clear Desk & Screen', 'titleTag' => 'span', 'description' => 'Formulir Log Kepatuhan Keamanan Fisik IT • Standar ISO/IEC 27001:2022 A.7.7']) ?>
 
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 p-4 rounded-xl bg-surface-container-low">
-                        <div class="space-y-1">
-                            <span class="text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider block">Akun Verifikator IT</span>
-                            <div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-2 rounded-lg shadow-rs">
-                                <?= design_icon('circle-user', 'text-tertiary text-base') ?>
-                                <span class="text-label-md font-bold text-on-surface truncate"><?= e(config('dashboard')['account']['email']) ?></span>
-                                <?= design_icon('circle-check', 'text-tertiary text-sm ml-auto', ['title' => 'Verified Domain Account']) ?>
-                            </div>
-                        </div>
-                        <div class="space-y-1">
-                            <label class="text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider block" for="inspectedAt">Waktu Inspeksi</label>
-                            <div class="flex items-center gap-2 bg-surface-container-lowest px-3 py-2 rounded-lg shadow-rs">
-                                <?= design_icon('clock', 'text-secondary text-base') ?>
-                                <input class="text-label-md text-on-surface bg-transparent focus:outline-none w-full" id="inspectedAt" name="started_at" readonly type="text" value="<?= e($module['inspected_at']) ?>">
-                            </div>
-                        </div>
-                        <?= partial('field', [
-                            'class' => 'space-y-1', 'label' => 'Shift Operasional', 'labelClass' => 'text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider block',
-                            'control' => 'select', 'name' => 'shift', 'options' => $module['shifts'], 'boxClass' => 'relative',
-                            'controlClass' => 'w-full bg-surface-container-lowest text-body-md text-on-surface px-3 py-2 rounded-lg focus:outline-none appearance-none pr-8 shadow-rs',
-                            'iconRight' => ['chevron-down', 'absolute right-2.5 top-2.5 text-on-surface-variant pointer-events-none text-base'],
-                        ]) ?>
-                    </div>
+        <?= partial('field', [
+            'class' => 'gf-card', 'label' => 'Shift Operasional', 'labelClass' => 'gf-q-title',
+            'control' => 'select', 'name' => 'shift', 'options' => $module['shifts'], 'boxClass' => 'gf-body',
+            'controlClass' => 'gf-select',
+        ]) ?>
 
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <?= $fieldLabel('lokasiInput', 'LOKASI KOMPUTER') ?>
-                            <span class="text-label-sm text-on-surface-variant">Zona Pelayanan Pasien &amp; Administrasi</span>
-                        </div>
-                        <?= $iconInput('map-pin', ['class' => 'w-full bg-surface-container-low focus:bg-surface-container-lowest text-body-md text-on-surface pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-tertiary transition-all shadow-rs', 'id' => 'lokasiInput', 'name' => 'location_unit', 'placeholder' => 'Contoh: Ruang Rekam Medis Lt. 1 / Meja Pendaftaran UGD / Ruang Poli Anak']) ?>
-                        <div class="flex flex-wrap items-center gap-2 pt-1">
-                            <span class="text-label-sm text-on-surface-variant">Pilihan Cepat:</span>
-                            <?php foreach ($module['quick_locations'] as $quick): ?>
-                            <?= partial('button', ['label' => $quick, 'class' => 'button-soft module-action px-2.5 py-1 rounded-full text-label-sm transition-colors shadow-rs whitespace-nowrap border', 'attrs' => ['data-fill-target' => 'lokasiInput']]) ?>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <?= $fieldLabel('macAddressInput', 'MAC ADDRESS') ?>
-                                <span class="text-label-sm text-secondary font-medium">NIC Hardware</span>
-                            </div>
-                            <?= $iconInput('ethernet-port', ['class' => 'w-full bg-surface-container-low focus:bg-surface-container-lowest text-label-md text-on-surface pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-tertiary transition-all shadow-rs', 'id' => 'macAddressInput', 'name' => 'mac_address', 'maxlength' => '17', 'placeholder' => '00:1A:2B:3C:4D:5E', 'autocapitalize' => 'characters', 'spellcheck' => 'false']) ?>
-                            <p class="text-body-sm text-on-surface-variant">Format MAC Address 12 digit heksadesimal dengan pemisah titik dua.</p>
-                        </div>
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <?= $fieldLabel('ipAddressInput', 'IP ADDRESS') ?>
-                                <span class="text-label-sm bg-surface-container px-2 py-0.5 rounded-sm text-on-secondary-container font-semibold">VLAN HIS Botania</span>
-                            </div>
-                            <?= $iconInput('router', ['class' => 'w-full bg-surface-container-low focus:bg-surface-container-lowest text-label-md text-on-surface pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-tertiary transition-all shadow-rs', 'id' => 'ipAddressInput', 'name' => 'ip_address', 'placeholder' => '192.168.10.45', 'inputmode' => 'decimal']) ?>
-                            <p class="text-body-sm text-on-surface-variant">Alamat IP lokal terminal kerja (Subnet 192.168.10.0/24).</p>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <span class="text-headline-sm font-bold text-on-surface flex items-center gap-1.5" id="osLabel"><span>SISTEM OPERASI</span><span class="text-primary">*</span></span>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3" role="radiogroup" aria-labelledby="osLabel">
-                            <?php foreach ($module['os_options'] as $i => $os): ?>
-                            <label class="relative flex items-center p-3.5 rounded-xl bg-surface-container-low hover:bg-surface-container cursor-pointer transition-all<?= !empty($os['wide']) ? ' sm:col-span-2' : '' ?> shadow-rs">
-                                <input<?= attrs(['checked' => $i === 0, 'class' => 'w-4 h-4 text-tertiary focus:ring-tertiary accent-tertiary', 'name' => 'os_option', 'type' => 'radio', 'value' => $os['value']]) ?>>
-                                <div class="ml-3">
-                                    <div class="text-body-md font-semibold text-on-surface"><?= e($os['label']) ?></div>
-                                    <div class="text-label-sm <?= !empty($os['highlight']) ? 'text-secondary' : 'text-on-surface-variant' ?>"><?= e($os['note']) ?></div>
-                                </div>
-                            </label>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="space-y-4 pt-2">
-                        <div class="flex items-center justify-between pb-2 bg-surface-container-low px-4 py-2.5 rounded-lg">
-                            <div class="flex items-center gap-2"><?= design_icon('list-checks', 'text-tertiary text-xl') ?><span class="text-headline-sm font-bold text-on-surface">Status Kepatuhan Audit Fisik</span></div>
-                            <span class="text-label-sm text-on-surface-variant">Tentukan status evaluasi</span>
-                        </div>
-                        <div class="space-y-3">
-                            <?php foreach ($module['checks'] as $i => $check): ?>
-                            <div class="p-4 rounded-xl bg-surface-container-low flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-rs" role="radiogroup" aria-labelledby="<?= e($check['name']) ?>-title">
-                                <div class="space-y-1 max-w-xl">
-                                    <div class="flex items-center gap-2">
-                                        <span class="w-6 h-6 rounded-full bg-surface-container-highest text-on-surface text-label-sm font-bold flex items-center justify-center whitespace-nowrap"><?= e($i + 1) ?></span>
-                                        <span class="text-headline-sm font-bold text-on-surface" id="<?= e($check['name']) ?>-title"><?= e($check['title']) ?></span>
-                                    </div>
-                                    <p class="text-body-sm text-on-surface-variant pl-8"><?= e($check['description']) ?></p>
-                                </div>
-                                <div class="flex items-center gap-3 pl-8 md:pl-0 shrink-0">
-                                    <label class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-secondary-container text-on-secondary-container text-body-sm font-semibold cursor-pointer shadow-rs">
-                                        <input checked class="w-4 h-4 accent-tertiary" name="<?= e($check['name']) ?>" type="radio" value="compliant"><span>Patuh</span>
-                                    </label>
-                                    <label class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-surface-container text-on-surface-variant text-body-sm font-medium cursor-pointer hover:bg-error-container hover:text-on-error-container transition-colors shadow-rs">
-                                        <input class="w-4 h-4 accent-primary" name="<?= e($check['name']) ?>" type="radio" value="non-compliant"><span>Temuan</span>
-                                    </label>
-                                </div>
-                            </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-
-                    <div class="space-y-3">
-                        <div class="flex items-center justify-between">
-                            <label class="text-headline-sm font-bold text-on-surface flex items-center gap-2" for="fileUpload"><?= design_icon('image-plus', 'text-secondary text-xl') ?><span>UNGGAH BUKTI FOTO MEJA / LAYAR (OPSIONAL)</span></label>
-                            <span class="text-label-sm text-on-surface-variant">JPG, PNG, atau PDF (Maks. 10MB)</span>
-                        </div>
-                        <div class="rounded-xl bg-surface-container-low p-6 text-center hover:bg-surface-container transition-colors cursor-pointer group shadow-rs">
-                            <input accept="image/*,application/pdf" capture="environment" class="hidden" id="fileUpload" name="photo" type="file" data-file-input="fileUploadLabel">
-                            <label class="cursor-pointer flex flex-col items-center justify-center space-y-2" for="fileUpload">
-                                <div class="w-12 h-12 rounded-full bg-surface-container-lowest text-tertiary flex items-center justify-center group-hover:scale-110 transition-transform shadow-rs whitespace-nowrap"><?= design_icon('cloud-upload', 'text-2xl') ?></div>
-                                <div class="text-headline-sm font-semibold text-on-surface">Tarik &amp; letakkan foto kondisi meja kerja atau layar komputer</div>
-                                <p class="text-body-sm text-on-surface-variant" id="fileUploadLabel" data-file-label="Atau klik tombol di bawah untuk memilih file dari perangkat Anda">Atau klik tombol di bawah untuk memilih file dari perangkat Anda</p>
-                                <div class="pt-2"><span class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-surface-container-lowest text-on-surface text-body-sm font-semibold hover:bg-surface-container-high transition-colors shadow-rs"><?= design_icon('plus', 'text-base') ?><span>+ Add File Bukti</span></span></div>
-                            </label>
-                        </div>
-                    </div>
-
-                    <div class="space-y-2">
-                        <label class="text-headline-sm font-bold text-on-surface flex items-center gap-2" for="catatanTemuan"><?= design_icon('align-left', 'text-secondary text-xl') ?><span>CATATAN TEMUAN / TINDAK LANJUT</span></label>
-                        <textarea class="w-full bg-surface-container-low focus:bg-surface-container-lowest text-body-md text-on-surface p-3.5 rounded-lg focus:outline-none focus:ring-2 focus:ring-tertiary transition-all shadow-rs" id="catatanTemuan" name="notes" placeholder="Contoh: Diberikan kartu peringatan kepatuhan kepada staf loket 3; sticky note kredensial segera diamankan; sistem lock screen diatur ulang ke 3 menit." rows="3"></textarea>
-                    </div>
-
-                    <div class="p-4 rounded-xl bg-surface-container-low/70 flex items-start gap-3">
-                        <input class="w-5 h-5 mt-0.5 text-tertiary focus:ring-tertiary accent-tertiary rounded-sm shadow-rs" id="declarationCheck" name="declaration" required type="checkbox">
-                        <label class="text-body-sm text-on-surface cursor-pointer select-none" for="declarationCheck">Saya menyatakan bahwa pemeriksaan <strong class="font-semibold text-on-surface">Clear Desk and Clear Screen</strong> ini telah diverifikasi sesuai kondisi fisik riil di unit kerja dan mematuhi regulasi ISO 27001 IT RS Awal Bros Botania.</label>
-                    </div>
-
-                    <div class="pt-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-surface-container-low/50 -mx-6 lg:-mx-8 p-6 lg:p-8 rounded-b-[12px]">
-                        <div class="flex items-center gap-4 w-full md:w-auto justify-between md:justify-start">
-                            <?= partial('button', ['label' => 'Kembali ke Portal Terpadu', 'href' => url('/'), 'icon' => 'arrow-left', 'iconClass' => 'text-lg', 'class' => 'button-neutral module-action inline-flex items-center gap-1.5 text-body-sm font-semibold transition-colors border']) ?>
-                            <?= partial('button', ['label' => 'Lihat Riwayat', 'href' => url('/rekap/cleardesk'), 'class' => 'button-soft module-action text-body-sm font-semibold transition-colors border']) ?>
-                        </div>
-                        <div class="flex items-center gap-3 w-full md:w-auto justify-end flex-wrap">
-                            <?= partial('button', ['label' => 'Clear form', 'type' => 'reset', 'class' => 'button-ghost module-action px-4 py-2 text-body-sm font-semibold transition-colors']) ?>
-                            <?= partial('button', ['label' => 'Simpan Draft', 'class' => 'button-secondary module-action px-4 py-2.5 rounded-lg text-body-sm font-semibold transition-all shadow-rs border', 'attrs' => ['data-draft' => true]]) ?>
-                            <?= partial('button', ['label' => 'Kirim Laporan Inspeksi', 'type' => 'submit', 'icon' => 'send', 'iconClass' => 'text-lg', 'class' => 'button-primary module-action inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-body-sm font-bold transition-all shadow-rs']) ?>
-                        </div>
-                    </div>
-                </form>
+        <div class="gf-card">
+            <div class="gf-q-head">
+                <?= $fieldLabel('lokasiInput', 'LOKASI KOMPUTER') ?>
+                <span class="gf-pill">Zona Pelayanan Pasien &amp; Administrasi</span>
             </div>
-
-            <div class="xl:col-span-4 flex flex-col gap-6">
-                <div class="bg-surface-container-lowest rounded-xl p-6 space-y-5 shadow-rs">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-2"><?= design_icon('gauge', 'text-tertiary text-xl') ?><h2 class="text-headline-sm font-bold text-on-surface">Kepatuhan Harian</h2></div>
-                        <?= partial('badge', ['label' => 'Live Audit', 'class' => 'text-label-sm text-secondary bg-secondary-fixed/40 px-2 py-0.5 rounded-full font-semibold whitespace-nowrap']) ?>
-                    </div>
-                    <div class="flex items-center justify-center py-2">
-                        <div class="relative w-40 h-40 flex items-center justify-center">
-                            <svg class="w-full h-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
-                                <circle class="stroke-surface-container-high" cx="60" cy="60" fill="transparent" r="50" stroke-width="10"></circle>
-                                <circle class="stroke-tertiary" cx="60" cy="60" fill="transparent" r="50" stroke-dasharray="314" stroke-dashoffset="<?= e($daily['ring_offset']) ?>" stroke-linecap="round" stroke-width="10"></circle>
-                            </svg>
-                            <div class="absolute inset-0 flex flex-col items-center justify-center text-center">
-                                <span class="text-headline-xl font-bold text-on-surface leading-none"><?= e($daily['rate']) ?></span>
-                                <span class="text-label-sm text-secondary font-medium uppercase tracking-wider mt-1">Tingkat Patuh</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3 pt-2">
-                        <div class="p-3 rounded-lg bg-surface-container-low text-center">
-                            <div class="text-label-sm text-on-surface-variant font-medium">Workstation Diperiksa</div>
-                            <div class="text-headline-md font-bold text-on-surface mt-0.5"><?= e($daily['inspected']) ?> <span class="text-body-sm font-normal text-on-surface-variant">/ <?= e($daily['target']) ?></span></div>
-                        </div>
-                        <div class="p-3 rounded-lg bg-surface-container-low text-center">
-                            <div class="text-label-sm text-on-surface-variant font-medium">Sisa Target Unit</div>
-                            <div class="text-headline-md font-bold text-tertiary mt-0.5"><?= e($daily['remaining']) ?> <span class="text-body-sm font-normal text-on-surface-variant">Terminal</span></div>
-                        </div>
-                    </div>
-                    <div class="p-3 rounded-lg bg-error-container/40 flex items-center gap-3">
-                        <?= design_icon('triangle-alert', 'text-error text-xl shrink-0') ?>
-                        <div class="text-body-sm text-on-error-container"><strong class="font-semibold"><?= e($daily['findings']) ?> Temuan Pelanggaran Ringan</strong> terdeteksi pada shift berjalan dan telah diberikan teguran langsung.</div>
-                    </div>
+            <div class="gf-body">
+                <div class="gf-chips">
+                    <span class="gf-chips-label">Pilihan Cepat:</span>
+                    <?php foreach ($module['quick_locations'] as $quick): ?>
+                    <?= partial('button', ['label' => $quick, 'class' => 'gf-chip', 'attrs' => ['data-fill-target' => 'lokasiInput']]) ?>
+                    <?php endforeach; ?>
                 </div>
-
-                <div class="bg-surface-container-lowest rounded-xl p-6 space-y-4 shadow-rs">
-                    <div class="flex items-center justify-between pb-2">
-                        <div class="flex items-center gap-2"><?= design_icon('history', 'text-primary text-xl') ?><h2 class="text-headline-sm font-bold text-on-surface">Log Temuan Hari Ini</h2></div>
-                        <span class="text-label-sm text-on-surface-variant"><?= e(count($module['findings_today'])) ?> Insiden</span>
-                    </div>
-                    <div class="space-y-3">
-                        <?php foreach ($module['findings_today'] as $finding): ?>
-                        <div class="p-3.5 rounded-lg bg-surface-container-low space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-body-sm font-bold text-on-surface"><?= e($finding['location']) ?></span>
-                                <?= partial('badge', ['label' => ' Resolved', 'wrap' => false, 'dot' => 'w-1.5 h-1.5 rounded-full bg-tertiary', 'class' => 'inline-flex items-center gap-1 text-label-sm text-tertiary font-bold bg-secondary-fixed/50 px-2 py-0.5 rounded-full whitespace-nowrap']) ?>
-                            </div>
-                            <p class="text-body-sm text-on-surface-variant"><?= e($finding['note']) ?></p>
-                            <div class="flex items-center justify-between text-label-sm text-on-surface-variant/70 pt-1"><span><?= e($finding['time']) ?></span><span><?= e($finding['auditor']) ?></span></div>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
+                <?= $textInput(['class' => 'gf-input', 'id' => 'lokasiInput', 'name' => 'location_unit', 'placeholder' => 'Contoh: Ruang Rekam Medis Lt. 1 / Meja Pendaftaran UGD / Ruang Poli Anak']) ?>
             </div>
         </div>
-    </div>
-</div>
+
+        <div class="gf-card">
+            <div class="gf-q-head">
+                <?= $fieldLabel('macAddressInput', 'MAC ADDRESS') ?>
+                <span class="gf-pill">NIC Hardware</span>
+            </div>
+            <p class="gf-help">Format MAC Address 12 digit heksadesimal dengan pemisah titik dua.</p>
+            <div class="gf-body"><?= $textInput(['class' => 'gf-input gf-mono', 'id' => 'macAddressInput', 'name' => 'mac_address', 'maxlength' => '17', 'placeholder' => '00:1A:2B:3C:4D:5E', 'autocapitalize' => 'characters', 'spellcheck' => 'false']) ?></div>
+        </div>
+
+        <div class="gf-card">
+            <div class="gf-q-head">
+                <?= $fieldLabel('ipAddressInput', 'IP ADDRESS') ?>
+                <span class="gf-pill">VLAN HIS Botania</span>
+            </div>
+            <p class="gf-help">Alamat IP lokal terminal kerja (Subnet 192.168.10.0/24).</p>
+            <div class="gf-body"><?= $textInput(['class' => 'gf-input gf-mono', 'id' => 'ipAddressInput', 'name' => 'ip_address', 'placeholder' => '192.168.10.45', 'inputmode' => 'decimal']) ?></div>
+        </div>
+
+        <div class="gf-card">
+            <span class="gf-q-title" id="osLabel"><span>SISTEM OPERASI</span><span class="gf-req">*</span></span>
+            <div class="gf-body gf-options" role="radiogroup" aria-labelledby="osLabel">
+                <?php foreach ($module['os_options'] as $i => $os): ?>
+                <label class="gf-option">
+                    <input<?= attrs(['checked' => $i === 0, 'name' => 'os_option', 'type' => 'radio', 'value' => $os['value']]) ?>>
+                    <span class="gf-option-text">
+                        <span class="gf-option-label"><?= e($os['label']) ?></span>
+                        <span class="gf-option-note<?= !empty($os['highlight']) ? ' gf-option-note--accent' : '' ?>"><?= e($os['note']) ?></span>
+                    </span>
+                </label>
+                <?php endforeach; ?>
+            </div>
+        </div>
+
+        <?= partial('gf-section', ['number' => 2, 'title' => 'Status Kepatuhan Audit Fisik', 'titleTag' => 'span', 'description' => 'Tentukan status evaluasi']) ?>
+
+        <div class="gf-card">
+            <?php foreach ($module['checks'] as $i => $check): ?>
+            <div class="gf-matrix-row" role="radiogroup" aria-labelledby="<?= e($check['name']) ?>-title">
+                <div class="gf-matrix-item">
+                    <div class="gf-matrix-title"><span class="gf-qnum"><?= e($i + 1) ?></span><span id="<?= e($check['name']) ?>-title"><?= e($check['title']) ?></span></div>
+                    <p class="gf-matrix-note"><?= e($check['description']) ?></p>
+                </div>
+                <div class="gf-pills">
+                    <label class="gf-pill-radio"><input checked name="<?= e($check['name']) ?>" type="radio" value="compliant"><span>Patuh</span></label>
+                    <label class="gf-pill-radio"><input name="<?= e($check['name']) ?>" type="radio" value="non-compliant"><span>Temuan</span></label>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+
+        <div class="gf-card">
+            <div class="gf-q-head">
+                <label class="gf-q-title" for="fileUpload"><span>UNGGAH BUKTI FOTO MEJA / LAYAR (OPSIONAL)</span></label>
+                <span class="gf-pill">JPG, PNG, atau PDF (Maks. 10MB)</span>
+            </div>
+            <div class="gf-body">
+                <input accept="image/*,application/pdf" capture="environment" class="hidden" id="fileUpload" name="photo" type="file" data-file-input="fileUploadLabel">
+                <label class="gf-drop" for="fileUpload">
+                    <span class="gf-drop-icon"><?= design_icon('cloud-upload') ?></span>
+                    <span class="gf-drop-text">Tarik &amp; letakkan foto kondisi meja kerja atau layar komputer</span>
+                    <span class="gf-drop-note" id="fileUploadLabel" data-file-label="Atau klik tombol di bawah untuk memilih file dari perangkat Anda">Atau klik tombol di bawah untuk memilih file dari perangkat Anda</span>
+                    <span class="gf-file-btn"><?= design_icon('plus') ?><span>+ Add File Bukti</span></span>
+                </label>
+            </div>
+        </div>
+
+        <div class="gf-card">
+            <label class="gf-q-title" for="catatanTemuan"><span>CATATAN TEMUAN / TINDAK LANJUT</span></label>
+            <div class="gf-body"><textarea class="gf-input" id="catatanTemuan" name="notes" placeholder="Contoh: Diberikan kartu peringatan kepatuhan kepada staf loket 3; sticky note kredensial segera diamankan; sistem lock screen diatur ulang ke 3 menit." rows="3"></textarea></div>
+        </div>
+
+        <div class="gf-card">
+            <div class="gf-confirm">
+                <input id="declarationCheck" name="declaration" required type="checkbox">
+                <label class="gf-confirm-label" for="declarationCheck">Saya menyatakan bahwa pemeriksaan <strong>Clear Desk and Clear Screen</strong> ini telah diverifikasi sesuai kondisi fisik riil di unit kerja dan mematuhi regulasi ISO 27001 IT RS Awal Bros Botania.</label>
+            </div>
+        </div>
+
+        <div class="gf-actions">
+            <a class="gf-btn gf-btn--outline" href="<?= e(url('/')) ?>"><?= design_icon('arrow-left') ?><span>Kembali ke Portal Terpadu</span></a>
+            <div class="gf-actions-end">
+                <button class="gf-btn gf-btn--text" type="reset">Clear form</button>
+                <button class="gf-btn gf-btn--primary" type="submit"><?= design_icon('send') ?><span>Kirim Laporan Inspeksi</span></button>
+            </div>
+        </div>
+    </form>
 </main>
+<script src="<?= e(asset_v('js/gform.js')) ?>" defer></script>

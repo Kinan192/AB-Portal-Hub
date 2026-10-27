@@ -24,7 +24,7 @@ final class AntrianOnlineController
         $bedSent = count(array_filter($periodRecords, static fn (array $record): bool => $record['bed_sent']));
         View::render('antrian-online/rekap', [
             'pageTitle' => 'Rekap & Riwayat Monitoring Antrian Online BPJS',
-            'breadcrumbs' => monitoring_breadcrumbs('antrian-online', true),
+            'breadcrumbs' => monitoring_breadcrumbs('antrian-online'),
             'profile' => config('dashboard')['profile'],
             'report' => $report,
             'records' => $records,
@@ -50,7 +50,7 @@ final class AntrianOnlineController
 
         View::render('antrian-online/form', [
             'pageTitle' => 'Form Monitoring Antrian Online BPJS',
-            'breadcrumbs' => monitoring_breadcrumbs('antrian-online'),
+            'backToDashboard' => true,
             'profile' => config('dashboard')['profile'],
             'monitoring' => config('antrian-online'),
             'recordedAt' => date(DATE_ATOM),

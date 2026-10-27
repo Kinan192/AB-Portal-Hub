@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @import "./design-chrome.css";
 @import "./module-ui.css";
+@import "./gform.css";
 @source "../../app/**/*.php";
 @source "../../config/**/*.php";
 @source "../../database/dummy/*.php";
@@ -204,23 +205,23 @@
   }
 
   /* Form controls inside page content */
-  main :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"], select, textarea) {
+  main:not(.gf-page) :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"], select, textarea) {
     border: 1px solid #cdd6d4 !important;
     background-color: #fff !important;
     color: var(--color-rs-ink) !important;
     transition: border-color .15s, box-shadow .15s;
   }
-  main :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"]), main :is(select, textarea):not(.shadow-rs) { box-shadow: none !important; }
+  main:not(.gf-page) :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"]), main :is(select, textarea):not(.shadow-rs) { box-shadow: none !important; }
   /* The type-scale and radius classes outrank these control defaults in the design */
-  main :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"]), main :is(select, textarea):not([class*="text-body-"], [class*="text-label-"], [class*="text-headline-"]) { font-size: 14px !important; }
-  main :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"]), main :is(select, textarea):not(.rounded-xl, .rounded-2xl, .rounded-3xl) { border-radius: var(--radius-rs) !important; }
-  main :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], select) { min-height: 40px; }
-  main :is(select, textarea).border-rs-line { border-color: var(--color-rs-line) !important; }
-  main :is(input, textarea)::placeholder { color: #8a9896 !important; opacity: 1; }
-  main :is(input, select, textarea):hover { border-color: #aebbb8 !important; }
-  main :is(input, select, textarea):focus { outline: none !important; border-color: var(--color-rs-teal-600) !important; box-shadow: 0 0 0 3px rgba(19, 133, 113, .15) !important; }
-  main :is(input[type="checkbox"], input[type="radio"]) { accent-color: var(--color-rs-teal-700); }
-  main :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--color-rs-err) !important; box-shadow: 0 0 0 3px rgba(180, 35, 24, .1) !important; }
+  main:not(.gf-page) :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"]), main :is(select, textarea):not([class*="text-body-"], [class*="text-label-"], [class*="text-headline-"]) { font-size: 14px !important; }
+  main:not(.gf-page) :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], input[type="email"], input[type="password"]), main :is(select, textarea):not(.rounded-xl, .rounded-2xl, .rounded-3xl) { border-radius: var(--radius-rs) !important; }
+  main:not(.gf-page) :is(input[type="text"], input[type="number"], input[type="date"], input[type="time"], input[type="datetime-local"], select) { min-height: 40px; }
+  main:not(.gf-page) :is(select, textarea).border-rs-line { border-color: var(--color-rs-line) !important; }
+  main:not(.gf-page) :is(input, textarea)::placeholder { color: #8a9896 !important; opacity: 1; }
+  main:not(.gf-page) :is(input, select, textarea):hover { border-color: #aebbb8 !important; }
+  main:not(.gf-page) :is(input, select, textarea):focus { outline: none !important; border-color: var(--color-rs-teal-600) !important; box-shadow: 0 0 0 3px rgba(19, 133, 113, .15) !important; }
+  main:not(.gf-page) :is(input[type="checkbox"], input[type="radio"]) { accent-color: var(--color-rs-teal-700); }
+  main:not(.gf-page) :is(input, select, textarea)[aria-invalid="true"] { border-color: var(--color-rs-err) !important; box-shadow: 0 0 0 3px rgba(180, 35, 24, .1) !important; }
 
   /* Tables inside page content */
   main table { border-collapse: collapse; font-size: 13px; }

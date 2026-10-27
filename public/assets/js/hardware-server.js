@@ -7,7 +7,6 @@
   const feedback = document.getElementById('inspection-feedback');
   const review = document.getElementById('inspection-review');
   const notes = form.elements.namedItem('catatan_hardware');
-  const storageKey = `ab-portal:hardware-server:draft:v1:${form.dataset.inspector}`;
   const fields = ['rak_server', 'kondisi_cpu', 'keterangan_cpu', 'kondisi_monitor', 'keterangan_monitor', 'catatan_hardware', 'recorded_at'];
   const dateFormatter = new Intl.DateTimeFormat('id-ID', {
     timeZone: 'Asia/Jakarta', day: '2-digit', month: 'short', year: 'numeric',
@@ -31,32 +30,7 @@
       input.setCustomValidity(selected && !input.value.trim() ? 'Tuliskan keterangan kondisi lainnya.' : '');
     });
   };
-  const validateDraft = (draft) => {
-    if (!draft || draft.version !== 1 || !draft.values || typeof draft.savedAt !== 'string' || !Number.isFinite(Date.parse(draft.savedAt))) return false;
-    const values = draft.values;
-    if (!fields.every((name) => typeof values[name] === 'string')) return false;
-    const racks = Array.from(form.querySelectorAll('[name="rak_server"]'), (radio) => radio.value);
-    return racks.includes(values.rak_server)
-      && ['BAIK', 'TIDAK BAIK', 'Other'].includes(values.kondisi_cpu)
-      && ['BAIK', 'TIDAK BAIK', 'Other'].includes(values.kondisi_monitor)
-      && values.keterangan_cpu.length <= 500 && values.keterangan_monitor.length <= 500
-      && values.catatan_hardware.length <= 3000 && Number.isFinite(Date.parse(values.recorded_at));
-  };
 
-  try {
-    const stored = localStorage.getItem(storageKey);
-    if (stored) {
-      const draft = JSON.parse(stored);
-      if (validateDraft(draft)) {
-        fields.forEach((name) => { form.elements.namedItem(name).value = draft.values[name]; });
-        showFeedback(`Draft dari ${dateFormatter.format(new Date(draft.savedAt))} WIB dimuat dari perangkat ini. Data belum dikirim ke server.`);
-      } else {
-        showFeedback('Draft sebelumnya tidak dapat dimuat karena format datanya tidak sesuai. Silakan isi form kembali.');
-      }
-    }
-  } catch {
-    showFeedback('Draft tidak dapat dibaca dari browser ini. Anda tetap dapat mengisi form.');
-  }
   updateTimestamp();
   updateOtherFields();
   let baseline = JSON.stringify(readValues());
@@ -87,25 +61,8 @@
     });
   });
 
-  document.querySelectorAll('[data-save-inspection]').forEach((button) => {
-    button.addEventListener('click', () => {
-      try {
-        const savedAt = new Date().toISOString();
-        localStorage.setItem(storageKey, JSON.stringify({ version: 1, savedAt, values: readValues() }));
-        baseline = JSON.stringify(readValues());
-        if (review.open) review.close();
-        showFeedback(`Draft tersimpan di browser perangkat ini pada ${dateFormatter.format(new Date(savedAt))} WIB. Data belum dikirim ke server.`);
-        feedback.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-      } catch {
-        if (review.open) review.close();
-        showFeedback('Draft gagal disimpan. Penyimpanan browser mungkin penuh atau diblokir. Isi form tetap tersedia di halaman ini.');
-        feedback.scrollIntoView({ block: 'nearest', behavior: 'instant' });
-      }
-    });
-  });
-
   form.addEventListener('reset', (event) => {
-    if (!window.confirm('Kosongkan catatan dan mulai pemeriksaan baru? Draft yang tersimpan di perangkat ini juga akan dihapus.')) {
+    if (!window.confirm('Kosongkan catatan dan mulai pemeriksaan baru?')) {
       event.preventDefault();
       return;
     }
@@ -115,12 +72,7 @@
       updateOtherFields();
       updateTimestamp();
       baseline = JSON.stringify(readValues());
-      try {
-        localStorage.removeItem(storageKey);
-        showFeedback('Form baru siap diisi. Draft sebelumnya sudah dihapus dari perangkat ini.');
-      } catch {
-        showFeedback('Form sudah direset. Draft di browser tidak dapat dihapus karena penyimpanan diblokir.');
-      }
+      showFeedback('Form baru siap diisi.');
       form.querySelector('[name="rak_server"]:checked').focus();
     }, 0);
   });

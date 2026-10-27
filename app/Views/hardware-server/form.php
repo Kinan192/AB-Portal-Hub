@@ -38,7 +38,7 @@
                 </div>
             </div>
             <p id="inspection-feedback" role="status" aria-live="polite" class="hidden rounded-xl border border-teal-200 bg-teal-50 px-4 py-3 text-sm text-teal-800"></p>
-            <noscript><p class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Aktifkan JavaScript untuk menggunakan draft, catatan cepat, dan pemeriksaan form.</p></noscript>
+            <noscript><p class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Aktifkan JavaScript untuk menggunakan catatan cepat dan pemeriksaan form.</p></noscript>
 
             <fieldset class="inspection-panel" aria-describedby="rack-help">
                 <legend class="sr-only">Pilih rak server, wajib diisi</legend>
@@ -84,15 +84,14 @@
                 <textarea id="hardware-notes" name="catatan_hardware" rows="4" maxlength="3000" aria-describedby="hardware-notes-help" class="inspection-input mt-4 min-h-28 resize-y bg-slate-50/50 p-4 text-sm" placeholder="Tuliskan catatan kondisi hardware lainnya secara terperinci (misal: kondisi UPS, temperatur ruang AC server, kebersihan rak, perangkat storage)..."></textarea>
             </section>
 
-            <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm lg:grid lg:grid-cols-[1.2fr_0.55fr_1.4fr_0.8fr_1.4fr] lg:gap-3">
-                <div class="flex flex-wrap items-center gap-3 lg:contents">
+            <div class="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+                <div class="flex flex-wrap items-center gap-3">
                     <a href="/" class="button-neutral module-action inspection-button border"><?= icon('arrow-left', 'size-4 shrink-0') ?><span>Kembali ke Portal Terpadu</span></a>
-                    <button type="reset" class="button-ghost module-action min-h-11 rounded-lg px-3 py-2.5 text-xs font-semibold">Reset Form</button>
                     <a href="/reports/hardware-server" class="button-soft module-action inspection-button border"><?= icon('file', 'size-4 shrink-0') ?><span>Lihat Riwayat &amp; Rekap Laporan</span></a>
                 </div>
-                <div class="flex flex-col gap-3 sm:flex-row lg:contents">
-                    <button type="button" data-save-inspection class="button-secondary module-action inspection-button border"><?= icon('bookmark', 'size-4 shrink-0') ?>Simpan Draft</button>
-                    <button type="submit" class="button-primary module-action inspection-button shadow-sm" aria-haspopup="dialog"><?= icon('send', 'size-4 shrink-0') ?>Kirim Laporan Monitoring</button>
+                <div class="flex w-full flex-col-reverse gap-3 sm:w-auto sm:flex-row sm:items-center sm:justify-end">
+                    <button type="reset" class="button-ghost module-action inline-flex min-h-11 w-full items-center justify-center rounded-lg px-3 py-2.5 text-xs font-semibold sm:w-auto">Reset Form</button>
+                    <button type="submit" class="button-primary module-action inspection-button w-full shadow-sm sm:w-auto" aria-haspopup="dialog"><?= icon('send', 'size-4 shrink-0') ?>Kirim Laporan Monitoring</button>
                 </div>
             </div>
         </form>
@@ -102,6 +101,6 @@
 <dialog id="inspection-review" class="fixed inset-0 m-auto max-h-[85dvh] w-[calc(100%-2rem)] max-w-lg overflow-y-auto rounded-2xl border border-slate-200 bg-white p-6 text-slate-700 shadow-xl" aria-labelledby="inspection-review-title" aria-describedby="inspection-review-help">
     <div class="flex items-start justify-between gap-4"><div><p class="text-xs font-semibold text-teal-700">Pemeriksaan Hardware Server</p><h2 id="inspection-review-title" class="mt-1 text-lg font-bold text-slate-900">Ringkasan laporan</h2></div><button type="button" data-close-inspection-review class="button-ghost module-action-small rounded-lg p-2" aria-label="Tutup ringkasan"><?= icon('close', 'size-5') ?></button></div>
     <dl id="inspection-review-details" class="my-5 space-y-3 text-sm"></dl>
-    <p id="inspection-review-help" class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">Pengiriman laporan ke server belum tersedia. Data belum dikirim. Simpan draft di perangkat ini untuk melanjutkan pengisian nanti.</p>
-    <div class="mt-5 flex flex-wrap justify-end gap-3"><button type="button" data-close-inspection-review class="button-neutral module-action inspection-button border">Kembali ke Form</button><button type="button" data-save-inspection class="button-secondary module-action inspection-button border">Simpan Draft</button></div>
+    <p id="inspection-review-help" class="rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs leading-relaxed text-amber-900">Pengiriman laporan ke server belum tersedia. Data belum dikirim.</p>
+    <div class="mt-5 flex flex-wrap justify-end gap-3"><button type="button" data-close-inspection-review class="button-neutral module-action inspection-button border">Kembali ke Form</button></div>
 </dialog>

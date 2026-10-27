@@ -21,7 +21,7 @@ final class HardwareServerController
 
         View::render('hardware-server/rekap', [
             'pageTitle' => 'Rekap Bulanan Monitoring Hardware Server',
-            'breadcrumbs' => monitoring_breadcrumbs('hardware-server', true),
+            'breadcrumbs' => monitoring_breadcrumbs('hardware-server'),
             'hardwarePage' => 'history',
             'pageScripts' => ['js/hardware-server-history.js'],
             'profile' => config('dashboard')['profile'],
@@ -42,7 +42,7 @@ final class HardwareServerController
 
         View::render('hardware-server/form', [
             'pageTitle' => 'Form Monitoring Hardware Server IT',
-            'breadcrumbs' => monitoring_breadcrumbs('hardware-server'),
+            'backToDashboard' => true,
             'pageScripts' => ['js/hardware-server.js'],
             'profile' => config('dashboard')['profile'],
             'inspection' => config('hardware-server'),

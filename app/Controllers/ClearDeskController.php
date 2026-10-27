@@ -19,7 +19,7 @@ final class ClearDeskController extends Controller
         $this->render('cleardesk/form', $this->shell() + [
             'pageTitle' => 'Form Clear Desk & Clear Screen',
             'page' => 'form-cleardesk',
-            'breadcrumbs' => monitoring_breadcrumbs('cleardesk'),
+            'backToDashboard' => true,
             'modal' => ['formName' => 'Clear Desk & Screen', 'formId' => 'clearDeskForm'],
             'module' => dummy('cleardesk'),
         ]);
@@ -30,7 +30,7 @@ final class ClearDeskController extends Controller
         $this->render('cleardesk/rekap', $this->shell() + [
             'pageTitle' => 'Rekap Clear Desk & Clear Screen',
             'page' => 'rekap-cleardesk',
-            'breadcrumbs' => monitoring_breadcrumbs('cleardesk', true),
+            'breadcrumbs' => monitoring_breadcrumbs('cleardesk'),
             'flash' => $this->submittedFlash('Clear Desk & Screen'),
             'module' => dummy('cleardesk'),
         ]);
