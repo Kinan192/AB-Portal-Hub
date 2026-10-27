@@ -14,34 +14,32 @@ npm run dev
 
 Buka http://127.0.0.1:8080. PHP 8.3 atau lebih baru dapat menjalankan frontend; target produksi tetap PHP 8.4 sesuai arsitektur. MySQL dan Composer belum diperlukan untuk melihat dashboard.
 
-URL pengisian menggunakan `/forms/{nama-modul}`, sedangkan laporan menggunakan `/reports/{nama-modul}`. Route laporan hanya didaftarkan pada `/reports/...`.
+## Form dan riwayat
 
-Di bawah header, semua form menampilkan tombol **Kembali ke Dashboard** menuju `/` (controller mengirim `'backToDashboard' => true`), sedangkan semua laporan memakai breadcrumb bersama: `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya portal menuju `/`; kategori, nama modul, dan halaman aktif tidak ditautkan. Controller laporan memakai helper `monitoring_breadcrumbs()` dengan nama dari `config/monitoring-navigation.php`. Kedua layout merender `app/Views/components/breadcrumbs.php`; jangan menulis ulang navigasi pada view atau navbar.
+Semua form monitoring dan riwayatnya digambar dari daftar pertanyaan, bukan dari view HTML per modul:
 
-Halaman Form Monitoring Hardware Server IT tersedia di http://127.0.0.1:8080/forms/hardware-server atau melalui kartu pertamanya di dashboard. Pilihan rak/kondisi, keterangan Other, catatan cepat, validasi, dan reset dapat digunakan. Pengiriman ke server masih menunggu integrasi backend.
+- **Form bawaan** (enam modul): `/form/suhu`, `/form/cctv`, `/form/cleardesk`, `/forms/hardware-server`, `/forms/kesesuaian-user`, dan `/forms/antrian-online`. Pertanyaannya ada di `database/dummy/builtin-forms.php` (kunci = id kartu dashboard) dan dapat diubah lewat menu ⋯ › **Edit Isi Form** pada kartu dashboard (`/form-editor?id=…`). Tipe jawaban khusus form bawaan (suhu dengan status otomatis, tanggal & waktu, tanggal + jam, kisi Patuh/Temuan, pernyataan) tidak dapat diganti tipenya. Tombol **Kembalikan ke form asli** di editor memuat ulang pertanyaan asli.
+- **Riwayat** (enam modul): `/rekap/suhu`, `/rekap/cctv`, `/rekap/cleardesk`, `/reports/hardware-server`, `/reports/kesesuaian-user`, dan `/reports/antrian-online`, juga lewat tombol **Lihat Rekap** pada kartu dan form. Satu kolom per pertanyaan form saat ini, ringkasan (laporan ditampilkan, bulan ini, perlu perhatian, terakhir dikirim), pencarian, filter periode, 25 baris per halaman, daftar kartu di bawah 768 px, dan dialog detail berisi semua pertanyaan dengan jawabannya. Laporan contoh ada di `database/dummy/builtin-responses.php`.
+- **Form dinamis** buatan sendiri (tombol **+ Tambah** di dashboard): `/form-dinamis?id=…` dan riwayatnya `/form-dinamis/respons?id=…`, memakai halaman yang sama.
 
-Halaman rekap bulanan tersedia di http://127.0.0.1:8080/reports/hardware-server, juga melalui tombol Lihat Riwayat & Rekap Laporan pada form. Filter bulan/rak/status, pencarian, rincian laporan, pagination, serta Cetak Rekap sudah berfungsi di frontend. Tujuh baris awal berasal dari HTML referensi dan ditandai sebagai data referensi di halaman. Jumlah hasil dihitung dari data yang tersedia. Ekspor Excel/PDF dan unduh lembar menjelaskan bahwa integrasi laporan server belum tersedia; tidak ada unduhan atau persetujuan operasional yang diklaim berasal dari backend.
+Semua masih frontend saja. Pertanyaan hasil edit dan laporan yang dikirim disimpan di `sessionStorage` tab browser (`public/assets/js/dashboard-store.js`) dan hilang saat tab ditutup; tidak ada yang dikirim ke server. Tombol **Atur ulang** di dashboard mengembalikan data contoh. Ekspor Excel/PDF dan cetak riwayat belum dibangun.
+
+Tombol Kirim memvalidasi jawaban di browser (wajib isi, angka, suhu 0–60 °C, format MAC dan IPv4, ukuran dan jumlah file, pertanyaan bersyarat), menyimpan laporan, menandai kartu dashboard selesai hari ini, lalu menampilkan dialog dengan tautan ke riwayat.
+
+Di bawah header, halaman form, editor form, dan riwayat menampilkan tombol **Kembali ke Dashboard** menuju `/` (controller mengirim `'backToDashboard' => true`). Riwayat keenam modul juga menampilkan breadcrumb bersama di kanan baris yang sama: `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya portal menuju `/`; kategori, nama modul, dan halaman aktif tidak ditautkan. `DynamicFormController::history()` memakai helper `monitoring_breadcrumbs()` dengan nama dari `config/monitoring-navigation.php`. Kedua layout merender `app/Views/components/breadcrumbs.php`; jangan menulis ulang navigasi pada view atau navbar.
 
 Perintah `npm run dev` menjalankan server PHP lokal. Hentikan dengan Ctrl+C. Untuk menjalankan tanpa npm, gunakan `php -S 127.0.0.1:8080 -t public public/index.php`.
 
-CSS Tailwind dan font Inter sudah tersedia di `public/assets/`, sehingga portal tidak bergantung pada CDN maupun Node.js saat dijalankan. Dashboard, navbar, form, rekap, akun, dan login memakai Inter dari sumber lokal yang sama.
+CSS Tailwind dan font Inter sudah tersedia di `public/assets/`, sehingga portal tidak bergantung pada CDN maupun Node.js saat dijalankan. Dashboard, navbar, form, riwayat, akun, dan login memakai font dari sumber lokal yang sama.
 
 ## Mengembangkan tampilan
-
-Form Monitoring Antrian Online BPJS tersedia di http://127.0.0.1:8080/forms/antrian-online. View: `app/Views/antrian-online/form.php`; controller: `AntrianOnlineController`; konfigurasi: `config/antrian-online.php`. Isian berfokus pada status cron antrian dan cron bed MJKN, catatan tindak lanjut, serta konfirmasi pemeriksaan. Petugas dan waktu pencatatan ditampilkan otomatis. Reset, validasi, dan ringkasan berjalan di frontend. Shift, endpoint/status koneksi, jumlah tiket, dan unggah bukti sudah dihapus. Pengiriman laporan ke server menunggu integrasi backend.
-
-Rekap BPJS tersedia di http://127.0.0.1:8080/reports/antrian-online. View: `app/Views/antrian-online/rekap.php`; data referensi: `config/antrian-online-reports.php`; script: `public/assets/js/antrian-online-history.js`. Filter periode/status kedua cron, pencarian, rincian, pagination, dan cetak tersedia. Tabel memiliki lima kolom: waktu audit, cron antrian, cron bed, catatan, dan petugas. Filter shift, transaksi tiket, dan bukti log sudah dihapus. Tujuh baris referensi menghasilkan 7 sesi, cron antrian 85,7%, dan cron bed 100%. SOP serta ekspor Excel/PDF menunggu integrasi.
-
-Form Kesesuaian User HIS tersedia di http://127.0.0.1:8080/forms/kesesuaian-user dan melalui kartu Kesesuaian User di dashboard. View berada di `app/Views/kesesuaian-user/form.php`, controller di `app/Controllers/KesesuaianUserController.php`, serta konfigurasi alasan verifikasi di `config/kesesuaian-user.php`. Pilihan tidak sesuai menampilkan catatan alasan; tanggal/jam memakai WIB. Pengiriman ke server masih menunggu integrasi.
-
-Laporan Kesesuaian User tersedia di http://127.0.0.1:8080/reports/kesesuaian-user melalui kedua tombol rekap pada form. View berada di `app/Views/kesesuaian-user/rekap.php`, data referensi di `config/kesesuaian-user-reports.php`, dan interaksi di `public/assets/js/kesesuaian-user-history.js`. Filter periode/status/unit dan pencarian memperbarui tabel serta ringkasannya. Klik username untuk rincian; Cetak Rekap mencetak semua hasil filter lintas halaman. Ekspor Excel/PDF menunggu backend. Tujuh baris referensi menghasilkan ringkasan awal 7 user, 5 sesuai, 2 tidak sesuai, dan kepatuhan 71,4%, tanpa jumlah 128 yang tidak didukung data tabel.
 
 ```powershell
 npm ci
 npm run build
 ```
 
-Gunakan `npm run watch` (dashboard dan halaman `main.php`) atau `npm run watch:design` (halaman design system) selama mengubah view. Node.js hanya dipakai untuk membangun CSS. Ada dua bundel: `resources/css/app.css` → `public/assets/css/app.css` untuk dashboard `/` serta form dan rekap hardware server, kesesuaian user, dan antrian online, dan `resources/css/design.css` → `public/assets/css/design.css` untuk halaman design system (login, akun, suhu, CCTV, Clear Desk) agar token desain tidak mengubah tampilan dashboard. `npm run build` membangun keduanya. `package-lock.json` mengunci dependensi frontend. Panduan CLI: https://tailwindcss.com/docs/installation/tailwind-cli.
+Gunakan `npm run watch` (dashboard dan halaman `main.php`) atau `npm run watch:design` (halaman design system) selama mengubah view. Node.js hanya dipakai untuk membangun CSS. Ada dua bundel: `resources/css/app.css` → `public/assets/css/app.css` untuk halaman layout `main` (dashboard `/`, form, riwayat, dan editor form), dan `resources/css/design.css` → `public/assets/css/design.css` untuk halaman design system (login, akun, dan halaman error) agar token desain tidak mengubah tampilan dashboard. `npm run build` membangun keduanya. `package-lock.json` mengunci dependensi frontend. Panduan CLI: https://tailwindcss.com/docs/installation/tailwind-cli.
 
 ## Halaman
 
@@ -51,23 +49,17 @@ Halaman design system mengikuti desain statis di `docs/DESIGN/rs-awal-bros-porta
 | --- | --- | --- |
 | `/login` (publik), `POST /logout` | `AuthController` | `auth/login.php` (layout `auth`) |
 | `/` | `HomeController::index` | `home/index.php` (dashboard portal, layout `main`) |
-| `/forms/hardware-server`, `/reports/hardware-server` | `HardwareServerController` | `hardware-server/form.php`, `hardware-server/rekap.php` (layout `main`) |
-| `/forms/kesesuaian-user`, `/reports/kesesuaian-user` | `KesesuaianUserController` | `kesesuaian-user/form.php`, `kesesuaian-user/rekap.php` (layout `main`) |
-| `/forms/antrian-online`, `/reports/antrian-online` | `AntrianOnlineController` | `antrian-online/form.php`, `antrian-online/rekap.php` (layout `main`) |
+| `/form-editor?id=…` | `FormEditorController::edit` | `form-editor/index.php` (Edit Isi Form: tab Pertanyaan dan Jadwal, layout `main`) |
+| `/form/suhu`, `/form/cctv`, `/form/cleardesk`, `/forms/hardware-server`, `/forms/kesesuaian-user`, `/forms/antrian-online` (`/form/temperature` dialihkan ke `/form/suhu`) | `DynamicFormController::builtin()` | `form-dinamis/fill.php` (layout `main`) |
+| `/rekap/suhu`, `/rekap/cctv`, `/rekap/cleardesk`, `/reports/hardware-server`, `/reports/kesesuaian-user`, `/reports/antrian-online` | `DynamicFormController::history()` | `form-dinamis/respons.php` (layout `main`) |
+| `/form-dinamis?id=…`, `/form-dinamis/respons?id=…` | `DynamicFormController::fill()`, `responses()` | `form-dinamis/fill.php`, `form-dinamis/respons.php` (layout `main`) |
 | `/password`, `/users` | `AccountController` | `account/password.php`, `account/users.php` (layout `design`) |
-| `/form/suhu`, `/rekap/suhu` (`/form/temperature` dialihkan ke `/form/suhu`) | `SuhuController` | `suhu/form.php`, `suhu/rekap.php` (layout `design`) |
-| `/form/cctv`, `/rekap/cctv` | `CctvController` | `cctv/form.php`, `cctv/rekap.php` (layout `design`) |
-| `/form/cleardesk`, `/rekap/cleardesk` | `ClearDeskController` | `cleardesk/form.php`, `cleardesk/rekap.php` (layout `design`) |
 
-Halaman design system (suhu, CCTV, Clear Desk) masih memakai `/form/...` dan `/rekap/...`, berbeda dari pola `/forms/...` dan `/reports/...` di atas.
+Suhu, CCTV, dan Clear Desk memakai `/form/...` dan `/rekap/...`; tiga modul lainnya memakai `/forms/...` dan `/reports/...`. URL lama ini dipertahankan agar tautan yang sudah ada tetap berlaku. Route didaftarkan di `routes/web.php` dengan id kartu dashboard sebagai argumen.
 
-Semua route kecuali `/login` memerlukan sesi login (middleware `app/Core/RequireLogin.php`); pengunjung yang belum login diarahkan ke `/login` dengan HTTP 302, lalu kembali ke halaman yang diminta setelah login. File di `public/assets/` tidak diblokir. Kartu dashboard dengan `'available' => true` di `config/portal.php` menuju form modulnya; kartu lain menampilkan dialog informasi.
+Semua route kecuali `/login` memerlukan sesi login (middleware `app/Core/RequireLogin.php`); pengunjung yang belum login diarahkan ke `/login` dengan HTTP 302, lalu kembali ke halaman yang diminta setelah login. File di `public/assets/` tidak diblokir. Kartu dashboard berasal dari `database/dummy/dashboard.php`: kartu Monitoring Harian membuka halaman form-nya dan tombol **Lihat Rekap** membuka riwayatnya.
 
-Setiap form dikirim (POST) ke route rekap modulnya, lalu diarahkan kembali ke halaman rekap dengan notifikasi. Belum ada data yang disimpan. Filter dan pencarian rekap berjalan di browser (`public/assets/js/design.js`). Tombol Export dan Cetak masih berupa tampilan.
-
-Ketiga form memakai varian warna tombol bersama: `button-primary` untuk kirim, `button-secondary` untuk Kembali ke Dashboard, `button-neutral` untuk kembali, `button-soft` untuk rekap/bantuan, `button-ghost` untuk reset/tutup, `button-on-dark` untuk aksi hero, dan `button-danger` untuk hapus berkas. Pasangkan dengan class ukuran seperti `inspection-button`. Detail ada di Design System bagian 9. Breadcrumb laporan menyebut nama modul secara lengkap agar tujuan rekap jelas.
-
-Seluruh form dan rekap memakai warna tombol tersebut melalui `resources/css/module-ui.css`, yang dibangun ke kedua bundle CSS. Jenis font adalah Inter dengan ukuran berdasarkan peran: judul panel 20 px, judul bagian 17 px, label/input/tombol 14 px, aksi kecil/tabel 13 px, keterangan 12 px. Gunakan `ui-panel-title`, `ui-section-title`, `ui-field-label`, `ui-body`, dan `ui-caption` untuk tipografi; `module-action` atau `module-action-small` untuk tombol; serta `module-page-button` untuk pagination. Navbar tetap memakai sumber bersama dari home.
+Form dan riwayat memakai `resources/css/gform.css` (form bergaya Google Forms) dan `resources/css/form-dinamis.css` (tipe jawaban tambahan, status suhu, dan halaman riwayat); editor memakai `resources/css/form-editor.css`. Varian tombol `button-*` dan class `module-action` di `resources/css/module-ui.css` masih dipakai halaman akun, tombol Kembali ke Dashboard, dan dialog design system.
 
 ## Lokasi kode
 
@@ -78,20 +70,22 @@ Seluruh form dan rekap memakai warna tombol tersebut melalui `resources/css/modu
 | `routes/web.php` | Route aplikasi |
 | `app/Controllers/HomeController.php` | Data dashboard dan pengelompokan menu |
 | `app/Views/home/index.php` | Dashboard portal |
-| `app/Controllers/HardwareServerController.php` | Data halaman pemeriksaan hardware server |
-| `app/Views/hardware-server/form.php` | Halaman pengisian pemeriksaan hardware |
-| `app/Views/kesesuaian-user/form.php` | Halaman pengisian verifikasi user HIS |
-| `config/hardware-server.php` | Lokasi, periode, pilihan rak, dan teks pemeriksaan |
-| `public/assets/js/hardware-server.js` | Interaksi form dan validasi |
-| `app/Views/hardware-server/rekap.php` | Rekap bulanan dan tabel riwayat pemeriksaan |
-| `app/Views/kesesuaian-user/rekap.php` | Rekap dan riwayat verifikasi user HIS |
-| `app/Views/antrian-online/rekap.php` | Rekap cron, tiket, bukti, dan tindak lanjut antrian BPJS |
+| `app/Controllers/DynamicFormController.php` | Halaman form dan riwayat: enam form bawaan (`builtin()`, `history()`) dan form dinamis (`fill()`, `responses()`) |
+| `app/Controllers/FormEditorController.php` | Halaman Edit Isi Form |
+| `app/Views/form-dinamis/fill.php`, `respons.php` | Kerangka halaman form dan riwayat; isinya digambar oleh script |
+| `app/Views/form-editor/index.php` | Kerangka editor form (tab Pertanyaan dan Jadwal) |
+| `database/dummy/dashboard.php` | Bagian dan kartu dashboard, jadwal, serta form dinamis contoh |
+| `database/dummy/builtin-forms.php` | Daftar pertanyaan keenam form bawaan, termasuk tipe jawaban khususnya |
+| `database/dummy/builtin-responses.php` | Laporan contoh keenam form bawaan untuk halaman riwayat |
+| `app/Helpers/DashboardData.php`, `Schedule.php` | Data awal untuk browser dan aturan jadwal (sama dengan `dashboard-store.js`) |
+| `public/assets/js/dashboard-store.js` | State bersama di browser (data contoh + `sessionStorage`), ikon, toast, jadwal, dan aturan status suhu |
+| `public/assets/js/dashboard.js` | Dashboard: kartu, filter jadwal, dialog Tambah, menu kartu |
+| `public/assets/js/form-dinamis.js` | Halaman form: tipe jawaban, validasi, pertanyaan bersyarat, dan penyimpanan laporan |
+| `public/assets/js/form-riwayat.js` | Halaman riwayat: kolom per pertanyaan, filter, pagination, kartu mobile, dan dialog detail |
+| `public/assets/js/form-editor.js` | Editor form: pertanyaan, jadwal, dan Kembalikan ke form asli |
 | `app/Views/layouts/` | Kerangka HTML, satu header bersama, dan footer |
-| `config/hardware-server-reports.php` | Data referensi dan periode halaman rekap |
-| `public/assets/js/hardware-server-history.js` | Filter, pencarian, pagination, rincian, dan cetak |
-| `app/Views/components/` | Komponen UI bersama: brand, kartu, progres, dialog, pilihan kondisi, dan hero hardware |
+| `app/Views/components/` | Komponen UI bersama: brand, kartu, progres, dialog, breadcrumb, dan dialog dashboard |
 | `app/Views/components/breadcrumbs.php` | Breadcrumb bersama berdasarkan data controller |
-| `config/portal.php` | Daftar 15 kartu, kategori, target, serta urutannya |
 | `config/dashboard.php` | Identitas tampilan (`profile`, serta `account` untuk navbar design system) dan nilai progres awal sebelum integrasi backend |
 | `config/database.php` | Parameter koneksi MySQL dari environment |
 | `app/Core/Database.php` | Koneksi PDO dengan prepared statements native |
@@ -99,28 +93,27 @@ Seluruh form dan rekap memakai warna tombol tersebut melalui `resources/css/modu
 | `app/Controllers/` | Controller halaman design system; `Controller.php` berisi penjaga `APP_ENV` dan memakai layout `design` secara default |
 | `app/Core/Auth.php`, `app/Core/RequireLogin.php` | Sesi login, token CSRF, dan middleware login |
 | `app/Views/layouts/design.php`, `app/Views/layouts/auth.php` | Layout design system: `design.php` memakai navbar home dari `layouts/header.php`; `auth.php` untuk login tanpa navbar; breadcrumb, footer, dan toast mengikuti halaman |
-| `app/Views/components/design-footer.php`, `page-header`, `card`, `badge`, `button`, `field`, `table`, `rows/`, `submit-modal`, `toast` | Partial design system |
+| `app/Views/components/design-footer.php`, `page-header`, `card`, `badge`, `button`, `field`, `table`, `rows/user.php`, `submit-modal`, `toast` | Partial design system |
 | `app/Views/errors/design-404.php`, `design-unavailable.php` | Halaman 404 dan 503 versi design system (router dan `Controller.php`) |
 | `app/Helpers/functions.php` | `e()`, `partial()`, `icon()` (ikon dashboard dan halaman `main.php`), `design_icon()` (ikon design system), `csrf_field()`, `url()`, `asset_v()`, `dummy()` |
 | `app/Helpers/icons.php` | Ikon Lucide (ISC) untuk `design_icon()` |
-| `database/dummy/` | Data dummy modul suhu, CCTV, dan Clear Desk |
-| `resources/css/app.css` | Gaya dashboard serta form dan rekap hardware server, kesesuaian user, antrian online |
+| `resources/css/app.css` | Gaya dashboard, form, riwayat, dan editor form (mengimpor `gform.css`, `dashboard.css`, `form-dinamis.css`, `form-editor.css`) |
 | `resources/css/design.css` | Token design system (`@theme`), gaya dasar, dan komponen halaman design system |
 | `public/assets/js/app.js` | Jam, dialog, dan menu dashboard serta halaman `main.php` |
-| `public/assets/js/design.js`, `login.js` | Perilaku halaman design system (jam, menu, toast, form, filter rekap, login) |
+| `public/assets/js/design.js`, `login.js` | Perilaku halaman design system (jam, menu, toast, login) |
 
 ## Perilaku tahap pertama
 
 - Header, banner kerahasiaan, panel progres, 15 kartu dalam tiga kategori, serta footer telah dibuat mengikuti gambar dan HTML referensi.
 - Jam dan tanggal mengikuti Asia/Jakarta dan diperbarui melalui JavaScript.
 - Identitas IT Botania dan keterangan IT Division berasal dari `config/dashboard.php`. Keterangan departemen ini tidak menetapkan role atau hak akses pengguna.
-- Panel progres menggunakan nilai awal frontend 5/6 form (83%) dari `config/dashboard.php`. Cincin, bar capaian, dan jumlah form tersisa dihitung dari nilai tersebut. Saat integrasi backend, ganti sumber array `$progress` di `HomeController` dengan hasil perhitungan pengisian form dari MySQL.
+- Panel progres menghitung kartu form yang terjadwal hari ini dan yang sudah selesai (data contoh di `database/dummy/dashboard.php` serta laporan yang dikirim di tab browser). Cincin, bar capaian, dan jumlah form tersisa dihitung dari nilai tersebut. Saat integrasi backend, ganti sumber `$progress` di `HomeController` dengan hasil perhitungan pengisian form dari MySQL.
 - Logo memakai SVG yang diberikan pengguna di `public/assets/images/brand/rs-awal-bros.svg`, melalui komponen brand bersama pada semua halaman. Rasio asli 348:53 dipertahankan pada tinggi 32 px; URL logo diberi versi `filemtime` agar perubahan tidak tertahan cache. Teks satu baris digunakan hanya jika aset tidak tersedia. Path dapat diubah di `config/app.php`.
 - Proporsi kartu berangkat dari `code.html`, lalu disesuaikan berdasarkan arahan pengguna: judul 11.7 px, deskripsi 10.8 px, badge 9 px, padding 16 px, dan ikon 48 px. Grid enam/tujuh kolom aktif mulai lebar 1024 px.
 - Halaman memakai alur vertikal alami, tanpa tinggi tetap 100vh atau pemadatan kartu berdasarkan tinggi layar. Semua kartu kembali vertikal dengan ikon 48 px. Container desktop memakai lebar 90%, maksimal 1440 px, agar margin kiri dan kanan lebih lapang. Navbar, banner, dan hero tetap ringkas; bagian Sistem berada setelah Monitoring & Laporan dan dapat dijangkau dengan scroll.
 - Semua kartu memakai tiga baris subgrid bersama untuk ikon, judul, dan deskripsi. Judul diratakan ke atas dan tinggi barisnya mengikuti judul terpanjang pada satu baris kartu, tanpa minimum dua baris. Deskripsi memakai margin atas 2 px dan tetap sejajar antar kartu; ruang tersisa di bawah judul pendek menjaga perataan kedua teks. Padding serta kotak ikon 48 px tetap sama; hover tidak menggeser kartu atau memperbesar ikon.
-- Kartu Hardware Server, Kesesuaian User, Antrian Online, Rata-rata Suhu Server, Monitoring CCTV, dan Clear Desk berlabel `Form` dan membuka halaman pengisian. Kartu internal yang belum tersedia masih berlabel `Segera` dan menampilkan keterangan modul. Properti `available=true` digunakan hanya setelah route dan halamannya tersedia.
-- Kartu eksternal berlabel `Atur URL` sampai target dikonfigurasi di `config/portal.php`. URL HTTPS yang valid dibuka di tab baru dengan `noopener noreferrer`.
+- Kartu Hardware Server, Kesesuaian User, Antrian Online, Rata-rata Suhu Server, Monitoring CCTV, dan Clear Desk membuka halaman form-nya; tombol Lihat Rekap pada kartu membuka riwayatnya. Menu ⋯ pada kartu berisi Lihat Rekap, Edit Isi Form, Edit Kartu, Duplikat, Sembunyikan, dan Hapus.
+- Kartu tautan tanpa alamat menampilkan "Alamat belum diatur" sampai URL diisi lewat Edit atau di `database/dummy/dashboard.php`. URL `http`/`https` yang valid dibuka di tab baru dengan `noopener noreferrer`.
 - Password dan Users membuka halaman akun; Logout mengirim `POST /logout` (dengan token CSRF) dan kembali ke `/login`. Header form memakai tombol Logout yang sama.
 - Badge `Portal aktif` merujuk pada halaman portal, bukan uptime sistem eksternal.
 - Dialog bisa ditutup menggunakan Escape, tombol tutup, tombol kembali, atau klik di luar dialog. Fokus dikelola oleh elemen `<dialog>` browser.
@@ -131,7 +124,7 @@ Seluruh form dan rekap memakai warna tombol tersebut melalui `resources/css/modu
 
 Login memeriksa tabel `users`: isian Username dicocokkan dengan kolom `email` (akun `role = admin`, `is_active = 1`), lalu password diperiksa dengan `password_verify`. Pembatasan percobaan login dan audit log masih TODO di `AuthController`.
 
-Dashboard, form hardware server, dan halaman rekap saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, halaman tersebut mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
+Dashboard, form, dan halaman riwayat saat ini dijalankan pada `APP_ENV=local`, yang menjadi default pengembangan. Pada environment selain local, halaman tersebut mengembalikan HTTP 503 sampai autentikasi diimplementasikan. Penggantian istilah di antarmuka tidak mengubah pembatasan akses ini.
 
 **Mode pengembangan (login bebas).** Jika `APP_ENV=local` **dan** `AUTH_DEV_BYPASS=true` di `.env`, username dan password apa pun yang tidak kosong diterima sebagai admin dummy. Halaman login menampilkan banner "Mode pengembangan: login bebas", dan setiap login bebas dicatat di `storage/logs/auth-dev-bypass.log` (waktu, username, IP, user agent; tanpa password). Jika salah satu syarat tidak terpenuhi, mode ini mati otomatis. `.env.example` memakai `AUTH_DEV_BYPASS=false`; jangan pernah mengaktifkannya di server RS.
 

@@ -3,7 +3,7 @@
  * Data table. Each row is rendered by a row component from app/Views/components/rows.
  * @var array $columns  [['label' => ..., 'class' => ?string]]
  * @var array $rows
- * @var string $row  row component name, e.g. "rows/rekap-suhu"
+ * @var string $row  row component name, e.g. "rows/user"
  * Optional: $wrapClass, $class, $theadRowClass, $tbodyClass, $empty (text of the row shown when a filter
  *           hides every row; enables client-side filtering when set).
  */

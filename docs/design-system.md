@@ -2,7 +2,7 @@
 
 Panduan frontend Portal Monitoring IT RS Awal Bros Botania untuk rekan pengembang yang melakukan clone repository dan membuat halaman baru.
 
-Dokumen ini mencatat implementasi terakhir pada 26 Oktober 2026. Ukuran di bawah mengikuti source project yang aktif, termasuk penyesuaian pengguna setelah referensi `code.html`. Jangan mengambil ukuran dari versi screenshot lama.
+Dokumen ini mencatat implementasi terakhir pada 27 Oktober 2026. Ukuran di bawah mengikuti source project yang aktif, termasuk penyesuaian pengguna setelah referensi `code.html`. Jangan mengambil ukuran dari versi screenshot lama.
 
 ## 1. Sumber acuan dan batas pengembangan
 
@@ -11,10 +11,10 @@ Dokumen ini mencatat implementasi terakhir pada 26 Oktober 2026. Ukuran di bawah
 | `design-system.md` | Patokan komponen, ukuran, interaksi, dan pola halaman baru |
 | `resources/css/app.css` | Implementasi font, token, class komponen, dan aturan responsif |
 | `app/Views/layouts/` | Kerangka HTML, satu header bersama, dan footer |
-| `app/Views/{modul}/form.php` | Halaman pengisian per modul |
-| `app/Views/{modul}/rekap.php` | Halaman rekap dalam folder modul yang sama |
+| `database/dummy/builtin-forms.php` | Daftar pertanyaan keenam form monitoring bawaan (bagian 9.1) |
+| `app/Views/form-dinamis/fill.php`, `respons.php` | Satu halaman form dan satu halaman riwayat untuk semua form (bagian 9.1 dan 9.2) |
 | `app/Views/components/` | Satu folder untuk elemen kecil yang digunakan ulang |
-| `config/portal.php` | Definisi dan urutan kartu portal |
+| `database/dummy/dashboard.php` | Bagian, kartu, dan jadwal dashboard |
 | `config/dashboard.php` | Identitas tampilan dan nilai progres awal frontend |
 | Dokumen arsitektur awal dari pemilik project | Rancangan backend, database, autentikasi, dan middleware |
 
@@ -22,7 +22,7 @@ Dokumen arsitektur awal diberikan sebagai berkas terpisah bernama `architecture 
 
 Project ini adalah frontend aplikasi yang sedang dikembangkan langsung. Gunakan bahasa operasional seperti “Riwayat pemeriksaan”, “Kirim laporan”, dan “Informasi portal”. Fitur yang belum tersedia harus dijelaskan sesuai kondisinya, tanpa mengklaim sudah tersambung ke backend.
 
-Controller, View, router GET statis, konfigurasi, dan helper sudah digunakan. Model operasional, autentikasi, middleware, serta penyimpanan form ke server belum diimplementasikan. Angka progres 5/6 (83%) saat ini berasal dari konfigurasi frontend dan akan diganti sumbernya saat integrasi backend.
+Controller, View, router GET statis, konfigurasi, dan helper sudah digunakan. Model operasional, autentikasi, middleware, serta penyimpanan form ke server belum diimplementasikan. Angka progres harian saat ini dihitung dari kartu form dummy yang terjadwal hari ini dan akan diganti sumbernya saat integrasi backend.
 
 ## 2. Menjalankan hasil clone
 
@@ -184,9 +184,9 @@ ID `main-content` harus ada satu kali pada setiap halaman agar skip link berfung
 
 ### 8.1.1 Tombol kembali dan breadcrumb bersama
 
-Source: `config/monitoring-navigation.php`, helper `monitoring_breadcrumbs()`, serta `app/Views/components/breadcrumbs.php` dan `breadcrumb.php`. Semua form mengirim `'backToDashboard' => true` dan menampilkan tombol outline **Kembali ke Dashboard** (ikon panah kiri, tinggi minimal 44 px, `aria-label`, focus ring) menuju `/`; view boleh mengisi `$breadcrumbAside` untuk konten di kanan baris yang sama, misalnya badge ISO 27001 pada Clear Desk. Semua laporan mengirim array `breadcrumbs` dari controller. Layout `main.php` dan `design.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding vertikal 20 px. Jangan membuat breadcrumb lagi di navbar atau view halaman.
+Source: `config/monitoring-navigation.php`, helper `monitoring_breadcrumbs()`, serta `app/Views/components/breadcrumbs.php` dan `breadcrumb.php`. Halaman form, editor form, dan semua halaman riwayat mengirim `'backToDashboard' => true` dan menampilkan tombol outline **Kembali ke Dashboard** (ikon panah kiri, tinggi minimal 44 px, `aria-label`, focus ring) menuju `/`; view boleh mengisi `$breadcrumbAside` untuk konten di kanan baris yang sama. Riwayat keenam modul bawaan juga mengirim array `breadcrumbs` dari `DynamicFormController::history()`; breadcrumb tampil di kanan baris tombol dan turun ke baris berikutnya bila ruang tidak cukup. Layout `main.php` dan `design.php` merendernya satu kali sesudah header dan sebelum konten, dalam `.breadcrumb-shell.page-shell` dengan padding vertikal 20 px. Jangan membuat breadcrumb lagi di navbar atau view halaman.
 
-Urutan selalu `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya Portal Monitoring Terpadu memiliki tautan `/`. Kategori, nama modul, dan halaman aktif berupa teks tanpa tautan maupun cursor pointer, pada halaman rekap. Halaman aktif memiliki `aria-current=page`. Home dan halaman error tidak menampilkan breadcrumb monitoring.
+Urutan selalu `Portal Monitoring Terpadu / Monitoring Harian / Nama Modul / Nama Halaman`. Hanya Portal Monitoring Terpadu memiliki tautan `/`. Kategori, nama modul, dan halaman aktif berupa teks tanpa tautan maupun cursor pointer, pada halaman riwayat. Halaman aktif memiliki `aria-current=page`. Home dan halaman error tidak menampilkan breadcrumb monitoring.
 
 Contoh data halaman laporan:
 
@@ -240,27 +240,9 @@ Helper ikon:
 
 Nama yang tersedia: `server`, `user-check`, `thermometer`, `video`, `monitor`, `ticket`, `globe`, `dashboard`, `hospital`, `file`, `mail`, `target`, `bot`, `shield`, `calendar`, `chart`, `lock`, `users`, `logout`, `clock`, `close`, `info`, `home`, `network`, `clipboard`, `location`, `check-circle`, `cube`, `warning`, `arrow-left`, `bookmark`, dan `send`. Nama yang tidak dikenal menghasilkan ikon `info`.
 
-Tambah kartu melalui `config/portal.php`, bukan HTML dashboard yang disalin. Ikuti bentuk data berikut; `sort_order` disesuaikan dengan urutan kategori.
+Kartu dashboard berasal dari `database/dummy/dashboard.php` (bagian `sections` dan `cards`), bukan HTML dashboard yang disalin. Admin juga dapat menambah form dan tautan lewat tombol **+ Tambah**; perubahan itu disimpan di tab browser. Jenis kartu: `builtin` (form monitoring bawaan, dengan `url` halaman form dan `rekap` halaman riwayat), `form` (form dinamis), dan `link` (website eksternal). Kartu form memiliki `schedule` untuk badge jadwal dan filter Jadwal Hari Ini.
 
-```php
-[
-    'key' => 'nama-modul',
-    'title' => 'Nama Modul',
-    'description' => 'Penjelasan singkat fungsi modul',
-    'icon' => 'file',
-    'tone' => 'teal',
-    'category' => 'daily',
-    'type' => 'internal',
-    'target' => '/forms/nama-modul',
-    'form_slug' => 'nama-modul',
-    'enabled' => true,
-    'sort_order' => 65,
-]
-```
-
-Kategori yang ada: `daily`, `monitoring`, dan `systems`. Setiap `key` harus unik. Kartu eksternal memakai `type=external`, `form_slug=null`, dan target URL HTTPS yang dikelola pengembang. Kartu dengan `enabled=false` tidak ditampilkan.
-
-Perilaku saat ini: URL eksternal HTTPS yang valid menjadi tautan tab baru dengan `noopener noreferrer`. Target eksternal kosong menampilkan dialog keterangan. Kartu internal dengan `available=true` menjadi tautan dalam tab yang sama dan berlabel `Form`; saat ini Hardware Server, Kesesuaian User, dan Antrian Online sudah tersedia. Kartu internal tanpa properti tersebut tetap berlabel `Segera` dan membuka dialog. Tambahkan `available=true` pada konfigurasi kartu setelah route dan view modul selesai.
+Perilaku saat ini: kartu form membuka halaman form-nya, dan tombol **Lihat Rekap** membuka riwayatnya (bagian 9.2). URL eksternal `http`/`https` yang valid menjadi tautan tab baru dengan `noopener noreferrer`; kartu tautan tanpa URL menampilkan "Alamat belum diatur". Menu ⋯ kartu form berisi Lihat Rekap, Edit Isi Form, Edit Kartu, Duplikat, Sembunyikan, dan Hapus; kartu tautan berisi Edit, Pindah Kategori, Sembunyikan, dan Hapus.
 
 ### 8.5 Banner dan panel informasi
 
@@ -293,7 +275,7 @@ Pemicu yang sudah ditangani JavaScript adalah `[data-module]` dan `[data-account
 
 ## 9. Pola form dan tabel untuk halaman baru
 
-Form hardware server tersedia sebagai acuan implementasi. Komponen tabel bersama belum dibuat. Resep umum di bawah tetap berlaku untuk halaman berikutnya.
+Form monitoring dan riwayatnya tidak lagi dibuat per modul: keduanya digambar dari daftar pertanyaan (bagian 9.1 dan 9.2). Resep umum di bawah berlaku untuk halaman lain yang membutuhkan form atau tabel.
 
 - Susun input dalam satu kolom pada mobile, maksimal dua kolom pada desktop untuk kelompok input yang berkaitan.
 - Gunakan label yang terhubung ke `id` input. Placeholder tidak menggantikan label.
@@ -314,7 +296,7 @@ Contoh field:
 </div>
 ```
 
-Warna aksi form dan rekap memakai class bersama di `resources/css/module-ui.css`. Patokannya adalah form Hardware Server, Kesesuaian User, dan Antrian Online. Pasangkan varian warna berikut dengan `.module-action` untuk font tombol standar 14 px, `.module-action-small` untuk aksi kecil 13 px, atau `.module-page-button` untuk pagination 13 px. Bentuk dan padding tetap dapat memakai `.inspection-button` atau utility ukuran yang sesuai. Jangan menambah utility warna lain pada tombol atau ikonnya agar tidak menimpa varian bersama. Aturan ini juga berlaku pada dialog ringkasan, tombol ekspor, dan halaman akun.
+Halaman form dan riwayat memakai tombol `.gf-btn` (gform.css) dan `.dash-btn` (dashboard.css). Halaman lain, seperti akun dan dialog design system, memakai class bersama di `resources/css/module-ui.css`. Pasangkan varian warna berikut dengan `.module-action` untuk font tombol standar 14 px, `.module-action-small` untuk aksi kecil 13 px, atau `.module-page-button` untuk pagination 13 px. Bentuk dan padding memakai utility ukuran yang sesuai. Jangan menambah utility warna lain pada tombol atau ikonnya agar tidak menimpa varian bersama. Aturan ini juga berlaku pada dialog ringkasan, tombol ekspor, dan halaman akun.
 
 | Fungsi | Class warna | Tampilan |
 | --- | --- | --- |
@@ -330,127 +312,88 @@ Cetak memakai `.button-neutral`. Pagination aktif berwarna teal-700 dengan teks 
 
 Tampilkan keadaan kosong jika daftar belum berisi data. Jika ada pengambilan data asynchronous, tampilkan status memuat dan error yang bisa dicoba ulang. Dashboard saat ini dirender langsung oleh PHP dan tidak memerlukan indikator loading buatan.
 
-### 9.1 Form hardware server yang sudah tersedia
+### 9.1 Form monitoring dari daftar pertanyaan
 
-Source: `app/Views/hardware-server/form.php`, `app/Views/components/hardware-condition.php`, `config/hardware-server.php`, dan `public/assets/js/hardware-server.js`.
+Source: `database/dummy/builtin-forms.php`, `app/Controllers/DynamicFormController.php`, `app/Views/form-dinamis/fill.php`, `public/assets/js/form-dinamis.js`, `resources/css/gform.css`, dan `resources/css/form-dinamis.css`.
 
-Kelompokkan view per modul, seperti CCTV, Clear Desk, dan Suhu. Setiap folder modul memiliki `form.php` dan `rekap.php`. Controller berada langsung di `app/Controllers/` dengan method `form()` dan `rekap()`. Komponen dan layout tetap digunakan bersama.
+Keenam form bawaan (Suhu, CCTV, Clear Desk, Hardware Server, Kesesuaian User, Antrian Online) dan form dinamis buatan sendiri memakai satu halaman dan satu renderer. Tidak ada lagi view PHP per modul; jangan membuat folder `app/Views/{modul}/` untuk form atau rekap. Isi form diubah lewat data, atau oleh admin lewat **Edit Isi Form** (bagian 9.3).
 
 ```text
 app/Views/
-├── antrian-online/
-│   ├── form.php
-│   └── rekap.php
-├── cctv/
-│   ├── form.php
-│   └── rekap.php
-├── cleardesk/
-│   ├── form.php
-│   └── rekap.php
-├── hardware-server/
-│   ├── form.php
-│   └── rekap.php
-├── kesesuaian-user/
-│   ├── form.php
-│   └── rekap.php
-├── suhu/
-│   ├── form.php
-│   └── rekap.php
-├── layouts/
-│   ├── main.php
-│   ├── design.php
-│   ├── auth.php
-│   ├── header.php
-│   └── footer.php
-├── components/
+├── form-dinamis/
+│   ├── fill.php       halaman form (semua form)
+│   └── respons.php    halaman riwayat (semua form)
+├── form-editor/
+│   └── index.php      Edit Isi Form
 ├── home/
-│   └── index.php
+├── account/
+├── auth/
+├── layouts/
+├── components/
 └── errors/
 ```
 
-Tambahkan modul berikutnya sebagai `app/Views/{nama-modul}/form.php` dan `rekap.php`. Jangan membuat folder `forms/`, `reports/`, atau `components/` baru di dalam modul. `layouts/` tetap untuk kerangka global; `components/` tetap satu folder bersama untuk bagian konten yang digunakan ulang. Lokasi view tidak menentukan URL route.
+**Definisi form** (kunci = id kartu dashboard): `title`, `description`, `meta` (daftar `label` + `value`, atau `auto: now | today | month` yang diisi dengan waktu WIB di browser), `submitLabel`, `resetLabel` (bawaan "Kosongkan form"), dan `questions`.
 
-URL tetap sama saat file dipindah. Hardware Server, Kesesuaian User, dan Antrian Online memakai `/forms/{modul}` serta `/reports/{modul}`; CCTV, Clear Desk, dan Suhu memakai `/form/{modul}` serta `/rekap/{modul}`. Tidak ada redirect atau route tambahan dalam perubahan struktur ini. Router mendaftarkan semua path secara eksplisit.
+**Pertanyaan**: `id` tetap (dipakai jawaban dan kondisi; jangan diganti setelah ada laporan), `type`, `title`, `help`, `required`, serta opsional `badge` (pill di kanan judul), `placeholder`, `default`, `maxlength`, `rows`, `mono`, `hint`, `counter`, dan `image`.
 
-- Route: `/forms/hardware-server`; controller: `App\Controllers\HardwareServerController`.
-- Navbar memakai `layouts/header.php` yang sama dengan home. Breadcrumb tetap dirender oleh layout di bawah header, sama seperti form dan laporan lainnya. Logo, identitas portal, jam WIB, serta menu Password, Users, dan Logout memakai satu sumber bersama.
-- Form, laporan, dan isi hero memakai `.page-shell` yang sama dengan home dan navbar: lebar 90% mulai desktop, maksimal 1440 px, dengan padding mobile 20/32 px. Jangan menambahkan batas 1024 px pada halaman hardware server.
-- `.inspection-panel`: radius 16 px, border slate-200, padding 24 px pada mobile dan 32 px mulai `md`. Jarak antarpanel 24 px. Heading bagian 16 px; label pilihan 14 px; deskripsi 12 px; teks input 13 px.
-- `.inspection-choice` memakai radio native yang tetap dapat difokuskan melalui keyboard. State checked berborder teal-600 dan berlatar `#f0fdf4`; fokus memiliki outline. Pilihan awal mengikuti HTML referensi: rak pertama, CPU BAIK, dan monitor BAIK.
-- Kelompok CPU/monitor memakai partial `components/hardware-condition.php`. Tambahkan konfigurasi teks melalui controller/config, jangan menyalin struktur pilihan radio.
-- Keterangan Other wajib terisi ketika dipilih. Catatan cepat menambahkan teks ke textarea tanpa menggandakan rekomendasi yang sama. Reset dan Input Form Baru mengembalikan pilihan awal setelah konfirmasi.
-- Kirim Laporan membuka ringkasan setelah validasi dan menyatakan pengiriman belum tersedia. Lihat Riwayat & Rekap Laporan mengarah ke `/reports/hardware-server`. Jangan menampilkan status berhasil dikirim sebelum ada respons server yang berhasil.
-- Script khusus halaman didaftarkan melalui array `pageScripts` di controller. Layout memuatnya dengan `defer` dan versi `filemtime`; jangan memasukkan script inline ke view.
-- Controller mempertahankan pembatasan `APP_ENV=local` sampai autentikasi tersedia.
+| Kelompok | Tipe | Catatan |
+| --- | --- | --- |
+| Umum (tipe dapat diganti di editor) | `short`, `paragraph`, `radio`, `checkbox`, `select`, `file`, `date`, `time`, `scale`, `number`, `rating` | `number` menerima `21,5` dan `21.5` |
+| Blok tanpa jawaban | `section` (nomor, `help`, `chip`), `title`, `image` | Bagian diberi nomor otomatis |
+| Khusus form bawaan (tipe terkunci) | `temperature` (`unit`, `bands`), `datetime`, `datetime2` (dengan tombol Set Jam Sekarang), `grid` (`columns`, `rows`), `confirm` | `confirm` adalah pernyataan wajib centang (PRD FR-F7) |
 
-### 9.2 Rekap bulanan hardware server
+- **Opsi** berupa teks atau objek `value`, `label`, `note`, `badge`, dan `tone: 'red'` (jawaban yang perlu perhatian). `value` tetap meskipun label diubah. `other` bernilai `true` atau `['label' => …, 'placeholder' => …]` untuk pilihan "Lainnya" dengan isian teks.
+- **Rekomendasi cepat**: `chips` berupa teks atau `['label' => …, 'text' => …]`, dengan `chipsLabel` dan `chipMode` (`set` mengganti isi, `append` menambah baris tanpa duplikat).
+- **Kondisi**: `showIf` (`q`, `value`) menampilkan pertanyaan hanya untuk satu jawaban; `requiredWhen` (daftar `q`, `value`) membuatnya wajib bila salah satu jawaban dipilih. Pertanyaan tersembunyi tidak divalidasi dan tidak disimpan.
+- **Format**: `format: 'mac'` (disimpan `AA:BB:CC:DD:EE:FF`) dan `format: 'ipv4'` pada jawaban singkat.
+- **File**: `accept`, `maxMb`, `multiple`, `maxFiles`, `capture`, `dropText`, dan `formats`. Pada data contoh file tidak diunggah; hanya nama file yang disimpan.
+- **Status suhu** (PRD FR-T2) dihitung dari nilai yang dibulatkan satu desimal dengan `bands` (bawaan 18,0 / 24,0 / 27,0): Normal 18,0–24,0 °C; Peringatan di bawah 18,0 atau 24,1–26,9 °C; Kritis mulai 27,0 °C. Aturannya ada sekali di `public/assets/js/dashboard-store.js` (`tempStatus`) dan dipakai form maupun riwayat. Jangan menulis target suhu lain di teks pertanyaan.
 
-Source: `app/Views/hardware-server/rekap.php`, `config/hardware-server-reports.php`, dan `public/assets/js/hardware-server-history.js`. Route `/reports/hardware-server` memakai method `rekap()` pada controller hardware yang sama. Header dan `components/hardware-server-hero.php` digunakan bersama dengan form; tombol Input Form Baru mengarah kembali ke form, dan breadcrumb menunjukkan Rekap Monitoring Hardware Server IT.
+Tampilan dan perilaku halaman form:
 
-- Pertahankan `.page-shell` yang sama dengan home (90% pada desktop, maksimal 1440 px), jarak antarpanel 24 px, radius 16 px. Heading rekap 18 px; isi tabel 12 px; header dan badge tabel 10–11 px, mengikuti HTML referensi.
-- Panel kontrol memakai satu kolom pada mobile, dua mulai `sm`, dan empat mulai `md`. Label terhubung ke setiap input. Kelompok tombol ekspor dapat membungkus ketika ruang menyempit.
-- Tabel memakai `scope=col`, caption, dan wrapper horizontal yang bisa difokuskan. Lebar minimum 1380 px menjaga delapan kolom terbaca; hanya tabel yang bergeser, bukan seluruh halaman. Catatan penuh tersedia pada dialog rincian, sehingga teks tabel boleh dipotong dengan ellipsis.
-- Filter bulan/rak/status dapat digabung dengan pencarian beberapa kata. Pencarian mencakup catatan, nama/NIK petugas, identitas laporan, rak, dan kondisi. Perubahan filter mengembalikan pagination ke halaman pertama; tujuh baris per halaman berasal dari konfigurasi. Total dan tombol halaman dihitung dari hasil yang sebenarnya, tanpa jumlah 31 atau halaman tambahan buatan.
-- Kondisi kosong menampilkan penjelasan dan Reset Filter. Tombol ekspor/cetak dinonaktifkan ketika tidak ada hasil.
-- Data awal adalah tujuh baris dari HTML referensi, dengan pemberitahuan sumber pada halaman. Ganti sumber controller dengan Model saat data operasional tersedia; jangan menganggap data referensi sebagai laporan pemeriksaan sungguhan.
-- Rincian memakai dialog native. Data JSON diserialisasi dengan opsi `JSON_HEX_*`; nilai dimasukkan ke DOM menggunakan `textContent`.
-- Cetak Rekap membuka dialog cetak browser. CSS cetak menampilkan semua hasil filter lintas halaman, identitas rumah sakit, dan ringkasan filter; navigasi, hero, tombol aksi, dan pagination tidak ikut dicetak. Tata letak cetak memakai A4 landscape.
-- Ekspor Excel/PDF dan unduh lembar membuka keterangan integrasi yang belum tersedia. Jangan membuat pesan unduhan berhasil atau file dengan ekstensi palsu. Ekspor operasional menunggu backend dan hak akses.
-- Ikon tambahan: `chart-search`, `table`, `printer`, `search`, `chevron-down`, `eye`, dan `download`, melalui helper `icon()` yang sama.
+- Header: baris kecil RS AWAL BROS GROUP • IT BOTANIA, judul, keterangan, `meta`, Jadwal dan Batas pengisian dari kartu, keterangan wajib diisi, serta tautan **Lihat Rekap** ke riwayat. Kembali ke dashboard lewat tombol di atas halaman; aksi bawah hanya **Kosongkan form** dan tombol kirim.
+- Label terhubung ke input; pilihan, skala, rating, kisi, dan tanggal + jam memakai `fieldset` dengan `legend`. Pesan error berbahasa Indonesia tampil di bawah kartu pertanyaan, dan fokus pindah ke pertanyaan pertama yang salah. Input angka memakai keypad desimal; MAC memakai huruf kapital.
+- Setelah dikirim, laporan disimpan di state browser, kartu dashboard ditandai selesai hari ini, dan dialog sukses menautkan ke riwayat. Jangan mengklaim laporan tersimpan di server sebelum backend tersedia.
+- Perubahan yang belum dikirim memicu peringatan saat meninggalkan halaman.
+- Form bawaan yang kartunya dihapus dari dashboard tetap dapat dibuka lewat URL-nya, dari definisi aslinya.
 
-### 9.3 Form Kesesuaian User HIS
+Menambah form bawaan baru:
 
-Panel Sampel Terakhir Tercatat sudah dihapus beserta konfigurasi data referensinya. Form memakai lebar container penuh dan hanya memuat isian verifikasi serta tindakan form.
+1. Tambahkan definisi di `database/dummy/builtin-forms.php` dengan id kartu sebagai kunci.
+2. Tambahkan kartu `kind: 'builtin'` dengan `url` dan `rekap` di `database/dummy/dashboard.php`.
+3. Daftarkan dua route di `routes/web.php`: halaman form ke `$dynamicForm->builtin('id-kartu')` dan riwayat ke `$dynamicForm->history('id-kartu', 'kunci-navigasi')`.
+4. Tambahkan nama modul dan halaman riwayat di `config/monitoring-navigation.php` untuk breadcrumb.
 
-Route `/forms/kesesuaian-user` menggunakan `KesesuaianUserController::form()` dan view `app/Views/kesesuaian-user/form.php`. Halaman laporannya berada di `app/Views/kesesuaian-user/rekap.php`, tanpa folder modul tambahan. Konten alasan dan sampel berasal dari `config/kesesuaian-user.php`, dan script khusus halaman dari `public/assets/js/kesesuaian-user.js`.
+### 9.2 Halaman riwayat
 
-- Gunakan navbar global dan breadcrumb bersama dari layout; jangan menulis breadcrumb di view. Hero berwarna hijau dan judul sans-serif 24/30 px. Container sama dengan home: 90% pada desktop, maksimal 1440 px.
-- Isi memakai satu kolom pada mobile dan grid 12 kolom mulai `lg`: form delapan kolom dan sampel terakhir empat kolom. Panel putih memakai radius 12 px, padding 24/32 px. Field 13 px dengan tinggi 48 px; label 14 px; deskripsi 12 px.
-- Pilihan kesesuaian memakai radio native, dengan `.compliance-option`, `.compliance-radio`, dan fokus keyboard yang terlihat. Pilihan Tidak Sesuai membuka alasan dan catatan. Alasan wajib terisi untuk status tersebut; catatan wajib untuk alasan Lainnya. Field tersembunyi dinonaktifkan agar tidak menghalangi validasi.
-- Username wajib terisi dan tidak boleh mengandung spasi. Tanggal/jam login wajib terisi; Set Jam Sekarang menggunakan `Intl.DateTimeFormat` dengan zona Asia/Jakarta, tanpa mencampur tanggal UTC dengan jam lokal.
-- Kirim Verifikasi membuka ringkasan setelah validasi dan menjelaskan pengiriman belum tersedia. Kedua tombol rekap membuka `/reports/kesesuaian-user`; jangan mengarahkannya ke laporan hardware atau menampilkan penyimpanan berhasil tanpa respons server.
-- Sidebar memakai tiga sampel dari HTML referensi, ditandai sebagai data referensi. Jumlah badge mengikuti array, tanpa mengklaim Hari Ini (4). Ganti sumber data melalui Model setelah backend tersedia.
-- View memiliki anotasi PHPDoc untuk variabel yang dikirim controller. Ikon `user-search` dan `history` menggunakan helper yang sama. Controller tetap membatasi akses ke `APP_ENV=local` sampai autentikasi tersedia.
+Source: `app/Views/form-dinamis/respons.php`, `public/assets/js/form-riwayat.js`, `database/dummy/builtin-responses.php`, dan `resources/css/form-dinamis.css`. Route riwayat keenam modul tetap memakai URL rekap lama (`/rekap/...`, `/reports/...`); form dinamis memakai `/form-dinamis/respons?id=…`.
 
-### 9.4 Laporan Kesesuaian User HIS
+- Kolom selalu mengikuti form saat ini: No, Waktu kirim (WIB), satu kolom per pertanyaan (kecuali pernyataan), dan tombol Detail. Laporan yang dikirim sebelum suatu pertanyaan ditambahkan menampilkan "—"; jawaban pertanyaan yang sudah dihapus tidak ditampilkan.
+- Nilai ditampilkan sesuai tipenya: suhu "24,6 °C" dengan chip status, opsi bertanda `tone: 'red'` sebagai chip merah, kisi sebagai ringkasan "Patuh 2 · Temuan 1", tanggal "27 Okt 2026, 08.12", dan daftar file dipisah koma. Teks panjang dipotong tiga baris di tabel dan tampil lengkap di detail.
+- Ringkasan: Laporan ditampilkan dan Perlu perhatian (keduanya mengikuti filter), Bulan ini (bulan WIB berjalan), dan Terakhir dikirim. Laporan perlu perhatian bila ada suhu Peringatan/Kritis, jawaban `tone: 'red'`, atau kisi selain kolom pertama.
+- Pencarian mencakup semua jawaban dan berjalan 300 ms setelah berhenti mengetik; filter periode per bulan WIB; tombol Reset filter muncul saat filter aktif; 25 baris per halaman; keadaan kosong membedakan "belum ada laporan" dan "tidak ada hasil filter".
+- Di bawah 768 px tabel diganti daftar kartu per laporan (PRD FR-R9). Wrapper tabel dapat digeser horizontal di desktop, tetapi body halaman tidak boleh melebar.
+- Klik baris atau tombol Detail membuka `<dialog>` native berisi semua pertanyaan per bagian beserta jawabannya; fokus kembali ke pemicu saat dialog ditutup. Nilai ditulis dengan escape, bukan HTML mentah.
+- Bentuk laporan: `id`, `at` (waktu kirim UTC, ISO 8601), dan `answers` per id pertanyaan, berisi label opsi, angka, nama file, atau objek baris → kolom untuk kisi. Halaman menampilkan laporan contoh ditambah laporan yang dikirim di tab browser.
+- Belum tersedia: ekspor Excel/PDF, cetak, ubah/hapus laporan, dan change log. Semuanya menunggu backend.
 
-Route `/reports/kesesuaian-user` memakai `KesesuaianUserController::rekap()`, view `app/Views/kesesuaian-user/rekap.php`, konfigurasi `config/kesesuaian-user-reports.php`, dan script `public/assets/js/kesesuaian-user-history.js`.
+### 9.3 Edit Isi Form
 
-- Navbar global, breadcrumb, dan `.page-shell` mengikuti halaman form/home. Hero berwarna hijau dengan judul sans-serif 24/30 px. Empat kartu ringkasan memakai grid satu/dua/empat kolom sesuai breakpoint, padding 20 px, dan angka 30 px.
-- Ringkasan dihitung dari data yang tersedia dan mengikuti filter tabel, termasuk jumlah sesuai/tidak sesuai, persentase, dan sampling terakhir. Data awal tujuh baris referensi menghasilkan 7/5/2 dan 71,4%; jangan memakai 128/122/6 sebagai angka operasional tanpa sumber data.
-- Filter periode, status, unit, dan pencarian beberapa kata dapat digabung. Pencarian mencakup username, nama lengkap, unit, petugas, dan temuan. Perubahan filter mengembalikan halaman pertama. Kondisi kosong menampilkan nol, persentase “—”, pesan kosong, dan Reset Filter.
-- Tabel memiliki enam kolom, font isi 12 px, header 10 px, dan lebar minimum 1120 px. Kolom temuan membungkus agar seluruh isinya terbaca. Wrapper tabel dapat digeser; body halaman tetap mengikuti container. Username berupa tombol yang membuka rincian pada dialog native sehingga tidak perlu kolom aksi tambahan.
-- Pagination dihitung dari hasil filter dengan tujuh baris per halaman. Kartu ringkasan menghitung seluruh hasil, bukan hanya baris di halaman aktif. Tampilan cetak A4 landscape memuat seluruh hasil filter lintas halaman dan ringkasan filter.
-- Data referensi diberi penanda. Ekspor Excel/PDF membuka keterangan integrasi belum tersedia; tidak membuat unduhan palsu. Penyimpanan serta ekspor operasional menunggu backend dan kontrol akses. Controller mempertahankan batas `APP_ENV=local`.
-- Komponen logo mengikuti SVG bersama; jangan menyalin markup header/footer atau membuat folder components di dalam reports.
+Source: `app/Controllers/FormEditorController.php`, `app/Views/form-editor/index.php`, `public/assets/js/form-editor.js`, dan `resources/css/form-editor.css`. Dibuka dari menu ⋯ › Edit Isi Form pada kartu form, termasuk keenam form bawaan.
 
-### 9.5 Form Monitoring Antrian Online BPJS
-
-Route `/forms/antrian-online` memakai `AntrianOnlineController::form()`, view `app/Views/antrian-online/form.php`, konfigurasi `config/antrian-online.php`, dan script `public/assets/js/antrian-online.js`.
-
-- Form berisi status cron antrian dan cron bed MJKN, catatan tindak lanjut, serta checkbox konfirmasi. Identitas petugas dan waktu WIB ditampilkan sebagai metadata. Periode hero cukup bertuliskan Inspeksi Harian.
-- Pilihan shift, endpoint/status koneksi bridging, jumlah tiket, serta unggah bukti sudah dihapus dari view, konfigurasi, validasi, reset, dan ringkasan.
-- Dua card cron tetap memakai subgrid bersama agar judul, deskripsi, dan pilihan sejajar. Catatan dan konfirmasi memakai lebar penuh tanpa kolom unggah kosong.
-- Jika salah satu cron tidak terkirim, catatan wajib terisi dan tidak boleh hanya spasi. Konfirmasi tetap wajib dicentang sebelum ringkasan dibuka.
-- Reset meminta konfirmasi, mengembalikan status awal, mengosongkan catatan/konfirmasi, serta memperbarui waktu WIB. Kirim membuka ringkasan dengan keterangan bahwa pengiriman server belum tersedia.
-
-### 9.6 Rekap Monitoring Antrian Online BPJS
-
-Route `/reports/antrian-online` memakai `AntrianOnlineController::rekap()`, view `app/Views/antrian-online/rekap.php`, konfigurasi `config/antrian-online-reports.php`, dan script `public/assets/js/antrian-online-history.js`.
-
-- Empat ringkasan menampilkan jumlah sesi, persentase kedua cron, dan audit terakhir. Angka dihitung dari hasil filter. Tujuh baris referensi menghasilkan 7 sesi, 6 cron antrian terkirim (85,7%), dan 7 cron bed terkirim (100%).
-- Empat kontrol pencarian terdiri dari periode, status cron antrian, status cron bed, dan kata kunci. Filter shift sudah dihapus. Pencarian mencakup waktu WIB, kode respons cron, status, petugas, dan catatan.
-- Tabel memiliki lima kolom: nomor/waktu audit, cron antrian, cron bed MJKN, catatan operasional, dan petugas. Kolom transaksi tiket, bukti log, dan informasi shift sudah dihapus beserta data serta rincian terkait. Lebar minimum tabel 960 px; catatan tetap membungkus.
-- Pagination, rincian audit, keadaan kosong, reset filter, dan cetak seluruh hasil filter tetap berjalan. Ekspor Excel/PDF serta unduh SOP menjelaskan status belum tersedia sampai integrasi backend.
-- Data JSON memakai `JSON_HEX_*`; rincian ditulis melalui `textContent`. Data referensi diberi label dan tidak mengklaim hasil koneksi server secara langsung.
+- Tab **Pertanyaan**: judul dan keterangan form, kartu pertanyaan (teks, deskripsi, tipe, opsi, "Lainnya", rekomendasi cepat, gambar lewat URL, wajib diisi, pindah atas/bawah, duplikat, hapus) dan toolbar Tambah Pertanyaan/Judul/Gambar/Bagian. Di bawah 900 px toolbar menjadi bilah di bawah layar.
+- Tipe khusus form bawaan tampil sebagai label terkunci dengan penjelasan. Pertanyaan bersyarat diberi keterangan "Tampil hanya jika …". Pengaturan yang tidak ditampilkan editor (catatan dan badge opsi, nilai awal, kondisi, `meta` form) ikut tersimpan.
+- Tab **Jadwal**: pola harian, mingguan, bulanan, tahunan, atau tanggal tertentu; tanggal mulai/berakhir; batas waktu dan pengingat; kalender pratinjau.
+- **Simpan Form** menyimpan pertanyaan dan jadwal sekaligus. **Kembalikan ke form asli** (form bawaan) memuat pertanyaan asli dan baru berlaku setelah disimpan. **Batal** dengan perubahan yang belum disimpan menampilkan bilah "Lanjut mengedit / Buang perubahan".
 
 ## 10. Contoh menambah halaman dengan MVC yang tersedia
 
-Route `/forms/hardware-server`, controller, dan view yang disebut di bawah sudah dipakai oleh form pemeriksaan. Jangan menimpa file tersebut atau menggandakan route. Contoh ringkas ini menjelaskan pola MVC; gunakan nama modul dan path baru untuk halaman selanjutnya. Jangan menyalin navbar atau HTML dokumen ke dalam view.
+Contoh ini untuk halaman di luar form monitoring, misalnya halaman informasi. Untuk form monitoring baru, ikuti bagian 9.1 dan jangan membuat view form sendiri. Nama `InfoController` dan route `/info` hanya contoh; pastikan nama dan path belum dipakai. Jangan menyalin navbar atau HTML dokumen ke dalam view.
 
 ### A. Buat controller
 
-Lokasi: `app/Controllers/HardwareServerController.php`.
+Lokasi: `app/Controllers/InfoController.php`.
 
 ```php
 <?php
@@ -458,53 +401,44 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\View;
-
-final class HardwareServerController
+final class InfoController extends Controller
 {
-    public function form(): void
+    public function index(): void
     {
-        View::render('hardware-server/form', [
-            'pageTitle' => 'Monitoring Hardware Server',
+        $this->render('info/index', [
+            'pageTitle' => 'Informasi Portal',
             'backToDashboard' => true,
-            'profile' => config('dashboard')['profile'],
-        ]);
+        ], 'main');
     }
 }
 ```
 
+`Controller::render()` menutup halaman dengan HTTP 503 di luar `APP_ENV=local` sampai autentikasi tersedia.
+
 ### B. Daftarkan route
 
-Tambahkan ke `routes/web.php` setelah deklarasi `use` yang diperlukan. Jika controller dengan nama yang sama sudah ada, gunakan file yang ada.
+Tambahkan ke `routes/web.php` setelah deklarasi `use` yang diperlukan. Route di bawah middleware login otomatis memerlukan sesi.
 
 ```php
 <?php
-use App\Controllers\HardwareServerController;
+use App\Controllers\InfoController;
 
-$router->get('/forms/hardware-server', [new HardwareServerController(), 'form']);
+$router->get('/info', [new InfoController(), 'index']);
 ```
 
-Router mendukung `get()`, `post()`, dan middleware dengan path statis. Folder view tidak menentukan URL; daftarkan route secara eksplisit sesuai kebutuhan modul.
+Router mendukung `get()`, `post()`, dan middleware dengan path statis. Folder view tidak menentukan URL; daftarkan route secara eksplisit.
 
 ### C. Buat view
 
-Lokasi: `app/Views/hardware-server/form.php`.
+Lokasi: `app/Views/info/index.php`.
 
 ```php
 <main id="main-content" class="page-shell flex-1 space-y-5 py-4">
-    <header class="space-y-2">
-        <a href="/" class="text-xs font-medium text-teal-700 hover:underline">
-            Kembali ke portal
-        </a>
-        <h1 class="text-lg font-bold text-slate-800"><?= e($pageTitle) ?></h1>
-        <p class="text-xs text-slate-500">Riwayat pemeriksaan hardware server IT.</p>
-    </header>
+    <h1 class="text-lg font-bold text-slate-800"><?= e($pageTitle) ?></h1>
 
-    <section aria-labelledby="history-title"
+    <section aria-labelledby="info-title"
              class="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
-        <h2 id="history-title" class="text-sm font-bold text-slate-800">
-            Riwayat pemeriksaan
-        </h2>
+        <h2 id="info-title" class="text-sm font-bold text-slate-800">Informasi portal</h2>
         <p class="mt-3 text-xs text-slate-500">Belum ada data yang ditampilkan.</p>
     </section>
 </main>
@@ -516,7 +450,7 @@ Route baru tetap perlu pengaturan hak akses ketika backend diintegrasikan. `Auth
 
 ### D. Hubungkan dan bangun CSS
 
-Saat modul siap, hubungkan kartu internal melalui perubahan komponen terpusat yang dijelaskan pada bagian kartu. Lalu jalankan `npm run build` atau watcher CSS, buka route baru, dan periksa tampilannya.
+Bila halaman perlu kartu di dashboard, tambahkan kartu tautan atau form seperti dijelaskan pada bagian 8.4. Lalu jalankan `npm run build` atau watcher CSS, buka route baru, dan periksa tampilannya.
 
 Tailwind memindai `app/**/*.php`, `config/**/*.php`, dan `public/assets/js/*.js`. Tulis nama class lengkap di source, misalnya `text-[11.7px]`. Jangan menyusun class baru seperti `bg-<?= $warna ?>-50` tanpa daftar class lengkap yang bisa dibaca Tailwind. Varian `.tone-*` sudah ditulis eksplisit dalam source CSS.
 

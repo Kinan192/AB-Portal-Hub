@@ -20,12 +20,4 @@ abstract class Controller
         }
         View::render($template, $data, $layout);
     }
-
-    /** Toast shown after a form has been sent to its rekap page (see submit()). */
-    protected function submittedFlash(string $formName): ?array
-    {
-        return ($_GET['terkirim'] ?? '') === '1'
-            ? ['title' => 'Laporan Berhasil Terkirim!', 'description' => 'Data ' . $formName . ' telah tersimpan ke rekapitulasi audit.']
-            : null;
-    }
 }
