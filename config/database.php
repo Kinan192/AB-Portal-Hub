@@ -9,5 +9,6 @@ return [
     'username' => getenv('DB_USERNAME') ?: '',
     'password' => getenv('DB_PASSWORD') ?: '',
     'charset' => 'utf8mb4',
-    'timezone' => getenv('DB_TIMEZONE') ?: '+07:00',
+    // Stored times are UTC (PRD §10); pages show them in WIB (config/app.php timezone).
+    'timezone' => '+00:00',
 ];

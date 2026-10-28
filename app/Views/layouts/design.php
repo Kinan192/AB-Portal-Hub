@@ -1,6 +1,6 @@
 <?php
 /**
- * Design-system layout (login, account, suhu, CCTV, Clear Desk pages): navbar with live clock,
+ * Design-system layout (account pages): navbar with live clock,
  * optional breadcrumb bar, page content and footer. Styles: css/design.css, script: js/design.js.
  * Optional view data: $page, $bodyClass, $documentClass, $htmlClass,
  * $crumbbar (breadcrumb data shown in the white bar under the navbar), $footer, $modal.

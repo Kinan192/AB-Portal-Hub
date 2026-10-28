@@ -29,7 +29,7 @@ $offset = $circumference * (1 - $progress['ratio']);
                 <span class="shrink-0 font-mono font-bold text-emerald-400" data-progress="ratio"><?= e($progress['completed']) ?>/<?= e($progress['target']) ?> Selesai</span>
             </div>
             <div class="h-2 w-full overflow-hidden rounded-full border border-teal-700/50 bg-teal-950 sm:w-48" role="progressbar" data-progress="meter" aria-label="Capaian pengisian form" aria-valuemin="0" aria-valuemax="<?= e(max(1, $progress['target'])) ?>" aria-valuenow="<?= e($progress['completed']) ?>" aria-valuetext="<?= e($progress['completed']) ?> dari <?= e($progress['target']) ?> form selesai">
-                <div class="h-full rounded-full bg-linear-to-r from-teal-400 to-emerald-400" data-progress="bar" style="width: <?= e(number_format($progress['ratio'] * 100, 3, '.', '')) ?>%"></div>
+                <div class="h-full rounded-full bg-linear-to-r from-teal-400 to-emerald-400" data-progress="bar"></div><?php /* width set by dashboard.js: the CSP allows no inline style */ ?>
             </div>
             <div class="flex items-center pt-0.5"><span class="rounded border border-emerald-500/40 bg-emerald-950/80 px-1.5 py-0.5 text-[9px] font-semibold text-emerald-300">Target: 100% Hari Ini</span></div>
         </div>

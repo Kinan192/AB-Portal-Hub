@@ -7,7 +7,7 @@
  * Layout:  $class (wrapper), $labelClass, $labelHtml (rendered label content instead of $label),
  *          $required (append the required mark), $requiredClass, $boxClass (wrapper around the control),
  *          $iconLeft / $iconRight ([name, classes]), $toggle (password visibility button),
- *          $help, $helpClass, $error (['id' => ..., 'text' => ...]).
+ *          $help, $helpClass, $error (['id' => ..., 'text' => ...]; a non-empty text is shown at once).
  * $variant "account" renders the account-page field style (.rs-field / .rs-input).
  */
 $control = $control ?? 'input';
@@ -21,6 +21,10 @@ if ($control === 'input') {
 }
 if (isset($error['id'])) {
     $controlAttrs['aria-describedby'] = $error['id'];
+    // A message from the server is shown at once and marks the control invalid.
+    if (($error['text'] ?? '') !== '') {
+        $controlAttrs['aria-invalid'] = 'true';
+    }
 }
 $boxClass = $account ? 'rs-input' : ($boxClass ?? null);
 ?>
@@ -46,6 +50,6 @@ $boxClass = $account ? 'rs-input' : ($boxClass ?? null);
     <?php if ($boxClass !== null): ?></div><?php endif; ?>
     <?php if (isset($help)): ?><p class="<?= e($account ? 'rs-help' : ($helpClass ?? '')) ?>"><?= e($help) ?></p><?php endif; ?>
     <?php if (isset($error)): ?>
-    <p class="rs-error" id="<?= e($error['id']) ?>" hidden><?= design_icon('circle-alert') ?><span data-error-text><?= e($error['text'] ?? '') ?></span></p>
+    <p class="rs-error" id="<?= e($error['id']) ?>"<?= ($error['text'] ?? '') === '' ? ' hidden' : '' ?>><?= design_icon('circle-alert') ?><span data-error-text><?= e($error['text'] ?? '') ?></span></p>
     <?php endif; ?>
 </div>

@@ -3,34 +3,53 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-/** Session-backed sign-in state, CSRF token and the page to return to after login. */
+/**
+ * Session-backed sign-in state, CSRF token and the page to return to after login (PRD SEC-1, SEC-7).
+ * Idle timeout 30 minutes, absolute timeout 12 hours; the session id changes at login.
+ */
 final class Auth
 {
     private const USER = 'auth.user';
     private const LAST_SEEN = 'auth.last_seen';
     private const INTENDED = 'auth.intended';
     private const CSRF = 'csrf_token';
-    private const IDLE_SECONDS = 1800;
+    public const IDLE_SECONDS = 1800;
+    public const ABSOLUTE_SECONDS = 43200;
 
     public static function startSession(): void
     {
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
-        $https = ($_SERVER['HTTPS'] ?? '') !== '' && ($_SERVER['HTTPS'] ?? '') !== 'off';
         ini_set('session.use_strict_mode', '1');
         ini_set('session.use_only_cookies', '1');
+        // Sessions must outlive the absolute timeout; PHP's default (24 minutes) is shorter than the idle limit.
+        ini_set('session.gc_maxlifetime', (string) self::ABSOLUTE_SECONDS);
         session_save_path(BASE_PATH . '/storage/sessions');
         session_name('abportal_session');
-        session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => $https, 'httponly' => true, 'samesite' => 'Lax']);
+        session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => SecurityHeaders::https(), 'httponly' => true, 'samesite' => 'Lax']);
         session_start();
-        // Sign out after 30 idle minutes.
-        if (isset($_SESSION[self::USER]) && time() - (int) ($_SESSION[self::LAST_SEEN] ?? 0) > self::IDLE_SECONDS) {
-            unset($_SESSION[self::USER]);
-        }
         if (isset($_SESSION[self::USER])) {
-            $_SESSION[self::LAST_SEEN] = time();
+            $reason = self::expired(time(), (int) ($_SESSION[self::LAST_SEEN] ?? 0), (int) ($_SESSION[self::USER]['logged_in_at'] ?? 0));
+            if ($reason !== null) {
+                unset($_SESSION[self::USER]);
+                Flash::set('Sesi berakhir', $reason, 'info');
+            } else {
+                $_SESSION[self::LAST_SEEN] = time();
+            }
         }
+    }
+
+    /** Why a session is no longer valid, or null while it is (pure, see tests). */
+    public static function expired(int $now, int $lastSeen, int $loggedInAt): ?string
+    {
+        if ($now - $loggedInAt > self::ABSOLUTE_SECONDS) {
+            return 'Sesi lebih dari 12 jam. Silakan masuk kembali.';
+        }
+        if ($now - $lastSeen > self::IDLE_SECONDS) {
+            return 'Tidak ada aktivitas selama 30 menit. Silakan masuk kembali.';
+        }
+        return null;
     }
 
     public static function check(): bool
@@ -38,16 +57,14 @@ final class Auth
         return isset($_SESSION[self::USER]);
     }
 
-    /**
-     * Development-only free login, on only when APP_ENV=local AND AUTH_DEV_BYPASS=true.
-     * TODO(auth): HAPUS/NONAKTIFKAN sebelum dipakai di server RS.
-     */
-    public static function devBypassEnabled(): bool
+    /** @return array{id: ?int, name: string, username: string, email: string, session_version?: int, logged_in_at: int}|null */
+    public static function user(): ?array
     {
-        return getenv('APP_ENV') === 'local' && strtolower(trim((string) getenv('AUTH_DEV_BYPASS'))) === 'true';
+        $user = $_SESSION[self::USER] ?? null;
+        return is_array($user) ? $user : null;
     }
 
-    /** @param array{id: ?int, name: string, email: string, dev_bypass?: bool} $user */
+    /** @param array{id: ?int, name: string, username: string, email: string, session_version?: int} $user */
     public static function login(array $user): void
     {
         session_regenerate_id(true);
@@ -56,12 +73,29 @@ final class Auth
         unset($_SESSION[self::CSRF]);
     }
 
+    /** After the password changed here: this session stays valid with the new version. */
+    public static function refresh(int $sessionVersion): void
+    {
+        session_regenerate_id(true);
+        if (isset($_SESSION[self::USER])) {
+            $_SESSION[self::USER]['session_version'] = $sessionVersion;
+        }
+    }
+
     public static function logout(): void
     {
         $_SESSION = [];
         $params = session_get_cookie_params();
         setcookie(session_name(), '', ['expires' => time() - 3600] + array_intersect_key($params, array_flip(['path', 'domain', 'secure', 'httponly', 'samesite'])));
         session_destroy();
+    }
+
+    /** Ends this sign-in but keeps the session for a message on the login page. */
+    public static function forget(string $title, string $description): void
+    {
+        unset($_SESSION[self::USER]);
+        session_regenerate_id(true);
+        Flash::set($title, $description, 'info');
     }
 
     public static function rememberIntended(string $path): void

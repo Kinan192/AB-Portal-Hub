@@ -10,6 +10,7 @@ $modulePage = !isset($groups) && empty($portalPage);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Portal Monitoring IT RS Awal Bros Botania. Akses form internal, monitoring, laporan, dan sistem rumah sakit.">
     <meta name="theme-color" content="#043b33">
+    <meta name="csrf-token" content="<?= e(App\Core\Auth::csrfToken()) ?>">
     <title><?= e($pageTitle ?? config('app')['name']) ?> | RS Awal Bros Botania</title>
     <link rel="icon" href="data:,">
     <link rel="preload" href="<?= e(asset('fonts/inter-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>

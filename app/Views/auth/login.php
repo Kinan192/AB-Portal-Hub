@@ -1,16 +1,15 @@
 <main class="min-h-screen w-full flex flex-col lg:flex-row">
     <section class="w-full lg:w-[38%] min-h-screen bg-white flex flex-col justify-center px-8 sm:px-14 md:px-20 lg:px-16 xl:px-24 py-12 z-10" aria-labelledby="login-title">
         <div class="w-full max-w-sm mx-auto">
-            <?php if (!empty($devBypass)): ?>
-                <?php /* TODO(auth): HAPUS/NONAKTIFKAN sebelum dipakai di server RS (AUTH_DEV_BYPASS). */ ?>
-                <p class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900" role="status">Mode pengembangan: login bebas</p>
-            <?php endif; ?>
             <div class="flex items-center justify-between mb-8">
-                <h1 id="login-title" class="text-[24px] leading-8 font-semibold text-slate-900 tracking-tight">Sign In</h1>
+                <h1 id="login-title" class="text-[24px] leading-8 font-semibold text-slate-900 tracking-tight">Masuk</h1>
                 <?= partial('badge', ['label' => 'Botania', 'class' => 'inline-flex items-center justify-center bg-rs-teal-700 text-white text-xs font-semibold px-2.5 py-0.5 rounded-sm tracking-wide shadow-rs']) ?>
             </div>
             <form class="space-y-4" id="login-form" method="post" action="<?= e(url('/login')) ?>" novalidate>
                 <?= csrf_field() ?>
+                <?php if (!empty($notice)): ?>
+                <p class="rounded-lg border border-amber-200 bg-amber-50 px-3.5 py-2.5 text-[13px] text-amber-900" role="status"><strong><?= e($notice['title']) ?>.</strong> <?= e($notice['description']) ?></p>
+                <?php endif; ?>
                 <p class="rounded-lg border border-rs-err/20 bg-rs-err-bg px-3.5 py-2.5 text-[13px] text-rs-err" id="login-error" role="alert"<?= empty($error) ? ' hidden' : '' ?>><?= e($error ?? '') ?></p>
                 <div>
                     <label class="block text-[13px] leading-[1.55] font-medium text-rs-ink-2 mb-1.5" for="username">Username</label>
@@ -24,7 +23,7 @@
                 </div>
                 <div class="pt-2">
                     <button class="w-full inline-flex items-center justify-center gap-2 bg-rs-teal-700 hover:bg-rs-teal-800 text-white text-sm font-medium py-2.5 px-4 rounded-lg min-h-[42px] transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-70" type="submit" data-submit>
-                        <span data-submit-label>Sign In</span>
+                        <span data-submit-label>Masuk</span>
                         <?= design_icon('login-arrow', 'text-[16px] [&>svg]:stroke-[2.2]', ['data-submit-icon' => true]) ?>
                         <?= design_icon('loader-circle', 'text-[16px] animate-spin', ['data-submit-spinner' => true, 'hidden' => true]) ?>
                     </button>

@@ -18,4 +18,5 @@ if (is_file(BASE_PATH . '/vendor/autoload.php')) {
 }
 App\Core\Env::load(BASE_PATH . '/.env');
 date_default_timezone_set(config('app')['timezone']);
+App\Core\ErrorLog::register(config('app')['environment']);
 return new App\Core\Router();

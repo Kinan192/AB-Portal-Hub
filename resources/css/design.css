@@ -4,7 +4,6 @@
 @import "./gform.css";
 @source "../../app/**/*.php";
 @source "../../config/**/*.php";
-@source "../../database/dummy/*.php";
 @source "../../public/assets/js/*.js";
 
 /* Inter is self-hosted and declared once in design-chrome.css. */

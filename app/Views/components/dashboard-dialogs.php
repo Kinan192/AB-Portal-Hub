@@ -130,7 +130,7 @@ $iconOption = static fn (string $name, string $keywords, string $field, bool $ch
                         </div>
                         <div data-icon-panel="url" hidden>
                             <input id="link-icon-url" class="dash-input" type="url" inputmode="url" name="icon_url" maxlength="500" placeholder="https://.../logo.png" autocomplete="off" aria-label="URL gambar icon" aria-describedby="link-icon-url-help link-icon-url-error">
-                            <p class="dash-help" id="link-icon-url-help">Gambar persegi PNG, SVG, atau JPG. Pratinjau tampil di kartu.</p>
+                            <p class="dash-help" id="link-icon-url-help">Alamat diawali https://. Gambar persegi PNG, SVG, atau JPG. Pratinjau tampil di kartu.</p>
                             <p class="dash-error" id="link-icon-url-error" data-error-for="icon_url" hidden></p>
                         </div>
                     </fieldset>

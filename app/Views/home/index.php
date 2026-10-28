@@ -16,12 +16,23 @@
         </div>
     </section>
 
-    <?php if ($editable): ?>
-    <p class="demo-notice" role="note">
-        <?= card_icon('info', 'size-4 shrink-0') ?>
-        <span><strong>Data contoh.</strong> Perubahan di dashboard hanya tersimpan di tab browser ini dan hilang saat tab ditutup.</span>
-        <button type="button" class="section-textbtn" data-reset-demo>Atur ulang</button>
-    </p>
+    <?php if ($exceptions !== []): ?>
+    <section class="dash-attention" aria-labelledby="attention-title">
+        <h2 id="attention-title" class="dash-attention__title"><?= card_icon('triangle-alert', 'size-3.5') ?>Perlu perhatian</h2>
+        <ul class="dash-attention__list">
+            <?php foreach ($exceptions as $item): ?>
+            <li>
+                <a class="dash-attention__item" href="<?= e($item['url']) ?>">
+                    <span class="dash-attention__module"><?= e($item['module']) ?></span>
+                    <span class="dash-attention__no"><?= e($item['entry_no']) ?></span>
+                    <span class="dash-attention__when"><?= e($item['when']) ?></span>
+                    <span class="dash-attention__chip dash-attention__chip--<?= e($item['tone']) ?>"><?= e($item['status']) ?></span>
+                    <?= card_icon('chevron-right', 'size-4 dash-attention__go') ?>
+                </a>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+    </section>
     <?php endif; ?>
 
     <div id="dashboard-sections" class="space-y-5">
@@ -31,8 +42,9 @@
         // First paint uses the default filter "Jadwal Hari Ini" (dashboard.js redraws with the remembered one).
         $visible = array_values(array_filter($group['cards'], static fn (array $card): bool => !$card['hidden']));
         $isDue = static fn (array $card): bool => $card['status'] !== null && $card['status']['due'];
-        $dueCount = count(array_filter($visible, $isDue));
-        $doneCount = count(array_filter($visible, static fn (array $card): bool => $isDue($card) && $card['done_today']));
+        // Counter of the section: the same numbers the hero ring adds up (App\Services\Progress).
+        $dueCount = $sectionCounts[$group['id']]['due'] ?? 0;
+        $doneCount = $sectionCounts[$group['id']]['done'] ?? 0;
         if ($isForms) {
             $group['cards'] = array_values(array_filter($group['cards'], static fn (array $card): bool => $card['hidden'] || $isDue($card)));
         }
@@ -102,7 +114,7 @@
     <noscript><p class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Aktifkan JavaScript untuk menggunakan menu portal.</p></noscript>
 </main>
 <?php if ($editable): ?>
-<div class="card-menu" id="card-menu" role="menu" data-editor-url="<?= e(url('/form-editor')) ?>" data-fill-url="<?= e(url('/form-dinamis')) ?>" data-responses-url="<?= e(url('/form-dinamis/respons')) ?>" hidden></div>
+<div class="card-menu" id="card-menu" role="menu" data-editor-url="<?= e(url('/form-editor')) ?>" data-api-url="<?= e(rtrim(url('/dashboard'), '/')) ?>" hidden></div>
 <template id="dash-icons"><?php foreach ($iconNames as $name): ?><span data-icon="<?= e($name) ?>"><?= card_icon($name) ?></span><?php endforeach; ?></template>
 <script type="application/json" id="dashboard-state"><?= json_encode($clientState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) ?></script>
 <?php endif; ?>

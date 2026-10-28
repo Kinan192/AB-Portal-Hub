@@ -21,26 +21,44 @@
   tick();
   window.setInterval(tick, 1000);
 
+  // Profile menu: opens on click, closes on Esc, outside click or Tab out; arrow keys move between items.
+  const menu = document.querySelector('[data-profile-menu]');
+  if (menu) {
+    const toggle = menu.querySelector('[data-profile-toggle]');
+    const list = menu.querySelector('[role="menu"]');
+    const items = () => [...list.querySelectorAll('[role="menuitem"]')];
+    const setOpen = (open, focusToggle = false) => {
+      list.hidden = !open;
+      toggle.setAttribute('aria-expanded', String(open));
+      if (open) items()[0]?.focus();
+      else if (focusToggle) toggle.focus();
+    };
+    toggle.addEventListener('click', () => setOpen(list.hidden));
+    toggle.addEventListener('keydown', (event) => {
+      if (event.key === 'ArrowDown') { event.preventDefault(); setOpen(true); }
+    });
+    list.addEventListener('keydown', (event) => {
+      const all = items();
+      const at = all.indexOf(document.activeElement);
+      if (event.key === 'Escape') { event.preventDefault(); setOpen(false, true); }
+      else if (event.key === 'ArrowDown') { event.preventDefault(); all[(at + 1) % all.length].focus(); }
+      else if (event.key === 'ArrowUp') { event.preventDefault(); all[(at - 1 + all.length) % all.length].focus(); }
+      else if (event.key === 'Tab') setOpen(false);
+    });
+    document.addEventListener('click', (event) => {
+      if (!list.hidden && !menu.contains(event.target)) setOpen(false);
+    });
+  }
+
   const dialog = document.getElementById('portal-dialog');
   const title = document.getElementById('dialog-title');
   const description = document.getElementById('dialog-description');
-  const accountMessages = {
-    password: ['Ubah password', 'Penggantian password belum tersedia. Fitur ini akan diaktifkan setelah autentikasi akun portal terhubung.'],
-    users: ['Pengelolaan pengguna', 'Pengelolaan akun belum tersedia. Halaman ini akan digunakan administrator untuk mengatur akun dan akses petugas.'],
-    logout: ['Keluar dari portal', 'Fitur logout akan diaktifkan setelah integrasi autentikasi selesai.'],
-  };
 
   document.addEventListener('click', (event) => {
-    const trigger = event.target.closest('[data-module], [data-account]');
+    const trigger = event.target.closest('[data-module]');
     if (!trigger || !dialog) return;
-    if (trigger.dataset.account) {
-      [title.textContent, description.textContent] = accountMessages[trigger.dataset.account];
-    } else {
-      title.textContent = trigger.dataset.title;
-      description.textContent = trigger.dataset.type === 'external'
-        ? 'Alamat aplikasi belum dikonfigurasi. Tautan layanan ini akan tersedia setelah URL tujuan ditambahkan oleh pengelola portal.'
-        : 'Form internal ini belum tersedia pada tahap dashboard. Halaman pengisian dan riwayat akan dibuat setelah formulir resmi serta autentikasi portal disiapkan.';
-    }
+    title.textContent = trigger.dataset.title;
+    description.textContent = trigger.dataset.type === 'external' ? 'Alamat aplikasi belum diatur.' : 'Form belum tersedia.';
     dialog.showModal();
   });
   document.querySelector('[data-close-dialog]')?.addEventListener('click', () => dialog.close());
