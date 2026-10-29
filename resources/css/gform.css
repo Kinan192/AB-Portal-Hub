@@ -183,9 +183,14 @@
 .gf-footnote { margin: 8px 0 0; text-align: center; font-size: 12px; color: var(--gf-muted); }
 
 /* Focus. A field the browser scrolls to (e.g. the first invalid answer) stops below the sticky
+<<<<<<< HEAD
    header and "Kembali ke Dashboard" row (--header-h, --back-h, measured by app.js) with room for its
    question title above it. */
 html:has(.gf-page) { scroll-padding-top: calc(var(--header-h, 0px) + var(--back-h, 0px) + 12px); }
+=======
+   navbar (--gf-navbar-h, measured by gform.js) with room for its question title above it. */
+html:has(.gf-page) { scroll-padding-top: calc(var(--gf-navbar-h, 0px) + 12px); }
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 .gf-scope .gf-card :is(input, select, textarea) { scroll-margin-top: 56px; }
 .gf-scope :is(a, button, select, input[type="radio"], input[type="checkbox"]):focus-visible { outline: 2px solid var(--gf-teal); outline-offset: 2px; }
 .gf-scope .gf-drop:has(input:focus-visible) { outline: 2px solid var(--gf-teal); outline-offset: 2px; }

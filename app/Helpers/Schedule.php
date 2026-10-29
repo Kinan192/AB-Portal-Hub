@@ -89,8 +89,12 @@ final class Schedule
         }
         $last = $type === 'monthly' && ($schedule['month_day'] ?? 1) === 'last';
         $md = $type === 'yearly' ? explode('-', (string) ($schedule['year_md'] ?? '')) : [];
+<<<<<<< HEAD
         // An optional form has no deadline or reminder.
         $deadline = $type === 'optional' ? '' : (string) ($schedule['deadline'] ?? '');
+=======
+        $deadline = (string) ($schedule['deadline'] ?? '');
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         $row = [
             'type' => $type,
             'weekday_mask' => $mask,
@@ -117,7 +121,11 @@ final class Schedule
     {
         $errors = [];
         $type = $schedule['type'] ?? null;
+<<<<<<< HEAD
         if (!in_array($type, ['daily', 'weekly', 'monthly', 'yearly', 'dates', 'optional'], true)) {
+=======
+        if (!in_array($type, ['daily', 'weekly', 'monthly', 'yearly', 'dates'], true)) {
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             return ['type' => 'Pilih jenis jadwal.'];
         }
         $isDate = static function (mixed $value): bool {
@@ -216,10 +224,13 @@ final class Schedule
                 ? ['text' => 'Selesai', 'tone' => 'ok', 'due' => $due]
                 : ['text' => (string) $period['text'], 'tone' => 'plain', 'due' => $due];
         }
+<<<<<<< HEAD
         // Not required: done today, or simply open (no next date, no reminder).
         if (($schedule['type'] ?? 'daily') === 'optional') {
             return $doneToday ? ['text' => 'Selesai', 'tone' => 'ok', 'due' => false] : ['text' => 'Kapan saja', 'tone' => 'next', 'due' => false];
         }
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         if (!$hasData && !$doneToday) {
             return ['text' => 'Belum ada data', 'tone' => 'muted', 'due' => $due];
         }

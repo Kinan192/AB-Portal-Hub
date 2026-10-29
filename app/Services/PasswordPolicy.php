@@ -13,7 +13,11 @@ final class PasswordPolicy
     /** PASSWORD_MIN_LENGTH in .env (never below 8), otherwise 12. */
     public static function minLength(): int
     {
+<<<<<<< HEAD
         $value = \App\Core\Env::get('PASSWORD_MIN_LENGTH');
+=======
+        $value = getenv('PASSWORD_MIN_LENGTH');
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         return $value !== false && ctype_digit(trim($value)) ? max(self::FLOOR, (int) $value) : self::MIN_LENGTH;
     }
 

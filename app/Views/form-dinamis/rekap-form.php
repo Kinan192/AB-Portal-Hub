@@ -26,7 +26,11 @@ $tone = $card['color'] ?? 'teal';
             <div class="fr-card__head">
                 <h2 id="fr-table-title"><?= card_icon('table-2', 'size-4') ?>Data laporan</h2>
                 <span class="fr-count" data-fr-count aria-live="polite"></span>
+<<<<<<< HEAD
                 <?= partial('recap-export', ['exportUrl' => $exportUrl, 'signatureUrl' => $signatureUrl, 'signature' => $signature]) ?>
+=======
+                <?= partial('recap-export', ['exportUrl' => $exportUrl]) ?>
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             </div>
             <form class="fr-filters fr-filters--recap" role="search" data-filters>
                 <div class="fr-search">

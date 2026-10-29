@@ -12,6 +12,7 @@
             <time id="portal-clock" class="inline-flex items-center rounded border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-[11.7px] font-medium text-slate-600" datetime="<?= e(date(DATE_ATOM)) ?>">
                 <span data-clock-text><?= e(date('d/m/Y H:i:s')) ?> WIB</span>
             </time>
+<<<<<<< HEAD
             <?php if (\App\Core\Auth::check()): $bell = \App\Services\Attention::notifications(); ?>
             <div class="notif-menu" data-notif-menu>
                 <button type="button" class="notif-menu__button" aria-expanded="false" aria-controls="notif-panel" data-notif-toggle
@@ -42,6 +43,11 @@
                 </div>
             </div>
             <?php endif; ?>
+=======
+            <span class="inline-flex items-center gap-1.5 rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[11.7px] font-semibold text-emerald-800" title="Status halaman portal, bukan status layanan eksternal">
+                <span class="size-2 rounded-full bg-emerald-500" aria-hidden="true"></span>Portal aktif
+            </span>
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             <div class="profile-menu" data-profile-menu>
                 <button type="button" class="profile-menu__button" aria-haspopup="menu" aria-expanded="false" aria-controls="profile-menu-list" data-profile-toggle>
                     <span class="profile-menu__avatar"><?= e($profile['initials'] ?? 'IT') ?></span>

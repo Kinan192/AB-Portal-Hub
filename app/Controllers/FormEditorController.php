@@ -26,7 +26,11 @@ final class FormEditorController extends Controller
         'plus', 'x', 'save', 'list-checks', 'calendar-days', 'info', 'circle-alert', 'lock',
         // The preview draws the fill-in page's icons too (question-ui.js); "Ubah" opens an item.
         'check', 'paperclip', 'triangle-alert', 'pencil', 'eye', 'split',
+<<<<<<< HEAD
         'calendar-range', 'calendar-plus', 'calendar-check', 'calendar-off', 'chevron-left', 'chevron-right', 'thermometer', 'refresh-ccw',
+=======
+        'calendar-range', 'calendar-plus', 'calendar-check', 'chevron-left', 'chevron-right', 'thermometer', 'refresh-ccw',
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     ];
 
     public function edit(): void

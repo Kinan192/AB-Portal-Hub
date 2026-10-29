@@ -51,6 +51,7 @@
   .profile-menu__list a, .profile-menu__list button { @apply flex min-h-11 w-full items-center gap-2.5 rounded px-3 text-left text-[13px] font-medium text-slate-700 hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none; }
   .profile-menu__list form { @apply mt-1 border-t border-slate-100 pt-1; }
   .profile-menu__list .is-danger { @apply text-red-700 hover:bg-red-50 focus-visible:bg-red-50; }
+<<<<<<< HEAD
   /* Notification bell (header): "Perlu perhatian" of the last days, newest first. */
   .notif-menu { @apply relative; }
   .notif-menu__button { @apply relative inline-flex size-9 items-center justify-center rounded border border-slate-200 bg-slate-50 text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700; }
@@ -78,6 +79,12 @@
   @media (max-width: 639px) {
     .profile-menu, .notif-menu { position: static; }
     .profile-menu__list, .notif-menu__panel { left: 16px; right: 16px; width: auto; margin-top: 0; }
+=======
+  /* Phones: the menu hangs under the whole (sticky) header instead of the button. */
+  @media (max-width: 639px) {
+    .profile-menu { position: static; }
+    .profile-menu__list { left: 16px; right: 16px; width: auto; margin-top: 0; }
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
   }
 
   /* Breadcrumb */

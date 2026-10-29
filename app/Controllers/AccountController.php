@@ -47,6 +47,7 @@ final class AccountController extends Controller
         Audit::log('password_change', 'user', (int) $account['id']);
         Flash::set('Password berhasil diubah', 'Perangkat lain yang masih masuk sudah dikeluarkan.');
         redirect('/password');
+<<<<<<< HEAD
     }
 
     /** @param array<string, string> $errors */
@@ -63,4 +64,25 @@ final class AccountController extends Controller
             'flash' => $flash,
         ]);
     }
+=======
+    }
+
+    /** @param array<string, string> $errors */
+    private function show(array $errors, ?array $flash): void
+    {
+        $this->render('account/password', [
+            'pageTitle' => 'Password',
+            'page' => 'password',
+            'bodyClass' => 'rs-content-box',
+            'crumbbar' => [
+                'class' => 'flex items-center',
+                'items' => [['label' => 'Portal Monitoring Terpadu', 'href' => url('/')], ['label' => 'Password']],
+            ],
+            'footer' => ['class' => 'text-center py-6'],
+            'profile' => current_profile(),
+            'errors' => $errors,
+            'flash' => $flash,
+        ]);
+    }
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 }

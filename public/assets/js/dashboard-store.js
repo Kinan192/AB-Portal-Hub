@@ -89,7 +89,10 @@
     const due = isDue(s, now.day);
     // A module counted per period (temperature: this month's locations, "3/4 lokasi").
     if (card.period) return card.period.done ? { text: 'Selesai', tone: 'ok', due } : { text: card.period.text, tone: 'plain', due };
+<<<<<<< HEAD
     if (s.type === 'optional') return card.done_today ? { text: 'Selesai', tone: 'ok', due: false } : { text: 'Kapan saja', tone: 'next', due: false };
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     if (!card.has_data && !card.done_today) return { text: 'Belum ada data', tone: 'muted', due };
     if (!due) {
       const next = nextDue(s, now.day);

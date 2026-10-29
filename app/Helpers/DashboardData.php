@@ -60,7 +60,11 @@ final class DashboardData
             $style['category_icons'],
             array_column($data['sections'], 'icon'),
             array_column($data['cards'], 'icon'),
+<<<<<<< HEAD
             ['ellipsis', 'chart-column', 'check', 'eye', 'eye-off', 'plus', 'trash-2', 'link', 'clipboard-list', 'pencil', 'folder-input', 'image', 'upload', 'triangle-alert', 'copy', 'file-pen-line', 'calendar-days', 'calendar-check', 'circle-check', 'list-checks', 'folder-open'],
+=======
+            ['ellipsis', 'chart-column', 'check', 'eye', 'eye-off', 'plus', 'trash-2', 'link', 'clipboard-list', 'pencil', 'folder-input', 'image', 'triangle-alert', 'copy', 'file-pen-line', 'calendar-days', 'calendar-check', 'list-checks', 'folder-open'],
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             $extra,
         )));
     }

@@ -13,9 +13,12 @@ final class CardInput
 {
     public const URL_MESSAGE = 'Gunakan alamat lengkap yang diawali http:// atau https://';
     public const IMAGE_MESSAGE = 'Isi URL gambar yang diawali https://';
+<<<<<<< HEAD
     public const UPLOAD_MESSAGE = 'Unggah gambar icon dulu.';
     /** An uploaded icon is kept as the portal path of its file (/berkas/<id>, without the folder prefix). */
     public const UPLOAD_PATH = '#^/berkas/[1-9][0-9]{0,9}$#';
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 
     /**
      * An address a card may open: http or https with a host, no spaces or control characters, at
@@ -79,6 +82,7 @@ final class CardInput
 
     /**
      * Kategori & Tautan tab and "Edit Tautan" (the category itself is checked by the controller).
+<<<<<<< HEAD
      * icon_source 'list' keeps the list icon, 'url' shows the https image, 'upload' an uploaded image
      * (icon_url = /berkas/<id>); the list icon stays as the fallback when the image cannot be loaded.
      * color is the icon colour (teal when missing). @param list<string> $colors
@@ -86,11 +90,20 @@ final class CardInput
     public static function link(array $input, array $icons, array $colors): array
     {
         $source = in_array($input['icon_source'] ?? 'list', ['url', 'upload'], true) ? $input['icon_source'] : 'list';
+=======
+     * icon_source 'list' keeps the list icon, 'url' shows the https image (the list icon stays as its
+     * fallback when the image cannot be loaded).
+     */
+    public static function link(array $input, array $icons): array
+    {
+        $source = ($input['icon_source'] ?? 'list') === 'url' ? 'url' : 'list';
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         $values = [
             'title' => self::line($input['title'] ?? ''),
             'description' => self::line($input['description'] ?? ''),
             'url' => is_string($input['url'] ?? null) ? trim($input['url']) : '',
             'icon' => is_string($input['icon'] ?? null) && $input['icon'] !== '' ? $input['icon'] : 'link',
+<<<<<<< HEAD
             'image_url' => $source !== 'list' && is_string($input['icon_url'] ?? null) ? trim($input['icon_url']) : null,
             'color' => is_string($input['color'] ?? null) && $input['color'] !== '' ? $input['color'] : 'teal',
         ];
@@ -98,6 +111,11 @@ final class CardInput
         if (!in_array($values['color'], $colors, true)) {
             $errors['color'] = 'Pilih warna.';
         }
+=======
+            'image_url' => $source === 'url' && is_string($input['icon_url'] ?? null) ? trim($input['icon_url']) : null,
+        ];
+        $errors = [];
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         if ($values['title'] === '') {
             $errors['title'] = 'Judul wajib diisi.';
         } elseif (mb_strlen($values['title']) > 40) {
@@ -115,9 +133,12 @@ final class CardInput
         if ($source === 'url' && !self::safeUrl($values['image_url'], httpsOnly: true)) {
             $errors['icon_url'] = self::IMAGE_MESSAGE;
         }
+<<<<<<< HEAD
         if ($source === 'upload' && preg_match(self::UPLOAD_PATH, (string) $values['image_url']) !== 1) {
             $errors['icon_upload'] = self::UPLOAD_MESSAGE;
         }
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         return ['values' => $values, 'errors' => $errors];
     }
 

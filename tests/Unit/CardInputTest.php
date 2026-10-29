@@ -51,6 +51,7 @@ final class CardInputTest extends TestCase
 
     public function testLinkCheckCleansTextAndReportsEveryBadField(): void
     {
+<<<<<<< HEAD
         $ok = CardInput::link(['title' => "  HIS \n Baru ", 'description' => ' Sistem ', 'url' => ' https://his.test ', 'icon' => 'server', 'icon_source' => 'list', 'icon_url' => 'https://x.test/a.png'], self::ICONS, self::COLORS);
         self::assertSame([], $ok['errors']);
         self::assertSame(['title' => 'HIS Baru', 'description' => 'Sistem', 'url' => 'https://his.test', 'icon' => 'server', 'image_url' => null, 'color' => 'teal'], $ok['values']);
@@ -73,6 +74,20 @@ final class CardInputTest extends TestCase
     public function testLinkTitleLimitCountsCharactersNotBytes(): void
     {
         $check = CardInput::link(['title' => str_repeat('é', 40), 'url' => 'https://ok.test', 'icon' => 'link'], self::ICONS, self::COLORS);
+=======
+        $ok = CardInput::link(['title' => "  HIS \n Baru ", 'description' => ' Sistem ', 'url' => ' https://his.test ', 'icon' => 'server', 'icon_source' => 'list', 'icon_url' => 'https://x.test/a.png'], self::ICONS);
+        self::assertSame([], $ok['errors']);
+        self::assertSame(['title' => 'HIS Baru', 'description' => 'Sistem', 'url' => 'https://his.test', 'icon' => 'server', 'image_url' => null], $ok['values']);
+
+        $bad = CardInput::link(['title' => str_repeat('a', 41), 'description' => str_repeat('b', 61), 'url' => 'javascript:alert(1)', 'icon' => 'nope', 'icon_source' => 'url', 'icon_url' => 'http://x.test/a.png'], self::ICONS);
+        self::assertSame(['title', 'description', 'url', 'icon', 'icon_url'], array_keys($bad['errors']));
+        self::assertSame(CardInput::IMAGE_MESSAGE, $bad['errors']['icon_url']);
+    }
+
+    public function testLinkTitleLimitCountsCharactersNotBytes(): void
+    {
+        $check = CardInput::link(['title' => str_repeat('é', 40), 'url' => 'https://ok.test', 'icon' => 'link'], self::ICONS);
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         self::assertArrayNotHasKey('title', $check['errors']);
     }
 

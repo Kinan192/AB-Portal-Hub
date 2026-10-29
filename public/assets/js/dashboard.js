@@ -770,8 +770,12 @@
       description: field('description').value.trim().replace(/\s+/g, ' '),
       icon_source: iconSource(),
       icon: $('input[name="icon"]:checked', iconGrid)?.value ?? 'link',
+<<<<<<< HEAD
       icon_url: { url: field('icon_url').value.trim(), upload: field('icon_upload').value }[iconSource()] ?? '',
       color: $('input[name="color"]:checked', form)?.value ?? 'teal',
+=======
+      icon_url: iconSource() === 'url' ? field('icon_url').value.trim() : '',
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
       url: field('url').value.trim(),
     };
     const card = editing;
@@ -780,9 +784,14 @@
     const answer = await send(card ? `/cards/${card.ref}` : '/links', values, (error) => {
       const names = Object.keys(error.errors ?? {});
       names.forEach((name) => setError(name, error.errors[name]));
+<<<<<<< HEAD
       const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url', 'icon_upload'].find((name) => error.errors?.[name]);
       if (first === 'icon') $('input[name="icon"]', iconGrid).focus();
       else if (first === 'icon_upload') fileInput.focus();
+=======
+      const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url'].find((name) => error.errors?.[name]);
+      if (first === 'icon') $('input[name="icon"]', iconGrid).focus();
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
       else if (first) field(first).focus();
       else apiError(error);
     });

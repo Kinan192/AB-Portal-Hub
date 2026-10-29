@@ -60,8 +60,12 @@ final class Dashboard
                 'description' => $row['description'],
                 'icon' => $row['icon'],
                 'color' => $row['color'],
+<<<<<<< HEAD
                 // An uploaded icon (/berkas/<id>) gets the folder the portal is opened from.
                 'image' => $row['image_url'] !== null && str_starts_with($row['image_url'], '/berkas/') ? url($row['image_url']) : $row['image_url'],
+=======
+                'image' => $row['image_url'],
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
                 'hidden' => (bool) $row['is_hidden'],
             ];
             if ($row['kind'] === 'link') {
@@ -173,12 +177,15 @@ final class Dashboard
         return $versionId;
     }
 
+<<<<<<< HEAD
     /** The PDF/Cetak signature texts of a form (app/Services/ReportSignature.php). */
     public function saveSignature(int $formId, array $values): void
     {
         $this->pdo->prepare('UPDATE forms SET report_signature_json = ? WHERE id = ?')->execute([json_encode($values, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $formId]);
     }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     public function saveSchedule(int $formId, array $schedule): void
     {
         [$row, $dates] = Schedule::toRow($schedule);
@@ -264,7 +271,11 @@ final class Dashboard
     public function formBySlug(string $slug): ?array
     {
         $statement = $this->pdo->prepare(
+<<<<<<< HEAD
             'SELECT f.id, f.slug, f.kind, f.module_key, f.entry_prefix, f.current_version_id, v.version_no, v.title, v.description, v.definition_json, f.report_signature_json,
+=======
+            'SELECT f.id, f.slug, f.kind, f.module_key, f.entry_prefix, f.current_version_id, v.version_no, v.title, v.description, v.definition_json,
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
                     c.id AS card_id, c.title AS card_title
              FROM forms f LEFT JOIN form_versions v ON v.id = f.current_version_id
              LEFT JOIN dashboard_cards c ON c.id = (SELECT MIN(x.id) FROM dashboard_cards x WHERE x.form_id = f.id AND x.deleted_at IS NULL)

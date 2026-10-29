@@ -9,18 +9,27 @@ use App\Core\View;
 use App\Helpers\DashboardData;
 use App\Helpers\Format;
 use App\Models\Attachment;
+<<<<<<< HEAD
 use App\Models\AttentionList;
 use App\Models\Dashboard;
 use App\Models\FormEntries;
 use App\Models\NumberSequence;
 use App\Services\Attention;
+=======
+use App\Models\Dashboard;
+use App\Models\FormEntries;
+use App\Models\NumberSequence;
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use App\Services\FileUpload;
 use App\Services\FormAnswers;
 use App\Services\FormDefinition;
 use App\Services\FormRecap;
 use App\Services\FormToken;
 use App\Services\RecapExport;
+<<<<<<< HEAD
 use App\Services\ReportSignature;
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use DateTimeImmutable;
 use DateTimeZone;
 use PDO;
@@ -262,7 +271,10 @@ final class DynamicFormController extends Controller
             'filters' => FormRecap::filterLabels($filters),
             'stats' => FormRecap::stats($stats),
             'columns' => FormRecap::exportColumns($items),
+<<<<<<< HEAD
             'signature' => ReportSignature::fromJson($form['report_signature_json'] ?? null),
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             'total' => $stats['count'],
             'rows' => RecapExport::rows(
                 static fn (int $page, int $per): array => $entries->page((int) $form['id'], $filters, $page, $per)['rows'],
@@ -272,6 +284,7 @@ final class DynamicFormController extends Controller
         ], $_GET);
     }
 
+<<<<<<< HEAD
     /**
      * POST /form-dinamis/tanda-tangan?id=<slug> {left_title, left_role, left_name, right_title, right_role,
      * right_name}: the signature block of this form's PDF and Cetak export ("Tanda tangan" on the recap page).
@@ -309,6 +322,8 @@ final class DynamicFormController extends Controller
         json_response(['message' => 'Tanda tangan tersimpan', 'signature' => $check['values']]);
     }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     /** GET /form-dinamis/entri/{id}: every answer with the questions of its version, files and change history. */
     public function detail(array $params): void
     {
@@ -317,6 +332,7 @@ final class DynamicFormController extends Controller
             json_response(['message' => 'Laporan tidak ditemukan. Mungkin sudah dihapus.'], 404);
             return;
         }
+<<<<<<< HEAD
         // Opening a "Perlu perhatian" report counts as seen for the header bell.
         if ((int) ($entry['attention'] ?? 0) === 1 && ($userId = Attention::userId()) !== null) {
             try {
@@ -325,6 +341,8 @@ final class DynamicFormController extends Controller
                 error_log('Tandai dilihat: ' . $exception->getMessage());
             }
         }
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         $definition = $this->definition($entry['definition_json']);
         $answers = json_decode((string) $entry['answers_json'], true) ?: [];
         $labels = [];
@@ -383,7 +401,10 @@ final class DynamicFormController extends Controller
             'pageTitle' => $entry !== null ? 'Ubah ' . $entry['entry_no'] : (string) $form['title'],
             'portalPage' => true,
             'backToDashboard' => true,
+<<<<<<< HEAD
             'breadcrumbWidth' => 'breadcrumb-fill',
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             'formId' => $form['slug'],
             'submitUrl' => $entry !== null ? url('/form-dinamis/entri/' . $entry['id']) : url('/form-dinamis/entri') . '?' . http_build_query(['id' => $form['slug']]),
             'formToken' => $entry === null ? FormToken::issue($form['slug']) : null,
@@ -413,8 +434,11 @@ final class DynamicFormController extends Controller
             'card' => $card,
             'dataUrl' => url('/form-dinamis/respons/data') . '?' . http_build_query(['id' => $form['slug']]),
             'exportUrl' => url('/form-dinamis/respons/ekspor') . '?' . http_build_query(['id' => $form['slug']]),
+<<<<<<< HEAD
             'signature' => ReportSignature::fromJson($form['report_signature_json'] ?? null),
             'signatureUrl' => url('/form-dinamis/tanda-tangan') . '?' . http_build_query(['id' => $form['slug']]),
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             'detailUrl' => url('/form-dinamis/entri'),
             'formUrl' => $urls['fill'],
             'iconNames' => DashboardData::iconNames($data, self::ICONS),

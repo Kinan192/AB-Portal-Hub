@@ -3,10 +3,16 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Database;
 use App\Helpers\DashboardData;
 use App\Helpers\Schedule;
+<<<<<<< HEAD
+=======
+use App\Models\AttentionList;
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use App\Services\Progress;
 use DateTimeImmutable;
+use Throwable;
 
 final class HomeController extends Controller
 {
@@ -38,6 +44,10 @@ final class HomeController extends Controller
             'newCardId' => null,
             'cardStyle' => config('dashboard-cards'),
             'progress' => Progress::summary($counts),
+<<<<<<< HEAD
+=======
+            'exceptions' => $this->exceptions($data),
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             'profile' => current_profile(),
         ], 'main');
     }
@@ -78,4 +88,27 @@ final class HomeController extends Controller
         return array_values($groups);
     }
 
+<<<<<<< HEAD
+=======
+    /** FR-P6: the five newest reports needing a look, for the forms still on the dashboard. */
+    private function exceptions(array $data): array
+    {
+        try {
+            $rows = (new AttentionList(Database::connection()))->latest();
+        } catch (Throwable $exception) {
+            error_log('Perlu perhatian: ' . $exception->getMessage());
+            return [];
+        }
+        $forms = $data['forms'];
+        $list = [];
+        foreach ($rows as $row) {
+            if (!isset($forms[$row['slug']])) {
+                continue;
+            }
+            $list[] = ['module' => (string) ($row['title'] ?? $forms[$row['slug']]['title']), 'status' => 'Perlu perhatian', 'tone' => 'warn',
+                'url' => url('/form-dinamis/respons') . '?' . http_build_query(['id' => $row['slug'], 'buka' => $row['id']])] + $row;
+        }
+        return Progress::exceptions($list);
+    }
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 }

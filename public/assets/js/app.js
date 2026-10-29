@@ -21,6 +21,7 @@
   tick();
   window.setInterval(tick, 1000);
 
+<<<<<<< HEAD
   // The sticky "Kembali ke Dashboard" row sits under the sticky header; the header height (it wraps on
   // phones) and the row's own height go to CSS for the row, the editor toolbar and scroll-padding.
   const navbar = document.querySelector('.portal-navbar');
@@ -37,6 +38,8 @@
     measure();
   }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
   // Profile menu: opens on click, closes on Esc, outside click or Tab out; arrow keys move between items.
   const menu = document.querySelector('[data-profile-menu]');
   if (menu) {
@@ -66,6 +69,7 @@
     });
   }
 
+<<<<<<< HEAD
   // Notification bell ("Perlu perhatian"): opens on click, closes on Esc (focus back to the bell) or an outside click.
   const bell = document.querySelector('[data-notif-menu]');
   if (bell) {
@@ -122,6 +126,8 @@
     });
   }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
   const dialog = document.getElementById('portal-dialog');
   const title = document.getElementById('dialog-title');
   const description = document.getElementById('dialog-description');

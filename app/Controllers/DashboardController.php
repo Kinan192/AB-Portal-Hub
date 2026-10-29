@@ -6,10 +6,15 @@ namespace App\Controllers;
 use App\Core\Audit;
 use App\Core\Database;
 use App\Helpers\DashboardData;
+<<<<<<< HEAD
 use App\Models\Attachment;
 use App\Models\Dashboard;
 use App\Services\CardInput;
 use App\Services\FileUpload;
+=======
+use App\Models\Dashboard;
+use App\Services\CardInput;
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use PDO;
 use Throwable;
 
@@ -24,8 +29,11 @@ use Throwable;
  */
 final class DashboardController
 {
+<<<<<<< HEAD
     private const ICON_OWNER = 'card_icon';
     private const ICON_BYTES = 2 * 1024 * 1024;
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     private ?Dashboard $dashboard = null;
 
     /** POST /dashboard/sections {title, icon}: a new link category at the end of the dashboard. */
@@ -68,7 +76,11 @@ final class DashboardController
      */
     public function createForm(): void
     {
+<<<<<<< HEAD
         $check = CardInput::formCard($this->input(), $this->icons(), $this->colors());
+=======
+        $check = CardInput::formCard($this->input(), $this->icons(), array_keys(config('dashboard-cards')['colors']));
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         $section = $this->model()->formsSection();
         if ($check['errors'] !== [] || $section === null) {
             $this->invalid($check['errors'], $section === null ? 'Bagian Monitoring Harian tidak ditemukan.' : null);
@@ -83,6 +95,7 @@ final class DashboardController
         });
     }
 
+<<<<<<< HEAD
     /**
      * POST /dashboard/icon (multipart, file "gambar"): an icon image for a link card, PNG or JPG up to 2 MB,
      * stored like a report file. Answers {path: /berkas/<id>, url}; the card keeps the path once it is saved.
@@ -105,20 +118,32 @@ final class DashboardController
         json_response(['path' => '/berkas/' . $id, 'url' => url('/berkas/' . $id)]);
     }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     /** POST /dashboard/links {section_id, title, description, url, icon_source, icon, icon_url}. */
     public function createLink(): void
     {
         $input = $this->input();
+<<<<<<< HEAD
         $check = CardInput::link($input, $this->icons(), $this->colors());
         $section = $this->linkSection($input['section_id'] ?? null);
         $errors = $check['errors'] + ($section === null ? ['section_id' => 'Pilih kategori.'] : []) + $this->iconProblem($check['values']);
+=======
+        $check = CardInput::link($input, $this->icons());
+        $section = $this->linkSection($input['section_id'] ?? null);
+        $errors = $check['errors'] + ($section === null ? ['section_id' => 'Pilih kategori.'] : []);
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         if ($errors !== []) {
             $this->invalid($errors);
             return;
         }
         $values = $check['values'];
         $this->save(function (Dashboard $dashboard, PDO $pdo) use ($values, $section): array {
+<<<<<<< HEAD
             $id = $dashboard->createLink((int) $section['id'], $values);
+=======
+            $id = $dashboard->createLink((int) $section['id'], $values + ['color' => 'teal']);
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             Audit::log('create', 'dashboard_card', $id, ['title' => $values['title'], 'url' => $values['url'], 'section' => $section['title']], pdo: $pdo);
             return ['message' => 'Kartu berhasil ditambahkan', 'id' => 'link-' . $id];
         });
@@ -138,16 +163,26 @@ final class DashboardController
         }
         $input = $this->input();
         if ($card['kind'] === 'link') {
+<<<<<<< HEAD
             $check = CardInput::link($input, $this->icons(), $this->colors());
             $section = $this->linkSection($input['section_id'] ?? null);
             $errors = $check['errors'] + ($section === null ? ['section_id' => 'Pilih kategori.'] : []) + $this->iconProblem($check['values']);
+=======
+            $check = CardInput::link($input, $this->icons());
+            $section = $this->linkSection($input['section_id'] ?? null);
+            $errors = $check['errors'] + ($section === null ? ['section_id' => 'Pilih kategori.'] : []);
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             if ($errors !== []) {
                 $this->invalid($errors);
                 return;
             }
             $values = $check['values'];
             $this->save(function (Dashboard $dashboard, PDO $pdo) use ($card, $values, $section): array {
+<<<<<<< HEAD
                 $changes = Audit::changes($card, $values, ['title', 'description', 'url', 'icon', 'image_url', 'color']);
+=======
+                $changes = Audit::changes($card, $values, ['title', 'description', 'url', 'icon', 'image_url']);
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
                 $dashboard->updateCard((int) $card['id'], $values);
                 if ((int) $section['id'] !== (int) $card['section_id']) {
                     $dashboard->moveCard((int) $card['id'], (int) $section['id']);
@@ -161,7 +196,11 @@ final class DashboardController
             return;
         }
 
+<<<<<<< HEAD
         $check = CardInput::formCard($input, $this->icons(), $this->colors());
+=======
+        $check = CardInput::formCard($input, $this->icons(), array_keys(config('dashboard-cards')['colors']));
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         if ($check['errors'] !== []) {
             $this->invalid($check['errors']);
             return;
@@ -344,6 +383,7 @@ final class DashboardController
         return is_array($data) ? $data : [];
     }
 
+<<<<<<< HEAD
     /** An uploaded icon must be an icon file of this portal that is not deleted. */
     private function iconProblem(array $values): array
     {
@@ -355,6 +395,8 @@ final class DashboardController
         return $file !== null && $file['owner_type'] === self::ICON_OWNER ? [] : ['icon_upload' => 'Gambar tidak ditemukan. Unggah ulang.'];
     }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     private function linkSection(mixed $slug): ?array
     {
         $section = is_string($slug) && preg_match('/^[a-z0-9-]{1,64}$/', $slug) === 1 ? $this->model()->sectionBySlug($slug) : null;
@@ -368,12 +410,15 @@ final class DashboardController
         return array_values(array_unique([...array_keys($style['icons']), ...$style['category_icons']]));
     }
 
+<<<<<<< HEAD
     /** @return list<string> */
     private function colors(): array
     {
         return array_keys(config('dashboard-cards')['colors']);
     }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     private function model(): Dashboard
     {
         return $this->dashboard ??= new Dashboard(Database::connection());

@@ -20,8 +20,19 @@ Buka http://127.0.0.1:8080. Dashboard membaca data dari MySQL/MariaDB, jadi data
 
 Salin seluruh folder project ke `C:\xampp\htdocs\<nama-folder>`, mis. `C:\xampp\htdocs\abportal`, nyalakan Apache dan MySQL di XAMPP Control Panel, lalu buka http://localhost/abportal. Portal mengenali foldernya sendiri: semua tautan, aset, form, dan ekspor memakai awalan `/abportal`, tanpa perlu mengisi `APP_URL`. File `.htaccess` di root project meneruskan setiap permintaan ke `public/`, sehingga `.env`, `app/`, `storage/` (berkas unggahan), `vendor/`, dan `.git` tidak bisa dibuka dari browser (mis. `/abportal/.env` menjawab 404). Bila `mod_rewrite` Apache mati, folder itu tidak disajikan sama sekali. Untuk server rumah sakit tetap arahkan web root ke `public/` ([docs/deploy.md](docs/deploy.md)).
 
+<<<<<<< HEAD
 Folder kerja utama di mesin pengembangan ini adalah `C:\xampp\htdocs\AB-Portal` (dibuka di http://localhost/AB-Portal); commit dan perubahan dilakukan di folder itu. `npm run build` hanya perlu setelah mengubah CSS di `resources/css/`.
 
+=======
+Tanpa menyalin: buat junction `htdocs\abportal` yang menunjuk ke folder project (sudah dibuat di mesin pengembangan ini), sehingga perubahan kode langsung terlihat di http://localhost/abportal:
+
+```powershell
+New-Item -ItemType Junction -Path C:\xampp\htdocs\abportal -Target C:\Users\ASUS\AB-Portal-Hub
+```
+
+Hapus junction dengan `cmd /c rmdir C:\xampp\htdocs\abportal` (hanya tautannya yang hilang, isi project tetap). `npm run build` hanya perlu setelah mengubah CSS di `resources/css/`.
+
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 ## Form dan rekap
 
 Semua form adalah form dinamis: enam form monitoring (Hardware Server IT, Kesesuaian User, Suhu Server, CCTV, Clear Desk, Antrian Online) sudah tersedia dari `database/forms/monitoring.php`, form lain dibuat lewat **+ Tambah**. Semuanya diubah dengan cara yang sama di Edit Isi Form. Pertanyaan, jadwal, dan laporan tersimpan di database (`forms`, `form_versions`, `form_schedules`, `form_entries`).
@@ -40,10 +51,16 @@ Migrasi `2026_11_06_0011_monitoring_forms.php` menambahkan kembali keenam form m
 Semua angka di dashboard dihitung dari laporan yang tersimpan (`app/Services/Progress.php`), dengan aturan yang sama di server dan di browser (`public/assets/js/dashboard.js` menghitung ulang setelah kartu diubah).
 
 - **Kapan form dihitung**: kartunya ada di bagian Monitoring Harian, tidak disembunyikan, dan jadwalnya jatuh tempo hari ini (WIB): harian; mingguan pada hari terpilih; bulanan pada tanggal itu (tanggal 29–31 jatuh ke hari terakhir bulan yang lebih pendek) atau hari terakhir bulan; tahunan pada tanggal itu (29 Februari hanya di tahun kabisat); tanggal tertentu; selalu di antara tanggal mulai dan berakhir bila diisi.
+<<<<<<< HEAD
 - **Tidak wajib diisi** (pola jadwal di tab Jadwal, migrasi `2026_11_08_0013`): form tidak pernah jatuh tempo, jadi tidak masuk Jadwal Hari Ini, progres, maupun "Belum Diisi"; kartunya ada di Semua Form dengan label "Tidak wajib" dan status "Kapan saja" (atau Selesai bila sudah diisi hari ini).
 - **Kapan form selesai**: ada laporan bertanggal hari ini (WIB). Form yang sudah selesai hilang dari tab **Jadwal Hari Ini** (yang tersisa hanya yang belum diisi) dan tetap ada di **Semua Form**; bila semua sudah diisi, tab itu menampilkan "Semua form hari ini sudah diisi".
 - **Panel progres** = jumlah penghitung bagian ("6 dari 7 form dijadwalkan hari ini · 5 selesai" → panel 5/6), jadi keduanya selalu sama. Status di kartu: Selesai, Batas 14:00, Belum Diisi (lewat batas dengan pengingat), Hari ini, Berikutnya: 2 Nov, Tidak terjadwal, atau Belum ada data. **Lihat Rekap** aktif setelah ada laporan.
 - **Perlu perhatian** (FR-P6): laporan yang memilih opsi bertanda merah. Lonceng di header (semua halaman) menampilkan jumlah dan delapan laporan terbaru dari **7 hari terakhir** (`app/Services/Attention.php`, `Attention::DAYS`); laporan yang lebih lama hilang dari notifikasi. Angka di lonceng hanya menghitung yang **belum dilihat** akun itu (tabel `attention_reads`, migrasi `2026_11_09_0014`): klik di lonceng, membuka detailnya di rekap, atau **Tandai semua dilihat** membuat item pudar dan angkanya berkurang. **Lihat semua data** membuka `/perlu-perhatian` di tab baru (`AttentionController`): semua laporan tanpa batas waktu, filter form dan tanggal, jawaban yang ditandai merah, dan tombol Buka ke detail laporan di halaman rekapnya (`?buka=<id>`).
+=======
+- **Kapan form selesai**: ada laporan bertanggal hari ini (WIB).
+- **Panel progres** = jumlah penghitung bagian ("6 dari 7 form dijadwalkan hari ini · 5 selesai" → panel 5/6), jadi keduanya selalu sama. Status di kartu: Selesai, Batas 14:00, Belum Diisi (lewat batas dengan pengingat), Hari ini, Berikutnya: 2 Nov, Tidak terjadwal, atau Belum ada data. **Lihat Rekap** aktif setelah ada laporan.
+- **Perlu perhatian** (FR-P6): lima laporan terbaru yang memilih opsi bertanda merah, terbaru dulu. Setiap baris membuka detail laporan di halaman rekapnya (`?buka=<id>`). Bagian ini tidak tampil bila kosong.
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 - Kembali ke dashboard dengan tombol Back browser setelah mengirim form memuat ulang halaman, sehingga progres langsung memakai laporan baru (FR-P4).
 - B7 tidak memakai migrasi; tidak ada data yang berubah.
 
@@ -54,7 +71,10 @@ Setiap halaman rekap punya tombol **Ekspor Excel (.xlsx)**, **Ekspor PDF**, dan 
 - **Excel** (`app/Services/RecapExport.php`, OpenSpout): sheet **Data** dengan semua baris, baris judul dibekukan, filter otomatis, dan lebar kolom menyesuaikan isi. Angka tetap angka, waktu berupa tanggal Excel `dd/mm/yyyy hh:mm` (WIB). Sheet **Ringkasan**: rumah sakit, form, periode, filter yang dipakai (mis. "Laporan: Perlu perhatian"), waktu dibuat, jumlah baris, dan empat statistik rekap.
 - **PDF** (mPDF): A4 lanskap, margin 15 mm, huruf IBM Plex Sans 9 pt yang ditanam (`resources/fonts`). Setiap halaman: logo, "RS Awal Bros Botania — Instalasi Teknologi Informasi", judul rekap, periode, dan filter; kaki "Dicetak 28 Okt 2026, 07:28 WIB · Halaman X dari Y" dan ID laporan. Isi: blok statistik, lalu tabel dengan judul kolom di setiap halaman; status sebagai teks. Di akhir: "Dibuat oleh," nama admin dan tanggal, serta "Diketahui oleh, Kepala Instalasi IT" dengan nama dari `REPORT_HEAD_OF_IT_NAME` (kosong = garis untuk tanda tangan); blok ini tidak terpotong antarhalaman.
 - **Cetak**: PDF yang sama dibuka di tab baru dan langsung memanggil dialog cetak browser.
+<<<<<<< HEAD
 - **Tanda tangan** (tombol di samping Ekspor Excel): judul, jabatan, dan nama sisi kiri ("Dibuat oleh") dan kanan ("Diketahui oleh") di bawah tabel PDF dan Cetak, disimpan per form (`forms.report_signature_json`, migrasi `2026_11_07_0012`, `app/Services/ReportSignature.php`). Nama kiri kosong = nama akun yang mengekspor; nama kanan kosong = garis untuk tanda tangan. Setiap perubahan tercatat di Riwayat aktivitas.
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 - **Nama file**: `<modul>_<YYYYMMDD>-<YYYYMMDD>_<YYYYMMDDHHmm>`, mis. `rekap-cek-server_20261001-20261031_202611011015.xlsx` (periode filter, lalu waktu dibuat dalam WIB). Tanpa filter periode dipakai tanggal laporan pertama dan terakhir.
 - **Batas** (FR-E12, `config/report.php`): Excel 50.000 baris, PDF dan Cetak 2.000 baris. Di atas batas tombolnya nonaktif dengan pesan "Maksimal 2.000 baris untuk PDF. Persempit filter."; server juga menolak dengan pesan yang sama. Tombol nonaktif bila tidak ada data atau filter tidak valid.
 - **Catatan aktivitas** (FR-E13): setiap ekspor ditulis ke `audit_logs` (`action = export`, `entity_type = rekap`) dengan modul, format, filter, jumlah baris, ID laporan, dan nama file. ID laporan (mis. `RPT-1EEF2C6406`) tercetak di kaki PDF, sehingga salinan kertas bisa dicocokkan dengan catatan ini.
@@ -212,6 +232,10 @@ Form dan riwayat memakai `resources/css/gform.css` (form bergaya Google Forms) d
 - Kartu form membuka halaman form-nya; tombol Lihat Rekap pada kartu membuka rekapnya di tab baru. Menu ⋯ pada kartu berisi Lihat Rekap, Edit Isi Form, Edit Kartu, Duplikat, Sembunyikan, dan Hapus.
 - Kartu tautan tanpa alamat menampilkan "Alamat belum diatur" sampai URL diisi lewat menu ⋯ › Edit. URL `http`/`https` yang valid dibuka di tab baru dengan `noopener noreferrer`.
 - Menu profil (nama di kanan header) berisi Ubah password, Riwayat aktivitas, dan Logout (`POST /logout` dengan token CSRF, kembali ke `/login`); bisa dipakai dengan keyboard (panah, Esc). Tidak ada halaman Users. Nama di navbar berasal dari akun yang sedang masuk.
+<<<<<<< HEAD
+=======
+- Badge `Portal aktif` merujuk pada halaman portal, bukan uptime sistem eksternal.
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 - Dialog bisa ditutup menggunakan Escape, tombol tutup, tombol kembali, atau klik di luar dialog. Fokus dikelola oleh elemen `<dialog>` browser.
 - Daftar kategori tanpa menu memiliki empty state; route yang tidak ada mengembalikan 404, kegagalan render mengembalikan 500.
 - Tampilan awal dashboard dirender langsung oleh PHP. Aksi di dashboard dikirim ke server; selama satu aksi berjalan, tombol Simpan dinonaktifkan dan klik aksi lain diabaikan. Bila gagal, toast merah menjelaskan sebabnya (mis. "Sesi berakhir", "Permintaan ditolak") dan tidak ada yang berubah.
@@ -243,11 +267,19 @@ Salin `.env.example` menjadi `.env`. `.env` tidak boleh di-commit.
 | `APP_URL` | Alamat portal tanpa garis miring di akhir, mis. `https://portal-it.rs.local`. Kosong = dikenali otomatis: root situs, atau foldernya bila project ada di dalam `htdocs` (mis. `/abportal`) |
 | `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Koneksi MySQL/MariaDB |
 | `PASSWORD_MIN_LENGTH` | Panjang minimal password (bawaan 12, paling kecil 8) |
+<<<<<<< HEAD
 | `BACKUP_DIR`, `BACKUP_COPY_DIR`, `BACKUP_KEEP` | Folder backup (di luar folder project dan di luar `htdocs`; kosong = `AB-Portal-Hub-backups` di sebelah project, yang ikut tersaji Apache bila project ada di `htdocs`), salinan kedua di mesin lain/NAS (NFR-5), jumlah set yang disimpan (bawaan 30) |
 | `BACKUP_ENCRYPTION_KEY` | Kunci AES-256 opsional untuk backup (`php bin/backup.php key`). Simpan salinannya di luar server: tanpa kunci, backup terenkripsi tidak bisa dipulihkan |
 | `MYSQL_BIN_DIR` | Folder `mysqldump` dan `mysql`, mis. `C:\xampp\mysql\bin` (kosong = dari PATH) |
 | `LOG_KEEP_DAYS` | Umur log error harian di `storage/logs` sebelum dihapus oleh backup malam (bawaan 90) |
 | `REPORT_HEAD_OF_IT_NAME` | Nama awal sisi kanan tanda tangan PDF dan Cetak, sebelum diatur lewat tombol Tanda tangan di halaman rekap. Kosong = garis kosong untuk tanda tangan |
+=======
+| `BACKUP_DIR`, `BACKUP_COPY_DIR`, `BACKUP_KEEP` | Folder backup (di luar folder project; kosong = `AB-Portal-Hub-backups` di sebelah project), salinan kedua di mesin lain/NAS (NFR-5), jumlah set yang disimpan (bawaan 30) |
+| `BACKUP_ENCRYPTION_KEY` | Kunci AES-256 opsional untuk backup (`php bin/backup.php key`). Simpan salinannya di luar server: tanpa kunci, backup terenkripsi tidak bisa dipulihkan |
+| `MYSQL_BIN_DIR` | Folder `mysqldump` dan `mysql`, mis. `C:\xampp\mysql\bin` (kosong = dari PATH) |
+| `LOG_KEEP_DAYS` | Umur log error harian di `storage/logs` sebelum dihapus oleh backup malam (bawaan 90) |
+| `REPORT_HEAD_OF_IT_NAME` | Nama di bawah "Diketahui oleh, Kepala Instalasi IT" pada PDF dan Cetak (keputusan Q15). Kosong = garis kosong untuk tanda tangan |
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 
 Waktu disimpan di database dalam **UTC** (sesi koneksi `+00:00`) dan ditampilkan dalam WIB (`config/app.php`). `DB_TIMEZONE` tidak dipakai lagi.
 

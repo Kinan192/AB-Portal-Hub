@@ -6,6 +6,7 @@ namespace App\Models;
 use PDO;
 
 /**
+<<<<<<< HEAD
  * Reports marked "Perlu perhatian" (PRD FR-P6), newest first, for the header notification (the last days only)
  * and the "Perlu perhatian" page (every report, filtered). Deleted reports and reports of deleted forms are
  * left out. Each row carries the questions of its own version, so the page can name the marked answers, and
@@ -21,10 +22,18 @@ final class AttentionList
         LEFT JOIN attention_reads r ON r.entry_id = e.id AND r.user_id = :user
         WHERE e.deleted_at IS NULL AND e.attention = 1';
 
+=======
+ * Reports marked "Perlu perhatian" (PRD FR-P6), newest first. Deleted reports and reports of deleted forms
+ * are left out.
+ */
+final class AttentionList
+{
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     public function __construct(private readonly PDO $pdo)
     {
     }
 
+<<<<<<< HEAD
     /**
      * Reports sent in the last $days days (UTC clock), at most $limit, with how many of them $userId has not seen.
      * @return array{rows: list<array>, total: int, unread: int}
@@ -95,5 +104,23 @@ final class AttentionList
         $rows = $this->pdo->query('SELECT DISTINCT f.slug, cv.title FROM form_entries e JOIN forms f ON f.id = e.form_id AND f.deleted_at IS NULL
             LEFT JOIN form_versions cv ON cv.id = f.current_version_id WHERE e.deleted_at IS NULL AND e.attention = 1 ORDER BY cv.title')->fetchAll();
         return array_column($rows, 'title', 'slug');
+=======
+    /** @return list<array{source: string, id: int, entry_no: string, at: string, status: string, count: int, slug: ?string, title: ?string}> */
+    public function latest(int $perModule = 5): array
+    {
+        $limit = max(1, $perModule);
+        $queries = [
+            "SELECT 'form' AS source, e.id, e.entry_no, e.submitted_at AS at, 'perhatian' AS status, 0 AS count, f.slug, v.title
+             FROM form_entries e JOIN forms f ON f.id = e.form_id AND f.deleted_at IS NULL LEFT JOIN form_versions v ON v.id = f.current_version_id
+             WHERE e.deleted_at IS NULL AND e.attention = 1 ORDER BY e.submitted_at DESC, e.id DESC LIMIT {$limit}",
+        ];
+        $rows = [];
+        foreach ($queries as $sql) {
+            foreach ($this->pdo->query($sql)->fetchAll() as $row) {
+                $rows[] = ['id' => (int) $row['id'], 'count' => (int) $row['count']] + $row;
+            }
+        }
+        return $rows;
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     }
 }

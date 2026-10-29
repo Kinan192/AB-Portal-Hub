@@ -2,7 +2,10 @@
 declare(strict_types=1);
 
 use App\Controllers\AccountController;
+<<<<<<< HEAD
 use App\Controllers\AttentionController;
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use App\Controllers\AuditController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
@@ -20,7 +23,10 @@ $dynamicForm = new DynamicFormController();
 $auth = new AuthController();
 $account = new AccountController();
 $audit = new AuditController();
+<<<<<<< HEAD
 $attention = new AttentionController();
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 $files = new FileController();
 
 // Every POST (public ones included) must carry the session's CSRF token.
@@ -35,8 +41,11 @@ $router->get('/password', [$account, 'password']);
 $router->post('/password', [$account, 'updatePassword']);
 // Change log, read only (B9, PRD SEC-12): no route changes audit_logs.
 $router->get('/riwayat-aktivitas', [$audit, 'index']);
+<<<<<<< HEAD
 $router->get('/perlu-perhatian', [$attention, 'index']);
 $router->post('/perlu-perhatian/dilihat', [$attention, 'markSeen']);
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 
 $router->get('/', [$home, 'index']);
 // Dashboard JSON API (public/assets/js/dashboard.js): fetch() POSTs with the X-CSRF-Token header.
@@ -44,7 +53,10 @@ $router->post('/dashboard/sections', [$dashboard, 'createSection']);
 $router->post('/dashboard/sections/{id}/delete', [$dashboard, 'deleteSection']);
 $router->post('/dashboard/forms', [$dashboard, 'createForm']);
 $router->post('/dashboard/links', [$dashboard, 'createLink']);
+<<<<<<< HEAD
 $router->post('/dashboard/icon', [$dashboard, 'uploadIcon']);
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 $router->post('/dashboard/cards/{id}', [$dashboard, 'updateCard']);
 $router->post('/dashboard/cards/{id}/hide', [$dashboard, 'hide']);
 $router->post('/dashboard/cards/{id}/show', [$dashboard, 'show']);
@@ -67,7 +79,10 @@ $router->get('/form-dinamis/respons', [$dynamicForm, 'responses']);
 $router->get('/form-dinamis/respons/data', [$dynamicForm, 'data']);
 // Exports of the recap pages (B8, PRD §9): ?format=xlsx|pdf|cetak plus the filters of the page.
 $router->get('/form-dinamis/respons/ekspor', [$dynamicForm, 'export']);
+<<<<<<< HEAD
 $router->post('/form-dinamis/tanda-tangan', [$dynamicForm, 'saveSignature']);
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 
 // Uploaded files of the reports (only for a signed-in session).
 $router->get('/berkas/{id}', [$files, 'show']);

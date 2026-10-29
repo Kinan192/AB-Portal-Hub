@@ -36,7 +36,10 @@ final class ScheduleTest extends TestCase
             'dates list' => [['type' => 'dates', 'dates' => ['2026-10-27', '2026-12-01']], ['2026-10-27' => true, '2026-12-01' => true, '2026-10-28' => false]],
             'start date' => [['type' => 'daily', 'start' => '2026-10-27'], ['2026-10-26' => false, '2026-10-27' => true]],
             'end date (inclusive)' => [['type' => 'daily', 'end' => '2026-10-27'], ['2026-10-27' => true, '2026-10-28' => false]],
+<<<<<<< HEAD
             'optional is never due' => [['type' => 'optional'], ['2026-10-27' => false, '2026-02-28' => false]],
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             'weekly inside start..end' => [['type' => 'weekly', 'days' => [2], 'start' => '2026-10-20', 'end' => '2026-11-03'], ['2026-10-13' => false, '2026-10-20' => true, '2026-11-03' => true, '2026-11-10' => false]],
         ];
     }
@@ -74,6 +77,7 @@ final class ScheduleTest extends TestCase
         // Suhu (decision Q12): the month's locations instead of today.
         self::assertSame(['text' => '3/4 lokasi', 'tone' => 'plain', 'due' => false], $status(self::schedule(['type' => 'monthly', 'month_day' => 1]), false, true, '2026-10-27 09:00', ['done' => false, 'text' => '3/4 lokasi']));
         self::assertSame('Selesai', $status(self::schedule(['type' => 'monthly', 'month_day' => 1]), true, true, '2026-10-27 09:00', ['done' => true, 'text' => '4/4 lokasi'])['text']);
+<<<<<<< HEAD
         // Tidak wajib diisi: no reminder, open any time.
         $optional = self::schedule(['type' => 'optional', 'deadline' => '14:00', 'reminder' => true]);
         self::assertSame(['text' => 'Kapan saja', 'tone' => 'next', 'due' => false], $status($optional, false, false, '2026-10-27 15:00'));
@@ -87,5 +91,7 @@ final class ScheduleTest extends TestCase
         [$row] = Schedule::toRow(self::schedule(['type' => 'optional', 'deadline' => '14:00', 'reminder' => true]));
         self::assertSame(['optional', null, 0], [$row['type'], $row['deadline_time'], $row['reminder']]);
         self::assertNull(Schedule::nextDue(self::schedule(['type' => 'optional']), self::day('2026-10-27')));
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     }
 }

@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+<<<<<<< HEAD
+=======
+use App\Helpers\Format;
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use App\Helpers\Schedule;
 use DateTimeImmutable;
 
@@ -56,4 +60,26 @@ final class Progress
             'ratio' => $target > 0 ? $completed / $target : 0.0,
         ];
     }
+<<<<<<< HEAD
+=======
+
+    /**
+     * FR-P6: the newest reports with status Peringatan or Kritis (or "Perlu perhatian") across the modules,
+     * newest first, each with a link that opens its detail on the recap page (?buka=<id>).
+     * @param list<array{module: string, entry_no: string, at: string, status: string, tone: string, url: string}> $rows
+     * @return list<array{module: string, entry_no: string, when: string, status: string, tone: string, url: string}>
+     */
+    public static function exceptions(array $rows, int $limit = 5): array
+    {
+        usort($rows, static fn (array $a, array $b): int => [$b['at'], $b['entry_no']] <=> [$a['at'], $a['entry_no']]);
+        return array_map(static fn (array $r): array => [
+            'module' => $r['module'],
+            'entry_no' => $r['entry_no'],
+            'when' => Format::dateTime($r['at']),
+            'status' => $r['status'],
+            'tone' => $r['tone'],
+            'url' => $r['url'],
+        ], array_slice($rows, 0, $limit));
+    }
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 }

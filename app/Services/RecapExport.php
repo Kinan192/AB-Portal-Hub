@@ -370,6 +370,7 @@ final class RecapExport
         if ($count === 0) {
             $body[count($body) - 1] = '<div class="empty">Tidak ada data untuk filter ini.</div>';
         }
+<<<<<<< HEAD
         // Texts set on the recap page ("Tanda tangan"); an empty left name is the exporting account, an empty right
         // name a line to sign on.
         $sign = ($report['signature'] ?? []) + ReportSignature::defaults();
@@ -378,6 +379,12 @@ final class RecapExport
         $body[] = '<table class="sign"><tr>'
             . '<td>' . $head($sign['left_title'], $sign['left_role']) . '<div class="sign-space"></div><div class="sign-name">' . e($leftName) . '</div><div>' . e($date) . '</div></td>'
             . '<td>' . $head($sign['right_title'], $sign['right_role']) . '<div class="sign-space"></div><div class="sign-name">' . ($sign['right_name'] !== '' ? e($sign['right_name']) : '(______________________________)') . '</div></td>'
+=======
+        $name = $config['head_of_it_name'];
+        $body[] = '<table class="sign"><tr>'
+            . '<td>Dibuat oleh,<div class="sign-space"></div><div class="sign-name">' . e($author !== '' ? $author : 'Admin') . '</div><div>' . e($date) . '</div></td>'
+            . '<td>Diketahui oleh,<br>Kepala Instalasi IT<div class="sign-space"></div><div class="sign-name">' . ($name !== '' ? e($name) : '(______________________________)') . '</div></td>'
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             . '</tr></table>';
         return ['css' => $css, 'header' => $header, 'footer' => $footer, 'body' => $body, 'rows' => $count];
     }

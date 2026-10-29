@@ -10,8 +10,11 @@
   const BLOCKS = ['section', 'title', 'image'];
   const validUrl = (value) => { try { const url = new URL(value); return ['http:', 'https:'].includes(url.protocol) && url.hostname !== ''; } catch { return false; } };
   const otherOf = (q) => (q.other ? { label: 'Lainnya:', ...(typeof q.other === 'object' ? q.other : {}) } : null);
+<<<<<<< HEAD
   // An option marked "perlu perhatian" in the editor is drawn red.
   const red = (o) => typeof o === 'object' && o?.tone === 'red';
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
   const decimal = (value) => Number(String(value).trim().replace(',', '.'));
   const isDecimal = (value) => /^-?\d+([.,]\d+)?$/.test(String(value).trim());
 
@@ -27,13 +30,21 @@
       const type = q.type === 'checkbox' ? 'checkbox' : 'radio';
       const other = otherOf(q);
       return '<div class="gf-options">'
+<<<<<<< HEAD
         + (q.options ?? []).map((o) => `<label class="gf-option${red(o) ? ' gf-option--red' : ''}"><input type="${type}" name="${name(q)}" value="${esc(optValue(o))}"><span class="gf-option-text"><span class="gf-option-label">${esc(optLabel(o))}</span></span></label>`).join('')
+=======
+        + (q.options ?? []).map((o) => `<label class="gf-option"><input type="${type}" name="${name(q)}" value="${esc(optValue(o))}"><span class="gf-option-text"><span class="gf-option-label">${esc(optLabel(o))}</span></span></label>`).join('')
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         + (other ? `<label class="gf-option"><input type="${type}" name="${name(q)}" value="__other" data-other-toggle><span class="gf-option-text"><span class="gf-option-label">${esc(other.label)}</span>`
           + `<input class="gf-input gf-option-other" name="${name(q)}-other" aria-label="Jawaban lainnya" maxlength="200" disabled></span></label>` : '')
         + '</div>';
     };
     const select = (q) => `<select class="gf-select" id="${name(q)}" name="${name(q)}"${describedBy(q)}><option value="">Pilih</option>`
+<<<<<<< HEAD
       + (q.options ?? []).map((o) => `<option value="${esc(optValue(o))}"${red(o) ? ' class="gf-opt-red"' : ''}>${esc(optLabel(o))}</option>`).join('') + '</select>';
+=======
+      + (q.options ?? []).map((o) => `<option value="${esc(optValue(o))}">${esc(optLabel(o))}</option>`).join('') + '</select>';
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     const scale = (q) => {
       const values = Array.from({ length: (+q.max || 5) - (+q.min || 0) + 1 }, (_, k) => (+q.min || 0) + k);
       return `<div class="fd-scale">${q.minLabel ? `<span class="fd-scale__end">${esc(q.minLabel)}</span>` : ''}<div class="fd-scale__options">`

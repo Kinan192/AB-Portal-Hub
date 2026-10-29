@@ -37,4 +37,18 @@ final class ProgressTest extends TestCase
         self::assertSame(['completed' => 0, 'target' => 0, 'remaining' => 0, 'percentage' => 0, 'ratio' => 0.0], Progress::summary([]));
     }
 
+<<<<<<< HEAD
+=======
+    public function testExceptionsNewestFirstFrP6(): void
+    {
+        $row = static fn (string $no, string $at, string $tone = 'warn'): array => ['module' => 'M', 'entry_no' => $no, 'at' => $at, 'status' => 'Peringatan', 'tone' => $tone, 'url' => '/x'];
+        $list = Progress::exceptions([
+            $row('TMP-1', '2026-10-01 01:00:00'), $row('CCTV-1', '2026-10-27 02:00:00', 'bad'), $row('CDS-1', '2026-10-26 03:00:00'),
+            $row('HWS-1', '2026-10-27 01:00:00'), $row('TMP-2', '2026-10-20 01:00:00'), $row('F7-1', '2026-10-25 01:00:00'),
+        ]);
+        self::assertSame(['CCTV-1', 'HWS-1', 'CDS-1', 'F7-1', 'TMP-2'], array_column($list, 'entry_no'));
+        self::assertSame('27 Okt 2026, 09:00 WIB', $list[0]['when']);
+        self::assertSame([], Progress::exceptions([]));
+    }
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 }

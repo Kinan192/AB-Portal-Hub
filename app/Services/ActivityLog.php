@@ -45,11 +45,17 @@ final class ActivityLog
     private const MODULES = ['rekap-suhu' => 'Suhu server', 'rekap-cctv' => 'CCTV', 'rekap-cleardesk' => 'Clear Desk'];
     /** Labels of dashboard, editor and account fields; module fields come from their controllers. */
     private const LABELS = [
+<<<<<<< HEAD
         'title' => 'Judul', 'url' => 'Alamat', 'icon' => 'Ikon', 'icon_attachment_id' => 'Ikon (unggahan)', 'icon_url' => 'Ikon (alamat)', 'image_url' => 'Ikon (gambar)',
         'section' => 'Bagian', 'section_id' => 'Bagian', 'badge' => 'Label', 'description' => 'Keterangan', 'questions' => 'Pertanyaan',
         'schedule' => 'Jadwal', 'color' => 'Warna', 'kind' => 'Jenis', 'workstation' => 'Workstation', 'berkas' => 'Bukti',
         'left_title' => 'TTD kiri: judul', 'left_role' => 'TTD kiri: jabatan', 'left_name' => 'TTD kiri: nama',
         'right_title' => 'TTD kanan: judul', 'right_role' => 'TTD kanan: jabatan', 'right_name' => 'TTD kanan: nama',
+=======
+        'title' => 'Judul', 'url' => 'Alamat', 'icon' => 'Ikon', 'icon_attachment_id' => 'Ikon (unggahan)', 'icon_url' => 'Ikon (alamat)',
+        'section' => 'Bagian', 'section_id' => 'Bagian', 'badge' => 'Label', 'description' => 'Keterangan', 'questions' => 'Pertanyaan',
+        'schedule' => 'Jadwal', 'color' => 'Warna', 'kind' => 'Jenis', 'workstation' => 'Workstation', 'berkas' => 'Bukti',
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     ];
 
     /** @return array{from: string, to: string, from_utc: ?string, to_utc: ?string, group: string, actions: list<string>, entity: string, q: string, page: int, error: ?string} */

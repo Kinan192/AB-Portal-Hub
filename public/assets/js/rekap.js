@@ -279,6 +279,7 @@
     }
   });
 
+<<<<<<< HEAD
   /* "Tanda tangan": the signature block of the PDF and Cetak export, saved for this form on the server. */
   const signDialog = document.getElementById('fr-sign');
   if (signDialog) {
@@ -318,6 +319,8 @@
     });
   }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
   fromUrl();
   // ?buka=<id> (a link from the dashboard's "Perlu perhatian", PRD FR-P6) opens that report's detail; the
   // parameter is then dropped from the address.

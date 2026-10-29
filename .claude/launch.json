@@ -17,8 +17,13 @@
                 "-S",
                 "127.0.0.1:8081",
                 "-t",
+<<<<<<< HEAD
                 "C:/xampp/htdocs/AB-Portal/public",
                 "C:/xampp/htdocs/AB-Portal/public/index.php"
+=======
+                "public",
+                "public/index.php"
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             ],
             "env": {
                 "DB_DATABASE": "abportal_test"
@@ -32,8 +37,13 @@
                 "-S",
                 "127.0.0.1:8084",
                 "-t",
+<<<<<<< HEAD
                 "C:/xampp/htdocs/AB-Portal/public",
                 "C:/xampp/htdocs/AB-Portal/public/index.php"
+=======
+                "public",
+                "public/index.php"
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             ],
             "env": {
                 "DB_DATABASE": "abportal_b4_check",
@@ -48,8 +58,13 @@
                 "-S",
                 "127.0.0.1:8085",
                 "-t",
+<<<<<<< HEAD
                 "C:/xampp/htdocs/AB-Portal/public",
                 "C:/xampp/htdocs/AB-Portal/public/index.php"
+=======
+                "public",
+                "public/index.php"
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
             ],
             "env": {
                 "APP_ENV": "production",

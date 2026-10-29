@@ -115,6 +115,7 @@ final class RecapExportTest extends TestCase
         self::assertSame(1, $parts['rows']);
     }
 
+<<<<<<< HEAD
     public function testPdfSignatureUsesTheFormTexts(): void
     {
         $sign = ['left_title' => 'Disusun oleh,', 'left_role' => 'Staf IT', 'left_name' => '', 'right_title' => 'Mengetahui,', 'right_role' => 'Manajer <IT>', 'right_name' => 'dr. Rina'];
@@ -126,6 +127,8 @@ final class RecapExportTest extends TestCase
         self::assertStringNotContainsString('Kepala Instalasi IT', $body);
     }
 
+=======
+>>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     public function testClearDeskPdfGroupsBySessionWithSubtotals(): void
     {
         $row = static fn (string $session, bool $ok): array => ['cells' => [$session], 'group' => $session, 'group_title' => 'Sesi ' . $session, 'ok' => $ok];
