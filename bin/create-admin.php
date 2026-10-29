@@ -1,21 +1,21 @@
 <?php
 declare(strict_types=1);
 
-// Creates the single admin account, or changes its password when the email already exists.
-// Email, name and password are asked in the terminal; the password is typed hidden and twice,
-// and is never taken from arguments, files or environment variables.
+// Creates the single admin account, or resets its password when the username already exists
+// (PRD SEC-6: password reset only on the server). Username, name, email and password are asked in the
+// terminal; the password is typed hidden and twice, and is never taken from arguments, files or
+// environment variables. A reset logs out every signed-in device.
 // Usage: php bin/create-admin.php   (or: composer admin:create)
 
 use App\Core\Database;
+use App\Models\User;
+use App\Services\PasswordPolicy;
 
 if (PHP_SAPI !== 'cli') {
     exit(1);
 }
 
 require dirname(__DIR__) . '/bootstrap/app.php';
-
-const MIN_PASSWORD_LENGTH = 12; // PRD SEC-5
-const MAX_PASSWORD_BYTES = 72;  // bcrypt ignores anything longer
 
 function fail(string $message): never
 {
@@ -108,16 +108,11 @@ function readHiddenWindows(): string
     return $value;
 }
 
-function askNewPassword(string $email): string
+function askNewPassword(string $username): string
 {
     while (true) {
         $password = askHidden('Password baru (tidak terlihat saat diketik): ');
-        $problem = match (true) {
-            mb_strlen($password) < MIN_PASSWORD_LENGTH => 'Password minimal ' . MIN_PASSWORD_LENGTH . ' karakter.',
-            strlen($password) > MAX_PASSWORD_BYTES => 'Password maksimal ' . MAX_PASSWORD_BYTES . ' byte.',
-            strcasecmp($password, $email) === 0 => 'Password tidak boleh sama dengan email.',
-            default => null,
-        };
+        $problem = PasswordPolicy::problem($password, $username);
         if ($problem !== null) {
             fwrite(STDERR, $problem . PHP_EOL);
             continue;
@@ -141,68 +136,76 @@ try {
     $pdo = Database::connection();
     $table = $pdo->prepare('SELECT COUNT(*) FROM information_schema.TABLES WHERE TABLE_SCHEMA = ? AND TABLE_NAME = ?');
     $table->execute([$database, 'users']);
-    if ((int) $table->fetchColumn() === 0) {
-        fail("Tabel users belum ada di database {$database}. Jalankan php bin/migrate.php terlebih dahulu.");
+    if ((int) $table->fetchColumn() === 0 || !App\Core\Migrator::hasColumn($pdo, 'users', 'username')) {
+        fail("Tabel users di database {$database} belum diperbarui. Jalankan php bin/migrate.php terlebih dahulu.");
     }
 } catch (Throwable $exception) {
     fail('Koneksi database gagal: ' . $exception->getMessage());
 }
 
 echo "Akun admin portal (database {$database})" . PHP_EOL;
-echo 'Login mencocokkan kolom email: isi kolom Username di halaman login dengan email ini.' . PHP_EOL . PHP_EOL;
+echo 'Isi kolom Username di halaman login dengan username ini.' . PHP_EOL . PHP_EOL;
 
 while (true) {
-    $email = strtolower(ask('Email: '));
-    if (strlen($email) <= 255 && filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+    $username = ask('Username: ');
+    if (preg_match('/^[A-Za-z0-9._@-]{3,100}$/', $username) === 1) {
         break;
     }
-    fwrite(STDERR, 'Email tidak valid.' . PHP_EOL);
+    fwrite(STDERR, 'Username 3–100 karakter: huruf, angka, titik, garis bawah, minus, atau @.' . PHP_EOL);
 }
 
-$find = $pdo->prepare('SELECT id, name, role, is_active FROM users WHERE email = ?');
-$find->execute([$email]);
+$find = $pdo->prepare('SELECT id, name, email, is_active FROM users WHERE username = ?');
+$find->execute([$username]);
 $user = $find->fetch();
 
 try {
     if ($user !== false) {
         $status = $user['is_active'] ? 'aktif' : 'nonaktif';
-        echo "Akun sudah ada: {$user['name']} (role {$user['role']}, {$status})." . PHP_EOL;
-        $note = $user['role'] !== 'admin' || !$user['is_active'] ? ' Akun juga akan diaktifkan dengan role admin.' : '';
-        if (!confirm('Ganti password akun ini?' . $note)) {
+        echo "Akun sudah ada: {$user['name']} ({$user['email']}, {$status})." . PHP_EOL;
+        $note = !$user['is_active'] ? ' Akun juga akan diaktifkan.' : '';
+        if (!confirm('Ganti password akun ini? Semua perangkat yang masih masuk akan dikeluarkan.' . $note)) {
             echo 'Tidak ada perubahan.' . PHP_EOL;
             exit(0);
         }
-        $hash = password_hash(askNewPassword($email), PASSWORD_DEFAULT, ['cost' => 12]);
+        $hash = User::hash(askNewPassword($username));
         $pdo->beginTransaction();
-        $pdo->prepare('UPDATE users SET password_hash = ?, role = ?, is_active = 1 WHERE id = ?')->execute([$hash, 'admin', $user['id']]);
+        $pdo->prepare(
+            'UPDATE users SET password_hash = ?, is_active = 1, password_changed_at = UTC_TIMESTAMP(), session_version = session_version + 1 WHERE id = ?'
+        )->execute([$hash, $user['id']]);
         audit($pdo, (int) $user['id'], 'admin_password_reset');
         $pdo->commit();
-        echo 'Password diganti. Login dengan email ' . $email . '.' . PHP_EOL;
+        echo "Password diganti. Login dengan username {$username}." . PHP_EOL;
         exit(0);
     }
 
-    // The portal has exactly one admin; a second email would create a second account.
-    $other = $pdo->prepare('SELECT email FROM users WHERE role = ? LIMIT 1');
-    $other->execute(['admin']);
-    $existing = $other->fetchColumn();
+    // The portal has exactly one admin; another username would create a second account.
+    $existing = $pdo->query('SELECT username FROM users ORDER BY id LIMIT 1')->fetchColumn();
     if ($existing !== false) {
-        fail("Sudah ada akun admin lain ({$existing}). Portal hanya memakai satu admin; jalankan ulang dengan email tersebut untuk mengganti passwordnya.");
+        fail("Sudah ada akun admin ({$existing}). Portal hanya memakai satu admin; jalankan ulang dengan username tersebut untuk mengganti passwordnya.");
     }
 
     while (true) {
-        $name = ask('Nama: ');
+        $name = ask('Nama tampilan: ');
         if ($name !== '' && mb_strlen($name) <= 150) {
             break;
         }
         fwrite(STDERR, 'Nama wajib diisi (maksimal 150 karakter).' . PHP_EOL);
     }
-    $hash = password_hash(askNewPassword($email), PASSWORD_DEFAULT, ['cost' => 12]);
+    while (true) {
+        $email = strtolower(ask('Email: '));
+        if (strlen($email) <= 255 && filter_var($email, FILTER_VALIDATE_EMAIL) !== false) {
+            break;
+        }
+        fwrite(STDERR, 'Email tidak valid.' . PHP_EOL);
+    }
+    $hash = User::hash(askNewPassword($username));
     $pdo->beginTransaction();
-    $pdo->prepare('INSERT INTO users (name, email, password_hash, role, is_active) VALUES (?, ?, ?, ?, 1)')->execute([$name, $email, $hash, 'admin']);
+    $pdo->prepare('INSERT INTO users (username, name, email, password_hash, password_changed_at, is_active) VALUES (?, ?, ?, ?, UTC_TIMESTAMP(), 1)')
+        ->execute([$username, $name, $email, $hash]);
     $userId = (int) $pdo->lastInsertId();
     audit($pdo, $userId, 'admin_create');
     $pdo->commit();
-    echo "Akun admin dibuat untuk {$name}. Login dengan email {$email}." . PHP_EOL;
+    echo "Akun admin dibuat untuk {$name}. Login dengan username {$username}." . PHP_EOL;
 } catch (Throwable $exception) {
     if ($pdo->inTransaction()) {
         $pdo->rollBack();

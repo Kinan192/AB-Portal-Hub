@@ -84,12 +84,6 @@
 .portal-page .card-badge--slate { background: #f1f5f9; color: #334155; }
 .portal-page .card-badge { white-space: nowrap; text-transform: none; letter-spacing: 0; font-size: 10px; }
 
-/* "Data contoh" notice: the dashboard runs on dummy data kept in this browser tab. */
-.portal-page .demo-notice { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0; padding: 6px 6px 6px 14px; border: 1px solid #fde68a; border-radius: 10px; background: #fffbeb; font-size: 12px; line-height: 1.5; color: #78350f; }
-.portal-page .demo-notice > span { flex: 1 1 260px; }
-.portal-page .demo-notice .section-textbtn { color: #92400e; }
-.portal-page .demo-notice .section-textbtn:hover { background: #fef3c7; }
-
 /* ---------- Buttons ---------- */
 .portal-page .dash-btn { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px; border: 1px solid transparent; border-radius: 8px; background: transparent; font-size: 13px; font-weight: 600; line-height: 1.2; color: #334155; text-decoration: none; white-space: nowrap; }
 .portal-page .dash-btn--sm { min-height: 36px; padding: 0 12px; font-size: 12.5px; }
@@ -117,12 +111,13 @@
 .portal-page .dash-dialog { width: calc(100% - 2rem); max-width: 440px; max-height: calc(100dvh - 2rem); margin: auto; padding: 0; border: 1px solid #e2e8f0; border-radius: 16px; background: #fff; color: #1e293b; box-shadow: 0 24px 48px -12px rgb(15 23 42 / 30%); overflow: hidden; }
 .portal-page .dash-dialog[open] { display: flex; flex-direction: column; }
 .portal-page .dash-dialog--wide { max-width: 880px; }
-.portal-page .dash-dialog form { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+/* flex-basis auto, not 0: Safari collapses a 0-basis child of a dialog without a set height to nothing. */
+.portal-page .dash-dialog form { display: flex; flex-direction: column; min-height: 0; flex: 1 1 auto; }
 .portal-page .dash-dialog__head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1px solid #e2e8f0; }
 .portal-page .dash-dialog__title { margin: 0; font-size: 18px; font-weight: 700; color: #0f172a; }
 .portal-page .dash-dialog__x { display: grid; place-items: center; width: 40px; height: 40px; margin-right: -8px; border: 0; border-radius: 8px; background: none; color: #64748b; }
 .portal-page .dash-dialog__x:hover { background: #f1f5f9; color: #0f172a; }
-.portal-page .dash-dialog__body { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; overscroll-behavior: contain; }
+.portal-page .dash-dialog__body { flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 20px; overscroll-behavior: contain; }
 .portal-page .dash-dialog__foot { display: flex; justify-content: flex-end; gap: 8px; padding: 14px 20px; border-top: 1px solid #e2e8f0; background: #f8fafc; }
 .portal-page .dash-dialog__pad { padding: 22px; overflow-y: auto; }
 .portal-page .dash-dialog__actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
@@ -158,6 +153,16 @@
 .portal-page .dash-seg span { display: inline-flex; align-items: center; min-height: 32px; padding: 0 12px; border-radius: 7px; font-size: 12.5px; font-weight: 600; color: #475569; }
 .portal-page .dash-seg input:checked + span { background: #fff; color: #0f766e; box-shadow: 0 1px 2px rgb(15 23 42 / 12%); }
 .portal-page .dash-seg input:focus-visible + span { outline: 3px solid #0f766e; outline-offset: 1px; }
+.portal-page .dash-seg { flex-wrap: wrap; }
+/* "Unggah gambar": drop area for a link card icon */
+.portal-page .dash-drop { display: flex; align-items: center; gap: 14px; padding: 16px; border: 2px dashed #cbd5e1; border-radius: 12px; background: #f8fafc; cursor: pointer; transition: border-color .15s, background .15s; }
+.portal-page .dash-drop:hover, .portal-page .dash-drop.is-drag { border-color: #0f766e; background: #f0fdfa; }
+.portal-page .dash-drop:has(input:focus-visible) { outline: 3px solid #0f766e; outline-offset: 2px; }
+.portal-page .dash-drop[aria-busy="true"] { opacity: .7; cursor: progress; }
+.portal-page .dash-drop__thumb { display: grid; place-items: center; flex-shrink: 0; width: 52px; height: 52px; overflow: hidden; border-radius: 12px; background: #fff; color: #0f766e; box-shadow: inset 0 0 0 1px #e2e8f0; }
+.portal-page .dash-drop__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.portal-page .dash-drop__text { display: grid; gap: 2px; min-width: 0; font-size: 12.5px; color: #64748b; }
+.portal-page .dash-drop__text b { overflow-wrap: anywhere; font-size: 13.5px; font-weight: 600; color: #1e293b; }
 .portal-page .dash-search { position: relative; margin-bottom: 8px; }
 .portal-page .dash-search svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
 .portal-page .dash-search .dash-input { padding-left: 34px; }

@@ -1,6 +1,6 @@
 /*
  * Google-Forms style for the form pages: the six built-in monitoring forms and the dynamic forms.
- * Imported by both bundles (app.css and design.css). Markup: main.gf-page > form.gf-form > .gf-card
+ * Imported by both bundles (app.css and design.css). Markup: main.gf-scope > form.gf-form > .gf-card
  * (header, sections, questions, confirmation) + .gf-actions, drawn from the question list by
  * public/assets/js/form-dinamis.js, which also adds the error state.
  * The rules are unlayered so they win over the utility classes and the forms reset of the bundles.
@@ -23,7 +23,9 @@
 @font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-ext-600-normal.woff2") format("woff2"); unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: "IBM Plex Mono"; font-style: normal; font-weight: 600; font-display: swap; src: url("../fonts/ibm-plex-mono-latin-600-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
 
-.gf-page {
+/* Colours and type of the question cards: on the fill-in page (main.gf-page.gf-scope) and in the "Edit Isi Form"
+   preview (.fe-preview.gf-scope), so a question looks the same in both (C2). */
+.gf-scope {
   --gf-teal: #0f6b5c;
   --gf-teal-dark: #0d4d43;
   --gf-teal-50: #eef7f4;
@@ -38,20 +40,22 @@
   --gf-amber: #9a5b00;
   --gf-amber-50: #fdf3e1;
   --gf-green: #1f7a4d;
+  color: var(--gf-ink);
+  font-size: 14.5px;
+  line-height: 1.5;
+}
+.gf-page {
   box-sizing: border-box;
   width: 100%;
   max-width: calc(760px + 2rem);
   margin-inline: auto;
   padding: 24px 1rem 32px;
-  color: var(--gf-ink);
-  font-size: 14.5px;
-  line-height: 1.5;
 }
 :is(.module-page, .rs-body) main.gf-page,
-.gf-page :is(button, input, select, textarea) { font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-.gf-page .gf-mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0; }
+.gf-scope :is(button, input, select, textarea) { font-family: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.gf-scope .gf-mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: 0; }
 .gf-form { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.gf-page .rs-ic { font-size: 16px; }
+.gf-scope .rs-ic { font-size: 16px; }
 
 /* Cards */
 .gf-card { position: relative; min-width: 0; background: #fff; border: 1px solid var(--gf-line); border-radius: 10px; padding: 22px 24px; }
@@ -60,111 +64,76 @@
 
 /* Header card */
 .gf-eyebrow { margin: 0 0 6px; font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; color: var(--gf-teal); }
-.gf-page .gf-title { margin: 0; font-size: clamp(22px, 1.1rem + 1.4vw, 28px); font-weight: 600; line-height: 1.25; letter-spacing: 0; color: var(--gf-ink); }
+.gf-scope .gf-title { margin: 0; font-size: clamp(22px, 1.1rem + 1.4vw, 28px); font-weight: 600; line-height: 1.25; letter-spacing: 0; color: var(--gf-ink); }
 .gf-desc { margin: 8px 0 0; font-size: 14.5px; line-height: 1.6; color: var(--gf-ink-2); }
 .gf-meta { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px 24px; margin: 16px 0 0; padding-top: 16px; border-top: 1px solid var(--gf-line); }
 .gf-meta-label { display: block; font-size: 12px; color: var(--gf-muted); }
 .gf-meta-value { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; margin: 2px 0 0; min-width: 0; font-size: 14px; font-weight: 500; color: var(--gf-ink); overflow-wrap: anywhere; }
 .gf-meta-sub { flex-basis: 100%; font-size: 12.5px; font-weight: 400; color: var(--gf-muted); }
-.gf-page .gf-meta-value input[readonly] { width: 100%; min-height: 0; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; outline: none; box-shadow: none; }
+.gf-scope .gf-meta-value input[readonly] { width: 100%; min-height: 0; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; outline: none; box-shadow: none; }
 .gf-header-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 16px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--gf-line); }
 .gf-required-note { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 500; color: var(--gf-red); }
 .gf-links { display: flex; flex-wrap: wrap; align-items: center; gap: 0 18px; margin-left: auto; }
-.gf-page .gf-link { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; font-size: 13.5px; font-weight: 500; color: var(--gf-teal); text-decoration: none; }
-.gf-page .gf-link:hover { color: var(--gf-teal-dark); text-decoration: underline; text-underline-offset: 3px; }
-.gf-page .gf-rekap { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 1px solid #bfddd5; border-radius: 8px; background: #fff; font-size: 13.5px; font-weight: 600; color: var(--gf-teal); text-decoration: none; white-space: nowrap; }
-.gf-page .gf-rekap:hover { border-color: #8fc2b5; background: var(--gf-teal-50); }
-.gf-page .gf-rekap__icon { width: 16px; height: 16px; flex-shrink: 0; }
+.gf-scope .gf-link { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; font-size: 13.5px; font-weight: 500; color: var(--gf-teal); text-decoration: none; }
+.gf-scope .gf-link:hover { color: var(--gf-teal-dark); text-decoration: underline; text-underline-offset: 3px; }
+.gf-scope .gf-rekap { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 14px; border: 1px solid #bfddd5; border-radius: 8px; background: #fff; font-size: 13.5px; font-weight: 600; color: var(--gf-teal); text-decoration: none; white-space: nowrap; }
+.gf-scope .gf-rekap:hover { border-color: #8fc2b5; background: var(--gf-teal-50); }
+.gf-scope .gf-rekap__icon { width: 16px; height: 16px; flex-shrink: 0; }
 
 /* Section header card */
 .gf-section-head { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 12px; }
 .gf-section-num { display: grid; flex: none; place-items: center; width: 28px; height: 28px; border-radius: 6px; background: var(--gf-teal); color: #fff; font-size: 14px; font-weight: 600; }
 .gf-section-text { flex: 1 1 220px; min-width: 0; }
-.gf-page .gf-section-title { margin: 3px 0 0; font-size: 15px; font-weight: 700; letter-spacing: .02em; line-height: 1.4; text-transform: uppercase; color: var(--gf-ink); }
+.gf-scope .gf-section-title { margin: 3px 0 0; font-size: 15px; font-weight: 700; letter-spacing: .02em; line-height: 1.4; text-transform: uppercase; color: var(--gf-ink); }
 .gf-section-desc { margin: 4px 0 0; font-size: 13px; color: var(--gf-muted); }
 
 /* Question cards */
 .gf-q-head { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: 6px 12px; }
-.gf-page .gf-q-title { display: block; margin: 0; font-size: 15.5px; font-weight: 500; line-height: 1.45; letter-spacing: 0; text-transform: none; color: var(--gf-ink); }
+.gf-scope .gf-q-title { display: block; margin: 0; font-size: 15.5px; font-weight: 500; line-height: 1.45; letter-spacing: 0; text-transform: none; color: var(--gf-ink); }
 .gf-req { margin-left: 2px; color: var(--gf-red); }
 .gf-qnum { margin-right: 6px; font-weight: 600; color: var(--gf-teal); }
-.gf-pill { display: inline-flex; flex: none; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 999px; background: var(--gf-teal-50); color: var(--gf-teal); font-size: 12px; font-weight: 500; line-height: 1.6; white-space: nowrap; }
-.gf-pill--red { background: var(--gf-red-50); color: var(--gf-red); }
 .gf-help { margin: 4px 0 0; font-size: 13px; line-height: 1.5; color: var(--gf-muted); }
 .gf-body { margin-top: 14px; }
 .gf-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px 24px; }
-.gf-meta-line { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px 12px; margin-top: 8px; font-size: 12.5px; color: var(--gf-muted); }
 
 /* Text inputs and textareas: underline */
-.gf-page .gf-input {
+.gf-scope .gf-input {
   display: block; box-sizing: border-box; width: 100%; min-height: 40px; margin: 0; padding: 8px 0;
   border: 0; border-bottom: 1px solid var(--gf-input-line); border-radius: 0; background: transparent;
   font-size: 14.5px; line-height: 1.5; color: var(--gf-ink); box-shadow: none; outline: none; appearance: none;
   transition: border-color .15s, box-shadow .15s;
 }
-.gf-page .gf-input::placeholder { color: #8a9896; opacity: 1; }
-.gf-page .gf-input:hover { border-bottom-color: #aebbb8; }
-.gf-page .gf-input:focus { border-bottom-color: var(--gf-teal); box-shadow: 0 1px 0 0 var(--gf-teal); }
-.gf-page textarea.gf-input { min-height: 64px; resize: vertical; field-sizing: content; }
-.gf-page .gf-input:is([type="date"], [type="time"], [type="datetime-local"]) { width: auto; min-width: 170px; max-width: 100%; }
+.gf-scope .gf-input::placeholder { color: #8a9896; opacity: 1; }
+.gf-scope .gf-input:hover { border-bottom-color: #aebbb8; }
+.gf-scope .gf-input:focus { border-bottom-color: var(--gf-teal); box-shadow: 0 1px 0 0 var(--gf-teal); }
+.gf-scope textarea.gf-input { min-height: 64px; resize: vertical; field-sizing: content; }
+.gf-scope .gf-input:is([type="date"], [type="time"], [type="datetime-local"]) { width: auto; min-width: 170px; max-width: 100%; }
 
 /* Select */
-.gf-page .gf-select {
+.gf-scope .gf-select {
   box-sizing: border-box; width: 240px; max-width: 100%; min-height: 40px; padding: 9px 12px;
   border: 1px solid var(--gf-input-line); border-radius: 8px; background-color: #fff;
   font-size: 14.5px; color: var(--gf-ink); box-shadow: none;
 }
-.gf-page .gf-select:focus { border-color: var(--gf-teal); outline: none; box-shadow: 0 0 0 3px rgba(15, 107, 92, .15); }
-
-/* Quick-fill chips */
-.gf-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 10px; }
-.gf-chips-label { margin-right: 2px; font-size: 12.5px; color: var(--gf-muted); }
-.gf-page .gf-chip {
-  display: inline-flex; align-items: center; min-height: 32px; padding: 4px 12px; border: 1px solid var(--gf-input-line);
-  border-radius: 999px; background: #fff; color: var(--gf-ink-2); font-size: 12.5px; font-weight: 500; line-height: 1.4; cursor: pointer;
-}
-.gf-page .gf-chip:hover { border-color: var(--gf-teal-200); background: var(--gf-teal-50); color: var(--gf-teal); }
+.gf-scope .gf-select:focus { border-color: var(--gf-teal); outline: none; box-shadow: 0 0 0 3px rgba(15, 107, 92, .15); }
 
 /* Radio / checkbox lists */
 .gf-options { display: flex; flex-direction: column; gap: 2px; }
 .gf-option { display: flex; align-items: flex-start; gap: 12px; margin-inline: -8px; padding: 9px 8px; border-radius: 8px; cursor: pointer; }
 .gf-option:hover { background: #f6f8f8; }
-.gf-page :is(.gf-option, .gf-confirm, .gf-pill-radio) > input:is([type="radio"], [type="checkbox"]) {
+.gf-scope :is(.gf-option, .gf-confirm) > input:is([type="radio"], [type="checkbox"]) {
   appearance: auto; flex: none; width: 18px; height: 18px; margin: 2px 0 0; padding: 0; border: 0;
   accent-color: var(--gf-teal); background: none; cursor: pointer;
 }
 .gf-option-text { display: flex; flex: 1; flex-direction: column; min-width: 0; }
 .gf-option-label { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; font-size: 14.5px; color: var(--gf-ink); }
-.gf-option-note { margin-top: 2px; font-size: 12.5px; line-height: 1.5; color: var(--gf-muted); }
-.gf-option-note--accent { color: var(--gf-teal); }
 .gf-option-other { margin-top: 6px; }
+/* Option marked "perlu perhatian" in the editor */
+.gf-option--red .gf-option-label, .gf-opt-red { color: var(--gf-red); }
+.gf-option--red input { accent-color: var(--gf-red); }
 
-/* Compliance grid: one row per item, pill radios on the right */
-.gf-matrix-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 14px 0; border-top: 1px solid #edf1f0; }
-.gf-matrix-row:first-child { padding-top: 0; border-top: 0; }
-.gf-matrix-row:last-child { padding-bottom: 0; }
-.gf-matrix-item { flex: 1 1 300px; min-width: 0; }
-.gf-matrix-title { display: flex; align-items: baseline; gap: 8px; font-size: 14.5px; font-weight: 600; color: var(--gf-ink); }
-.gf-matrix-note { margin: 2px 0 0; font-size: 12.5px; line-height: 1.5; color: var(--gf-muted); }
-.gf-pills { display: flex; flex: none; flex-wrap: wrap; gap: 8px; }
-.gf-pill-radio {
-  display: inline-flex; align-items: center; gap: 8px; min-height: 36px; padding: 4px 14px; border: 1px solid var(--gf-input-line);
-  border-radius: 999px; background: #fff; color: var(--gf-ink-2); font-size: 13.5px; font-weight: 500; cursor: pointer;
-}
-.gf-page .gf-pill-radio > input:is([type="radio"]) { width: 16px; height: 16px; margin: 0; }
-.gf-pill-radio:has(> input:checked) { border-color: var(--gf-teal); background: var(--gf-teal-50); color: var(--gf-teal); font-weight: 600; }
-
-/* Temperature field (Suhu) */
-.gf-temp { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; }
-.gf-page .gf-temp .gf-input { width: 160px; font-size: 20px; font-weight: 600; }
+/* Unit after a number answer */
 .gf-unit { font-size: 14px; color: var(--gf-muted); }
-.gf-status { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 13.5px; }
-.gf-ranges { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
-.gf-range { display: inline-flex; flex-direction: column; padding: 4px 10px; border: 1px solid; border-radius: 8px; font-size: 12px; line-height: 1.45; }
-.gf-range strong { font-weight: 600; }
-.gf-range--ok { border-color: var(--gf-teal-200); background: var(--gf-teal-50); color: var(--gf-teal); }
-.gf-range--warn { border-color: #f1d9a8; background: var(--gf-amber-50); color: var(--gf-amber); }
-.gf-range--bad { border-color: #f6cfca; background: var(--gf-red-50); color: var(--gf-red); }
 
 /* File upload drop zone */
 .gf-drop {
@@ -174,7 +143,7 @@
 }
 .gf-drop:hover, .gf-drop:focus-within { border-color: var(--gf-teal); background: var(--gf-teal-50); }
 .gf-drop-icon { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 999px; background: var(--gf-teal-50); color: var(--gf-teal); }
-.gf-page .gf-drop-icon .rs-ic { font-size: 22px; }
+.gf-scope .gf-drop-icon .rs-ic { font-size: 22px; }
 .gf-drop-text { margin: 0; font-size: 14px; color: var(--gf-ink); }
 .gf-drop-note { margin: 0; font-size: 12.5px; color: var(--gf-muted); }
 .gf-file-btn {
@@ -186,13 +155,10 @@
 /* Confirmation checkbox */
 .gf-confirm { display: flex; align-items: flex-start; gap: 12px; }
 .gf-confirm-label { font-size: 14px; line-height: 1.55; color: var(--gf-ink); cursor: pointer; }
-.gf-confirm-label::after { content: " *"; color: var(--gf-red); }
 
 /* Notices and sub-panels driven by the page scripts */
 .gf-notice { margin: 0; padding: 12px 16px; border: 1px solid var(--gf-teal-200); border-radius: 10px; background: var(--gf-teal-50); font-size: 13px; line-height: 1.55; color: var(--gf-teal-dark); }
 .gf-subpanel { margin-top: 14px; padding: 14px 16px; border: 1px solid #f6d5d1; border-radius: 8px; background: #fdf7f6; }
-.gf-subpanel-label { display: flex; align-items: center; gap: 6px; font-size: 13.5px; font-weight: 500; color: #7a1d14; }
-.gf-subpanel > * + * { margin-top: 10px; }
 
 /* Validation: missing required answer */
 .gf-card.is-invalid { border-color: var(--gf-red); box-shadow: inset 4px 0 0 var(--gf-red); }
@@ -202,34 +168,34 @@
 /* Actions */
 .gf-actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 4px; }
 .gf-actions-end { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-left: auto; }
-.gf-page .gf-btn {
+.gf-scope .gf-btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 16px;
   border: 1px solid transparent; border-radius: 8px; background: transparent; font-size: 14px; font-weight: 500; line-height: 1.2;
   text-decoration: none; cursor: pointer; box-shadow: none; transition: background-color .15s, border-color .15s, color .15s;
 }
-.gf-page .gf-btn--outline { border-color: var(--gf-input-line); background: #fff; color: var(--gf-ink-2); }
-.gf-page .gf-btn--outline:hover { background: #f6f8f8; color: var(--gf-ink); }
-.gf-page .gf-btn--text { color: var(--gf-teal); }
-.gf-page .gf-btn--text:hover { background: var(--gf-teal-50); }
-.gf-page .gf-btn--primary { border-color: var(--gf-teal); background: var(--gf-teal); color: #fff; }
-.gf-page .gf-btn--primary:hover { border-color: var(--gf-teal-dark); background: var(--gf-teal-dark); }
-.gf-page .gf-btn:disabled { cursor: wait; opacity: .7; }
+.gf-scope .gf-btn--outline { border-color: var(--gf-input-line); background: #fff; color: var(--gf-ink-2); }
+.gf-scope .gf-btn--outline:hover { background: #f6f8f8; color: var(--gf-ink); }
+.gf-scope .gf-btn--text { color: var(--gf-teal); }
+.gf-scope .gf-btn--text:hover { background: var(--gf-teal-50); }
+.gf-scope .gf-btn--primary { border-color: var(--gf-teal); background: var(--gf-teal); color: #fff; }
+.gf-scope .gf-btn--primary:hover { border-color: var(--gf-teal-dark); background: var(--gf-teal-dark); }
+.gf-scope .gf-btn:disabled { cursor: wait; opacity: .7; }
 .gf-footnote { margin: 8px 0 0; text-align: center; font-size: 12px; color: var(--gf-muted); }
 
 /* Focus. A field the browser scrolls to (e.g. the first invalid answer) stops below the sticky
-   navbar (--gf-navbar-h, measured by gform.js) with room for its question title above it. */
-html:has(.gf-page) { scroll-padding-top: calc(var(--gf-navbar-h, 0px) + 12px); }
-.gf-page .gf-card :is(input, select, textarea) { scroll-margin-top: 56px; }
-.gf-page :is(a, button, select, input[type="radio"], input[type="checkbox"]):focus-visible { outline: 2px solid var(--gf-teal); outline-offset: 2px; }
-.gf-page .gf-drop:has(input:focus-visible) { outline: 2px solid var(--gf-teal); outline-offset: 2px; }
+   header and "Kembali ke Dashboard" row (--header-h, --back-h, measured by app.js) with room for its
+   question title above it. */
+html:has(.gf-page) { scroll-padding-top: calc(var(--header-h, 0px) + var(--back-h, 0px) + 12px); }
+.gf-scope .gf-card :is(input, select, textarea) { scroll-margin-top: 56px; }
+.gf-scope :is(a, button, select, input[type="radio"], input[type="checkbox"]):focus-visible { outline: 2px solid var(--gf-teal); outline-offset: 2px; }
+.gf-scope .gf-drop:has(input:focus-visible) { outline: 2px solid var(--gf-teal); outline-offset: 2px; }
 
 @media (min-width: 808px) { .gf-page { max-width: 760px; padding-inline: 0; } }
 @media (max-width: 639px) {
   .gf-card { padding: 18px 16px; }
   .gf-actions, .gf-actions-end { flex-direction: column-reverse; align-items: stretch; width: 100%; margin-left: 0; }
-  .gf-page .gf-actions .gf-btn { width: 100%; min-height: 44px; }
-  .gf-page .gf-rekap { min-height: 44px; }
-  .gf-page .gf-chip, .gf-pill-radio { min-height: 40px; }
-  .gf-page .gf-select { width: 100%; }
+  .gf-scope .gf-actions .gf-btn { width: 100%; min-height: 44px; }
+  .gf-scope .gf-rekap { min-height: 44px; }
+  .gf-scope .gf-select { width: 100%; }
 }
 @media print { .gf-actions, .gf-header-foot .gf-links { display: none !important; } }

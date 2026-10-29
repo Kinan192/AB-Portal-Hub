@@ -1,6 +1,6 @@
 <?php
 /**
- * Design-system layout (login, account, suhu, CCTV, Clear Desk pages): navbar with live clock,
+ * Design-system layout (account pages): navbar with live clock,
  * optional breadcrumb bar, page content and footer. Styles: css/design.css, script: js/design.js.
  * Optional view data: $page, $bodyClass, $documentClass, $htmlClass,
  * $crumbbar (breadcrumb data shown in the white bar under the navbar), $footer, $modal.
@@ -13,6 +13,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Portal Monitoring IT RS Awal Bros Botania. Form monitoring harian, rekap, dan sistem rumah sakit.">
     <meta name="theme-color" content="#ffffff">
+    <?php if (\App\Core\Auth::check()): ?><meta name="csrf-token" content="<?= e(\App\Core\Auth::csrfToken()) ?>"><?php endif; ?>
     <title><?= e($pageTitle ?? config('app')['name']) ?> | RS Awal Bros Botania</title>
     <link rel="icon" href="data:,">
     <link rel="preload" href="<?= e(asset('fonts/inter-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>

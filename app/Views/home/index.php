@@ -16,14 +16,6 @@
         </div>
     </section>
 
-    <?php if ($editable): ?>
-    <p class="demo-notice" role="note">
-        <?= card_icon('info', 'size-4 shrink-0') ?>
-        <span><strong>Data contoh.</strong> Perubahan di dashboard hanya tersimpan di tab browser ini dan hilang saat tab ditutup.</span>
-        <button type="button" class="section-textbtn" data-reset-demo>Atur ulang</button>
-    </p>
-    <?php endif; ?>
-
     <div id="dashboard-sections" class="space-y-5">
     <?php foreach ($groups as $index => $group):
         $sectionId = 'section-' . e((string) ($group['id'] ?? $group['slug']));
@@ -31,12 +23,15 @@
         // First paint uses the default filter "Jadwal Hari Ini" (dashboard.js redraws with the remembered one).
         $visible = array_values(array_filter($group['cards'], static fn (array $card): bool => !$card['hidden']));
         $isDue = static fn (array $card): bool => $card['status'] !== null && $card['status']['due'];
-        $dueCount = count(array_filter($visible, $isDue));
-        $doneCount = count(array_filter($visible, static fn (array $card): bool => $isDue($card) && $card['done_today']));
+        // Counter of the section: the same numbers the hero ring adds up (App\Services\Progress).
+        $dueCount = $sectionCounts[$group['id']]['due'] ?? 0;
+        $doneCount = $sectionCounts[$group['id']]['done'] ?? 0;
+        // "Jadwal Hari Ini" lists what is still to do: due today and not yet filled today ("Semua Form" shows the rest).
         if ($isForms) {
-            $group['cards'] = array_values(array_filter($group['cards'], static fn (array $card): bool => $card['hidden'] || $isDue($card)));
+            $group['cards'] = array_values(array_filter($group['cards'], static fn (array $card): bool => $card['hidden'] || ($isDue($card) && !$card['done_today'])));
         }
         $filteredEmpty = $isForms && $visible !== [] && array_filter($group['cards'], static fn (array $card): bool => !$card['hidden']) === [];
+        $allDone = $dueCount > 0 && $doneCount >= $dueCount;
         $hiddenCount = count(array_filter($group['cards'], static fn (array $card): bool => $card['hidden']));
         $spacing = $index === 0 ? 'pt-2' : ($index === count($groups) - 1 ? 'pb-8 pt-4' : 'pt-4');
     ?>
@@ -69,9 +64,9 @@
         <?php endif; ?>
         <?php if ($filteredEmpty): ?>
         <div class="section-empty">
-            <?= card_icon('calendar-check', 'size-6 text-slate-400') ?>
-            <b>Tidak ada form yang dijadwalkan hari ini</b>
-            <span>Form lain tetap bisa dibuka dari tampilan Semua Form.</span>
+            <?= card_icon($allDone ? 'circle-check' : 'calendar-check', 'size-6 text-slate-400') ?>
+            <b><?= $allDone ? 'Semua form hari ini sudah diisi' : 'Tidak ada form yang dijadwalkan hari ini' ?></b>
+            <span><?= $allDone ? 'Form yang sudah diisi ada di tampilan Semua Form.' : 'Form lain tetap bisa dibuka dari tampilan Semua Form.' ?></span>
             <button type="button" class="dash-btn dash-btn--ghost dash-btn--sm" data-filter="all"><?= card_icon('list-checks', 'size-4') ?>Lihat Semua Form</button>
         </div>
         <?php if ($group['cards'] !== []): ?>
@@ -102,7 +97,7 @@
     <noscript><p class="mt-6 rounded-lg border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">Aktifkan JavaScript untuk menggunakan menu portal.</p></noscript>
 </main>
 <?php if ($editable): ?>
-<div class="card-menu" id="card-menu" role="menu" data-editor-url="<?= e(url('/form-editor')) ?>" data-fill-url="<?= e(url('/form-dinamis')) ?>" data-responses-url="<?= e(url('/form-dinamis/respons')) ?>" hidden></div>
+<div class="card-menu" id="card-menu" role="menu" data-editor-url="<?= e(url('/form-editor')) ?>" data-api-url="<?= e(rtrim(url('/dashboard'), '/')) ?>" hidden></div>
 <template id="dash-icons"><?php foreach ($iconNames as $name): ?><span data-icon="<?= e($name) ?>"><?= card_icon($name) ?></span><?php endforeach; ?></template>
 <script type="application/json" id="dashboard-state"><?= json_encode($clientState, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_THROW_ON_ERROR) ?></script>
 <?php endif; ?>

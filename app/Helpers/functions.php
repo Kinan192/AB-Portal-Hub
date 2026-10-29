@@ -12,27 +12,6 @@ function config(string $name): array
     return $loaded[$name] ??= require BASE_PATH . '/config/' . $name . '.php';
 }
 
-/**
- * Breadcrumb trail of a rekap page (form pages show a "Kembali ke Dashboard" button instead).
- * @return list<array{label: string}>
- */
-function monitoring_breadcrumbs(string $module): array
-{
-    $page = config('monitoring-navigation')[$module];
-    return [
-        ['label' => 'Monitoring Harian'],
-        ['label' => $page['module']],
-        ['label' => $page['report']],
-    ];
-}
-
-/** Dummy records used until the module tables are connected (database/dummy/*.php). */
-function dummy(string $name): array
-{
-    static $loaded = [];
-    return $loaded[$name] ??= require BASE_PATH . '/database/dummy/' . $name . '.php';
-}
-
 function asset(string $path): string
 {
     return config('app')['url'] . '/assets/' . ltrim($path, '/');
@@ -50,14 +29,55 @@ function url(string $path = '/'): string
     return config('app')['url'] . '/' . ltrim($path, '/');
 }
 
+/** The folder part of the portal address: "/abportal" for http://localhost/abportal, "" at a site root. */
+function url_base(): string
+{
+    return rtrim((string) (parse_url(config('app')['url'], PHP_URL_PATH) ?? ''), '/');
+}
+
 function redirect(string $path, int $status = 303): void
 {
     header('Location: ' . url($path), true, $status);
 }
-/** Hidden CSRF field for forms that POST (checked with App\Core\Auth::verifyCsrf()). */
+
+/** True for requests sent by fetch() that expect a JSON answer. */
+function wants_json(): bool
+{
+    return str_contains((string) ($_SERVER['HTTP_ACCEPT'] ?? ''), 'application/json');
+}
+
+/** JSON answer for requests sent by fetch(). */
+function json_response(array $data, int $status = 200): void
+{
+    http_response_code($status);
+    header('Content-Type: application/json; charset=utf-8');
+    echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP | JSON_INVALID_UTF8_SUBSTITUTE);
+}
+
+/** Hidden CSRF field for forms that POST (checked by App\Core\VerifyCsrf on every POST). */
 function csrf_field(): string
 {
     return '<input type="hidden" name="_token" value="' . e(App\Core\Auth::csrfToken()) . '">';
+}
+
+/**
+ * Name, initials and subtitle of the signed-in admin for the navbar and account page
+ * (the development login has no account row and shows its typed username).
+ * @return array{name: string, initials: string, subtitle: string, username: string}
+ */
+function current_profile(): array
+{
+    $user = App\Core\Auth::user();
+    $name = trim((string) ($user['name'] ?? '')) ?: (string) config('dashboard')['profile']['name'];
+    // First letters of the first two words ("Admin (mode pengembangan)" → "AM").
+    preg_match_all('/\p{L}[\p{L}\p{N}]*/u', $name, $words);
+    $initials = mb_strtoupper(mb_substr($words[0][0] ?? 'A', 0, 1) . mb_substr($words[0][1] ?? '', 0, 1));
+    return [
+        'name' => $name,
+        'initials' => $initials !== '' ? $initials : 'IT',
+        'subtitle' => (string) config('dashboard')['profile']['subtitle'],
+        'username' => (string) ($user['username'] ?? ''),
+    ];
 }
 
 /** Join class names, skipping empty values. */

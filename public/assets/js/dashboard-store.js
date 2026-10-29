@@ -1,11 +1,10 @@
 (() => {
   'use strict';
 
-  /* Shared by the dashboard (dashboard.js) and the form editor (form-editor.js), frontend only.
-     The start state is the dummy data of database/dummy/dashboard.php, embedded by the server as
-     #dashboard-state; every change lives in this browser tab (sessionStorage) and nothing is sent to
-     the server. Also: Lucide icons from #dash-icons, the toast (components/toast.php) and the
-     schedule rules (same as app/Helpers/Schedule.php, on WIB calendar dates). */
+  /* Shared by the dashboard (dashboard.js), the form pages and the form editor. The state comes from
+     the database, embedded by the server as #dashboard-state (see "State" below). Also: the server
+     calls (api), Lucide icons from #dash-icons, the toast (components/toast.php) and the schedule rules
+     (same as app/Helpers/Schedule.php, on WIB calendar dates). */
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
@@ -51,6 +50,9 @@
   document.addEventListener('click', (event) => {
     if (event.target.closest('#site-toast [data-toast-close]')) $('#site-toast').classList.remove('is-show');
   });
+  // A message the server left for this page load (App\Core\Flash, components/toast.php).
+  const flash = $('#site-toast')?.dataset;
+  if (flash?.flashTitle) showToast(flash.flashTitle, flash.flashDesc ?? '', flash.flashVariant ?? 'success');
 
   /* ---------- Schedules ---------- */
   const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
@@ -70,6 +72,7 @@
       case 'monthly': return s.month_day === 'last' ? day.getUTCDate() === last : day.getUTCDate() === Math.min(Math.max(1, +s.month_day || 1), last);
       case 'yearly': return Boolean(s.year_md) && key.slice(5) === s.year_md;
       case 'dates': return (s.dates ?? []).includes(key);
+      case 'optional': return false; // "Tidak wajib diisi": never due
       default: return true;
     }
   };
@@ -84,6 +87,9 @@
   const cardStatus = (card, now) => {
     const s = card.schedule;
     const due = isDue(s, now.day);
+    // A module counted per period (temperature: this month's locations, "3/4 lokasi").
+    if (card.period) return card.period.done ? { text: 'Selesai', tone: 'ok', due } : { text: card.period.text, tone: 'plain', due };
+    if (s.type === 'optional') return card.done_today ? { text: 'Selesai', tone: 'ok', due: false } : { text: 'Kapan saja', tone: 'next', due: false };
     if (!card.has_data && !card.done_today) return { text: 'Belum ada data', tone: 'muted', due };
     if (!due) {
       const next = nextDue(s, now.day);
@@ -111,6 +117,7 @@
         return { text: `Tahunan${day ? ` - ${+day} ${MONTHS[+month - 1]}` : ''}`, tone: 'purple' };
       }
       case 'dates': return { text: 'Tanggal tertentu', tone: 'slate' };
+      case 'optional': return { text: 'Tidak wajib', tone: 'slate' };
       default: return { text: 'Harian', tone: 'teal' };
     }
   };
@@ -123,6 +130,7 @@
   };
   const dayText = (value) => { const d = parseYmd(value); return d ? `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()]} ${d.getUTCFullYear()}` : ''; };
   const scheduleSummary = (s) => {
+    if (s.type === 'optional') return 'Form ini tidak wajib diisi: tidak masuk Jadwal Hari Ini dan progres harian, tetapi bisa diisi kapan saja dari tab Semua Form.';
     let tail = (s.start ? ` mulai ${dayText(s.start)}` : '') + (s.end ? ` sampai ${dayText(s.end)}` : '');
     let what;
     switch (s.type) {
@@ -149,48 +157,106 @@
     return `Form ini akan tampil ${what}${tail}.${s.deadline ? ` Batas pengisian pukul ${s.deadline}.` : ''}`;
   };
 
-  /* ---------- Questions (form-dinamis.js and form-riwayat.js) ---------- */
+  /* ---------- Questions (form-dinamis.js) ---------- */
   // Options are a string or { value, label, note, badge, tone }.
   const optValue = (o) => (typeof o === 'string' ? o : String(o.value ?? o.label ?? ''));
   const optLabel = (o) => (typeof o === 'string' ? o : String(o.label ?? o.value ?? ''));
   const oneDecimal = (n) => (Math.round(n * 10) / 10).toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-  // Temperature status (PRD FR-T2), computed from the value rounded to 1 decimal.
-  const bandsOf = (q) => ({ low: 18.0, high: 24.0, critical: 27.0, ...(q.bands ?? {}) });
-  const tempStatus = (q, value) => {
-    const v = Math.round(value * 10) / 10;
-    const b = bandsOf(q);
-    if (v >= b.critical) return { tone: 'bad', text: 'Kritis', note: 'Bahaya / overheat, segera tindak lanjuti.' };
-    if (v < b.low) return { tone: 'warn', text: 'Peringatan', note: `Di bawah ${oneDecimal(b.low)} °C.` };
-    if (v > b.high) return { tone: 'warn', text: 'Peringatan', note: `Di atas ${oneDecimal(b.high)} °C.` };
-    return { tone: 'ok', text: 'Normal', note: 'Sesuai batas aman ruang server.' };
-  };
 
-  /* ---------- State: dummy data + changes in sessionStorage ---------- */
+  /* ---------- State ----------
+     seed(): the dashboard as the server sent it (#dashboard-state, from the database). The dashboard
+     always starts from it and saves through api(). The form pages (fill-in, history, editor) still keep
+     what they change in this browser tab (load/save, sessionStorage) until entries and the editor are
+     saved on the server (B3–B6); a changed server state starts them from the database again. */
   const KEY = 'abportal.dashboard';
   const stateEl = $('#dashboard-state');
   const seedText = stateEl?.textContent ?? '';
-  // A changed dummy file starts the demo again instead of reusing an older saved state.
   const seedId = String([...seedText].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) | 0, 7));
   const seed = () => JSON.parse(seedText);
   const load = () => {
     try {
       const saved = JSON.parse(window.sessionStorage.getItem(KEY) ?? 'null');
       if (saved && saved.seedId === seedId) return saved.state;
-    } catch { /* unreadable: start from the dummy data */ }
+    } catch { /* unreadable: start from the server state */ }
     return seed();
   };
   const save = (state) => {
     try { window.sessionStorage.setItem(KEY, JSON.stringify({ seedId, state })); } catch { /* private mode: changes last until reload */ }
   };
-  const reset = () => {
-    try { window.sessionStorage.removeItem(KEY); } catch { /* nothing saved */ }
-    return seed();
+
+  /* ---------- Server calls (JSON API, app/Controllers/DashboardController.php) ---------- */
+  // POST with the session's CSRF token (<meta name="csrf-token">); the body is JSON, or a FormData with
+  // files. Resolves with the answer; rejects with an Error carrying status (0 = no connection), message,
+  // errors ({ field: message } on 422) and data (the whole answer).
+  const api = async (url, body = {}) => {
+    const form = body instanceof FormData;
+    let response;
+    try {
+      response = await fetch(url, {
+        method: 'POST',
+        credentials: 'same-origin',
+        headers: { ...(form ? {} : { 'Content-Type': 'application/json' }), Accept: 'application/json', 'X-CSRF-Token': $('meta[name="csrf-token"]')?.content ?? '' },
+        body: form ? body : JSON.stringify(body),
+      });
+    } catch {
+      throw Object.assign(new Error('Tidak dapat terhubung ke server. Periksa jaringan lalu coba lagi.'), { status: 0, errors: {}, data: {} });
+    }
+    let data = {};
+    try { data = await response.json(); } catch { /* not JSON: a server error page */ }
+    if (!response.ok) {
+      throw Object.assign(new Error(data.message || 'Perubahan tidak tersimpan. Coba lagi atau muat ulang halaman.'), { status: response.status, errors: data.errors ?? {}, data });
+    }
+    return data;
+  };
+  // GET of a JSON answer (recap pages); rejects like api().
+  const getJson = async (url) => {
+    let response;
+    try {
+      response = await fetch(url, { credentials: 'same-origin', headers: { Accept: 'application/json' } });
+    } catch {
+      throw Object.assign(new Error('Tidak dapat terhubung ke server. Periksa jaringan lalu coba lagi.'), { status: 0, errors: {}, data: {} });
+    }
+    let data = {};
+    try { data = await response.json(); } catch { /* not JSON */ }
+    if (!response.ok) throw Object.assign(new Error(data.message || 'Data tidak dapat dimuat. Muat ulang halaman.'), { status: response.status, errors: {}, data });
+    return data;
+  };
+  // The toast for a failed call (field messages of a 422 are shown by the caller next to the fields).
+  const apiError = (error) => {
+    const title = { 0: 'Tidak terhubung', 401: 'Sesi berakhir', 404: 'Tidak ditemukan', 419: 'Permintaan ditolak', 422: 'Belum tersimpan' }[error.status] ?? 'Gagal menyimpan';
+    showToast(title, error.message, 'error');
   };
 
+  // A yes/no modal (dash-dialog styles): resolves true for the confirm button.
+  let askBox = null;
+  const ask = ({ title, text = '', ok = 'Ya', cancel = 'Batal', danger = false }) => new Promise((resolve) => {
+    if (!askBox) {
+      askBox = document.createElement('dialog');
+      askBox.className = 'dash-dialog';
+      askBox.setAttribute('aria-labelledby', 'ask-title');
+      askBox.innerHTML = '<form method="dialog" class="dash-dialog__pad"><h2 id="ask-title" class="dash-dialog__title"></h2><p class="dash-text" data-ask-text></p>'
+        + '<div class="dash-dialog__actions"><button type="submit" value="no" class="dash-btn dash-btn--ghost" data-ask-no></button><button type="submit" value="yes" class="dash-btn" data-ask-yes></button></div></form>';
+      document.body.append(askBox);
+    }
+    $('#ask-title', askBox).textContent = title;
+    const p = $('[data-ask-text]', askBox);
+    p.textContent = text;
+    p.hidden = text === '';
+    $('[data-ask-no]', askBox).textContent = cancel;
+    const yes = $('[data-ask-yes]', askBox);
+    yes.textContent = ok;
+    yes.className = `dash-btn ${danger ? 'dash-btn--danger' : 'dash-btn--primary'}`;
+    askBox.returnValue = '';
+    askBox.addEventListener('close', () => resolve(askBox.returnValue === 'yes'), { once: true });
+    askBox.showModal();
+    $('[data-ask-no]', askBox).focus();
+  });
+
   window.DashboardStore = {
-    ready: Boolean(stateEl), $, $$, esc, uid, clone, icon, showToast, MONTHS, MONTHS_LONG, DAY_SHORT, DAY_LONG, nowWib, ymd, parseYmd, isDue, nextDue, cardStatus, scheduleLabel, scheduleSummary, load, save, reset,
-    optValue, optLabel, oneDecimal, bandsOf, tempStatus,
-    // The dummy data as the server sent it (original questions of the built-in forms).
+    ready: Boolean(stateEl), $, $$, esc, uid, clone, icon, showToast, MONTHS, MONTHS_LONG, DAY_SHORT, DAY_LONG, nowWib, ymd, parseYmd, isDue, nextDue, cardStatus, scheduleLabel, scheduleSummary, load, save,
+    api, getJson, apiError, ask,
+    optValue, optLabel, oneDecimal,
+    // The state as the server sent it.
     seed,
   };
 })();

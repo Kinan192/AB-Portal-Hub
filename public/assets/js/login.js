@@ -41,7 +41,7 @@
   const setSubmitting = (submitting) => {
     state.submitting = submitting;
     submitButton.disabled = submitting;
-    submitLabel.textContent = submitting ? 'Memproses…' : 'Sign In';
+    submitLabel.textContent = submitting ? 'Memproses…' : 'Masuk';
     submitIcon.hidden = submitting;
     submitSpinner.hidden = !submitting;
     form.setAttribute('aria-busy', String(submitting));

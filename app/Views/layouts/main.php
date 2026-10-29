@@ -10,6 +10,7 @@ $modulePage = !isset($groups) && empty($portalPage);
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="Portal Monitoring IT RS Awal Bros Botania. Akses form internal, monitoring, laporan, dan sistem rumah sakit.">
     <meta name="theme-color" content="#043b33">
+    <meta name="csrf-token" content="<?= e(App\Core\Auth::csrfToken()) ?>">
     <title><?= e($pageTitle ?? config('app')['name']) ?> | RS Awal Bros Botania</title>
     <link rel="icon" href="data:,">
     <link rel="preload" href="<?= e(asset('fonts/inter-latin-400-normal.woff2')) ?>" as="font" type="font/woff2" crossorigin>
@@ -23,8 +24,11 @@ $modulePage = !isset($groups) && empty($portalPage);
     <a href="#main-content" class="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-teal-800 px-4 py-3 text-sm text-white focus:translate-y-0">Langsung ke konten</a>
     <?php require __DIR__ . '/header.php'; ?>
     <?php if (!empty($breadcrumbs) || !empty($backToDashboard)): ?>
-    <div class="breadcrumb-shell page-shell py-5">
-        <?php require BASE_PATH . '/app/Views/components/breadcrumbs.php'; ?>
+    <div class="breadcrumb-shell page-shell py-5<?= !empty($backToDashboard) ? ' is-sticky' : '' ?>">
+        <?php // $breadcrumbWidth: a page with a narrow centred column lines the row up with it (breadcrumb-fill, breadcrumb-editor). ?>
+        <div class="<?= e($breadcrumbWidth ?? '') ?>">
+            <?php require BASE_PATH . '/app/Views/components/breadcrumbs.php'; ?>
+        </div>
     </div>
     <?php endif; ?>
     <?= $content ?>

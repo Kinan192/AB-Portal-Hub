@@ -1,14 +1,16 @@
 (() => {
   'use strict';
 
-  /* Dashboard ("/"), frontend only. State, icons, toast and schedule rules come from dashboard-store.js
-     (dummy data + sessionStorage; nothing is sent to the server). The sections are drawn here with the
-     same markup as home/index.php and components/portal-card.php. Dialogs: components/dashboard-dialogs.php. */
+  /* Dashboard ("/"). The state comes from the database (#dashboard-state); every change is sent to the
+     JSON API (app/Controllers/DashboardController.php, routes /dashboard/…) and the dashboard is redrawn
+     from the state in the answer. Icons, toast, schedule rules and api() come from dashboard-store.js.
+     The sections are drawn here with the same markup as home/index.php and components/portal-card.php.
+     Dialogs: components/dashboard-dialogs.php. */
   const store = window.DashboardStore;
   if (!store?.ready) return;
-  const { $, $$, esc, uid, clone, icon, showToast, nowWib, ymd, isDue, cardStatus, scheduleLabel } = store;
-  let state = store.load();
-  const save = () => store.save(state);
+  const { $, $$, esc, icon, showToast, nowWib, isDue, cardStatus, scheduleLabel, api, apiError } = store;
+  let state = store.seed();
+  const API = $('#card-menu')?.dataset.apiUrl ?? '/dashboard';
   const sectionById = (id) => state.sections.find((section) => section.id === id);
   const linkSections = () => state.sections.filter((section) => section.kind === 'links');
 
@@ -23,14 +25,14 @@
     const status = !isLink && card.schedule ? cardStatus(card, now) : null;
     const rekap = !isLink && card.rekap && card.has_data ? card.rekap : null;
     const classes = ['portal-card', isLink ? '' : 'portal-card--form', card.hidden ? 'is-muted' : '', status && !status.due ? 'is-off-schedule' : '', newId === card.id ? 'is-new' : ''].filter(Boolean).join(' ');
-    const data = { id: card.id, kind: card.kind, builtin: card.builtin, title: card.title, description: card.description, icon: card.icon, image: card.image, url: card.url, rekap, section: card.section, hidden: card.hidden };
+    const data = { id: card.id, kind: card.kind, title: card.title, description: card.description, icon: card.icon, image: card.image, url: card.url, rekap, section: card.section, hidden: card.hidden };
     const title = href
       ? `<a class="card-link" href="${esc(href)}"${isLink ? ' target="_blank" rel="noopener noreferrer"' : ''}>${esc(card.title)}</a>`
       : `<button type="button" class="card-link" data-module="${esc(card.id)}" data-title="${esc(card.title)}" data-type="${isLink ? 'external' : 'internal'}" aria-haspopup="dialog">${esc(card.title)}</button>`;
     let foot = '';
     if (!isLink) {
       const button = rekap
-        ? `<a class="card-rekap" href="${esc(rekap)}" aria-label="${esc(`Lihat rekap ${card.title}`)}">${icon('chart-column', 'size-4')}Lihat Rekap</a>`
+        ? `<a class="card-rekap" href="${esc(rekap)}" target="_blank" rel="noopener" aria-label="${esc(`Lihat rekap ${card.title}`)}">${icon('chart-column', 'size-4')}Lihat Rekap</a>`
         : `<span class="card-tip"><button type="button" class="card-rekap is-off" aria-disabled="true" data-no-rekap aria-label="${esc(`Lihat rekap ${card.title} (belum ada laporan)`)}" aria-describedby="tip-${esc(card.id)}">${icon('chart-column', 'size-4')}Lihat Rekap</button><span class="card-tip__box" role="tooltip" id="tip-${esc(card.id)}">Belum ada laporan</span></span>`;
       const text = status ? `<span class="card-status card-status--${status.tone}">${status.tone === 'ok' ? icon('check', 'size-3.5') : ''}${esc(status.text)}</span>` : '';
       foot = `<div class="card-foot">${button}${text}</div>`;
@@ -48,15 +50,22 @@
   let filter = 'today';
   try { filter = window.localStorage.getItem(FILTER_KEY) === 'all' ? 'all' : 'today'; } catch { /* default */ }
   const dueToday = (card, now) => Boolean(card.schedule) && isDue(card.schedule, now.day);
+  // Counter of a forms section: visible cards, due today, done of those. The hero ring adds these up, so
+  // both always agree (same rule as App\Services\Progress on the server).
+  const sectionCount = (section, now) => {
+    const visible = state.cards.filter((card) => card.section === section.id && !card.hidden);
+    const due = visible.filter((card) => dueToday(card, now));
+    return { visible: visible.length, due: due.length, done: due.filter((card) => card.done_today).length };
+  };
   const sectionHtml = (section, index, total, now) => {
     const all = state.cards.filter((card) => card.section === section.id);
     const isForms = section.kind === 'forms';
-    // Under "Jadwal Hari Ini" a form that is not due today is left out (hidden cards stay for their toggle).
-    const cards = isForms && filter === 'today' ? all.filter((card) => card.hidden || dueToday(card, now)) : all;
+    // "Jadwal Hari Ini" lists what is still to do: due today and not filled yet today (hidden cards stay for
+    // their toggle). A form filled today moves to "Semua Form" only.
+    const cards = isForms && filter === 'today' ? all.filter((card) => card.hidden || (dueToday(card, now) && !card.done_today)) : all;
     const hidden = cards.filter((card) => card.hidden).length;
     const visible = all.filter((card) => !card.hidden);
-    const dueN = visible.filter((card) => dueToday(card, now)).length;
-    const doneN = visible.filter((card) => dueToday(card, now) && card.done_today).length;
+    const { due: dueN, done: doneN } = sectionCount(section, now);
     const filterBar = isForms
       ? '<div class="section-filter"><div class="section-seg" role="group" aria-label="Filter form">'
         + `<button type="button" data-filter="today" aria-pressed="${filter === 'today'}">Jadwal Hari Ini</button>`
@@ -75,8 +84,9 @@
     }
     let body;
     if (filteredEmpty) {
-      body = `<div class="section-empty">${icon('calendar-check', 'size-6 text-slate-400')}<b>Tidak ada form yang dijadwalkan hari ini</b>`
-        + '<span>Form lain tetap bisa dibuka dari tampilan Semua Form.</span>'
+      const allDone = dueN > 0 && doneN >= dueN;
+      body = `<div class="section-empty">${icon(allDone ? 'circle-check' : 'calendar-check', 'size-6 text-slate-400')}<b>${allDone ? 'Semua form hari ini sudah diisi' : 'Tidak ada form yang dijadwalkan hari ini'}</b>`
+        + `<span>${allDone ? 'Form yang sudah diisi ada di tampilan Semua Form.' : 'Form lain tetap bisa dibuka dari tampilan Semua Form.'}</span>`
         + `<button type="button" class="dash-btn dash-btn--ghost dash-btn--sm" data-filter="all">${icon('list-checks', 'size-4')}Lihat Semua Form</button></div>`
         + (cards.length ? `<div class="card-grid--forms grid grid-cols-1 gap-3.5">${cards.map((card) => cardHtml(card, now)).join('')}</div>` : '');
     } else if (!cards.length) {
@@ -93,11 +103,10 @@
       + `<div class="section-head"><h2 id="${headingId}" class="flex items-center gap-2 text-[11.7px] font-bold uppercase tracking-wider text-slate-500">${icon(section.icon, 'size-3.5 text-slate-400')}${esc(section.title)}</h2>${actions}</div>`
       + `${filterBar}${body}</section>`;
   };
-  /* Progress ring and bar (components/progress-summary.php): visible Monitoring Harian forms due today. */
+  /* Progress ring and bar (components/progress-summary.php): the counters of the forms sections added up. */
   const updateProgress = (now) => {
-    const formSections = state.sections.filter((section) => section.kind === 'forms').map((section) => section.id);
-    const due = state.cards.filter((card) => formSections.includes(card.section) && !card.hidden && dueToday(card, now));
-    const target = due.length, done = due.filter((card) => card.done_today).length, ratio = target ? done / target : 0;
+    const counts = state.sections.filter((section) => section.kind === 'forms').map((section) => sectionCount(section, now));
+    const target = counts.reduce((sum, c) => sum + c.due, 0), done = counts.reduce((sum, c) => sum + c.done, 0), ratio = target ? done / target : 0;
     const set = (name, text) => { const el = $(`[data-progress="${name}"]`); if (el) el.textContent = text; };
     set('pct', `${target ? Math.round(ratio * 100) : 0}%`);
     set('done', String(done));
@@ -137,11 +146,30 @@
       }, 8000);
     }
   };
-  const commit = (cardId = null) => { save(); newId = cardId; render(); };
+  // The server's answer to a change: its state replaces ours; $highlight marks the answer's card "Baru".
+  const apply = (answer, highlight = false) => {
+    state = { ...state, ...answer.state };
+    newId = highlight ? (answer.id ?? null) : null;
+    render();
+  };
+  // One change at a time: a second click while a call is under way is ignored.
+  let busy = false;
+  const send = async (path, body, onError = apiError) => {
+    if (busy) return null;
+    busy = true;
+    try {
+      return await api(`${API}${path}`, body);
+    } catch (error) {
+      onError(error);
+      return null;
+    } finally {
+      busy = false;
+    }
+  };
   render();
 
-  /* ---------- Demo reset and category removal ---------- */
-  document.addEventListener('click', (event) => {
+  /* ---------- Filter and category removal ---------- */
+  document.addEventListener('click', async (event) => {
     const filterButton = event.target.closest('[data-filter]');
     if (filterButton) {
       filter = filterButton.dataset.filter === 'all' ? 'all' : 'today';
@@ -151,19 +179,13 @@
       $(`.section-seg [data-filter="${filter}"]`)?.focus();
       return;
     }
-    if (event.target.closest('[data-reset-demo]')) {
-      state = store.reset();
-      newId = null;
-      render();
-      showToast('Data contoh diatur ulang', 'Dashboard kembali ke data awal.', 'info');
-      return;
-    }
     const remove = event.target.closest('[data-delete-section]');
     if (remove) {
       const section = sectionById(remove.dataset.deleteSection);
       if (!section?.custom || state.cards.some((card) => card.section === section.id)) return;
-      state.sections = state.sections.filter((item) => item !== section);
-      commit();
+      const answer = await send(`/sections/${section.ref}/delete`, {});
+      if (!answer) return;
+      apply(answer);
       showToast('Kategori dihapus', section.title);
     }
   });
@@ -215,7 +237,7 @@
     const item = document.createElement(href && !disabled ? 'a' : 'button');
     item.setAttribute('role', 'menuitem');
     item.dataset.action = action;
-    if (href && !disabled) item.href = href; else item.type = 'button';
+    if (href && !disabled) { item.href = href; if (action === 'rekap') { item.target = '_blank'; item.rel = 'noopener'; } } else item.type = 'button';
     if (disabled) item.setAttribute('aria-disabled', 'true');
     if (danger) item.classList.add('is-danger');
     item.innerHTML = icon(iconName, 'size-4');
@@ -224,11 +246,6 @@
     return item;
   };
   const cardById = (id) => state.cards.find((card) => card.id === id);
-  // A dynamic form card opens its fill-in page; "Lihat Rekap" opens its responses (once there are any).
-  const formLinks = (id) => ({
-    url: `${menu.dataset.fillUrl}?id=${encodeURIComponent(id)}`,
-    rekap: `${menu.dataset.responsesUrl}?id=${encodeURIComponent(id)}`,
-  });
   /* Items per card (as in the design): form cards, built-in module forms included · link cards. */
   const menuItems = (card) => {
     const visibility = card.hidden
@@ -296,9 +313,10 @@
 
   /* ---------- Card actions ---------- */
   const focusCard = (id) => $('.card-link', document.getElementById(`card-${id}`) ?? document)?.focus({ preventScroll: true });
-  const setHidden = (card, hidden) => {
-    card.hidden = hidden;
-    commit();
+  const setHidden = async (card, hidden) => {
+    const answer = await send(`/cards/${card.ref}/${hidden ? 'hide' : 'show'}`, {});
+    if (!answer) return;
+    apply(answer);
     if (hidden) {
       // The card is out of view now; keep the keyboard near it, on the section's "tersembunyi" toggle.
       $(`[data-section="${CSS.escape(card.section)}"] [data-toggle-hidden]`)?.focus({ preventScroll: true });
@@ -308,14 +326,12 @@
       showToast('Kartu ditampilkan lagi', card.title);
     }
   };
-  // The copy of a built-in module form is an ordinary dynamic form with the same questions.
-  const duplicateForm = (card) => {
-    const id = uid('form');
-    const copy = { ...clone(card), id, kind: 'form', builtin: false, ...formLinks(id), title: `${card.title} (Salinan)`.slice(0, 60), hidden: false, done_today: false, has_data: false };
-    state.cards.splice(state.cards.indexOf(card) + 1, 0, copy);
-    if (state.forms?.[card.id]) state.forms[copy.id] = { ...clone(state.forms[card.id]), title: `${state.forms[card.id].title} (Salinan)` };
-    commit(copy.id);
-    showToast('Form diduplikat', copy.title);
+  // The copy of a built-in module form is an ordinary dynamic form with the same questions (made by the server).
+  const duplicateForm = async (card) => {
+    const answer = await send(`/cards/${card.ref}/duplicate`, {});
+    if (!answer) return;
+    apply(answer, true);
+    showToast('Form diduplikat', cardById(answer.id)?.title ?? card.title);
   };
 
   // Small dialogs: close with Batal, Escape or a click outside.
@@ -343,17 +359,16 @@
     moveDialog.showModal();
     ($('input:checked', list) ?? $('input', list))?.focus();
   };
-  $('form', moveDialog).addEventListener('submit', (event) => {
+  $('form', moveDialog).addEventListener('submit', async (event) => {
     event.preventDefault();
     const card = cardById(moveDialog.dataset.cardId);
     const target = sectionById($('input[name="section"]:checked', moveDialog)?.value ?? '');
-    moveDialog.close();
-    if (!card || !target || target.id === card.section) return;
+    if (!card || !target || target.id === card.section) { moveDialog.close(); return; }
     // A moved card goes to the end of its new section.
-    state.cards.splice(state.cards.indexOf(card), 1);
-    card.section = target.id;
-    state.cards.push(card);
-    commit(card.id);
+    const answer = await send(`/cards/${card.ref}/move`, { section_id: target.id });
+    if (!answer) return;
+    moveDialog.close();
+    apply(answer, true);
     showToast('Kartu dipindahkan', `${card.title} sekarang di ${target.title}.`);
   });
 
@@ -381,15 +396,16 @@
   deleteInput.addEventListener('input', () => {
     deleteGo.disabled = deleteInput.value.trim() !== (cardById(deleteDialog.dataset.cardId)?.title ?? '').trim();
   });
-  $('form', deleteDialog).addEventListener('submit', (event) => {
+  $('form', deleteDialog).addEventListener('submit', async (event) => {
     event.preventDefault();
     const card = cardById(deleteDialog.dataset.cardId);
     if (!card || deleteGo.disabled) return;
+    // The server checks the typed title again.
+    const answer = await send(`/cards/${card.ref}/delete`, { confirm_title: deleteInput.value });
+    if (!answer) return;
     deleteDialog.close();
-    state.cards = state.cards.filter((item) => item !== card);
-    if (state.forms) delete state.forms[card.id];
     const section = card.section;
-    commit();
+    apply(answer);
     $(`[data-section="${CSS.escape(section)}"] .card-link, [data-section="${CSS.escape(section)}"] [data-open-add], [data-section="${CSS.escape(section)}"] .section-empty button`)?.focus({ preventScroll: true });
     showToast(card.kind === 'link' ? 'Tautan dihapus' : 'Form dihapus', card.title);
   });
@@ -405,6 +421,8 @@
   const openUrl = $('[data-open-url]', form);
   const tabs = $$('[data-add-tab]', dialog);
   let imageState = 'none'; // none | loading | ok | error, for the "URL gambar" preview
+  let uploadUrl = ''; // "Unggah gambar": address of the uploaded icon (its path is in the hidden icon_upload field)
+  const UPLOAD_PATH = /\/berkas\/(\d+)$/;
 
   const validUrl = (value) => {
     // http or https with a host (internal names such as http://his are allowed)
@@ -462,8 +480,15 @@
     if (validUrl(url)) { openUrl.href = url; openUrl.removeAttribute('aria-disabled'); }
     else { openUrl.removeAttribute('href'); openUrl.setAttribute('aria-disabled', 'true'); }
     const box = $('[data-preview-icon]', form);
+    box.className = `card-icon tone-${$('input[name="color"]:checked', form)?.value ?? 'teal'}`;
     const imageUrl = field('icon_url').value.trim();
-    if (iconSource() === 'url' && validUrl(imageUrl)) {
+    if (iconSource() === 'upload') {
+      imageState = 'none';
+      const img = uploadUrl ? Object.assign(document.createElement('img'), { className: 'card-icon-img', alt: '', src: uploadUrl }) : null;
+      if (img) box.replaceChildren(img); else box.innerHTML = icon('image');
+      const thumb = $('[data-icon-thumb]', form);
+      if (uploadUrl) thumb.replaceChildren(Object.assign(document.createElement('img'), { alt: '', src: uploadUrl })); else thumb.innerHTML = icon('upload', 'size-5');
+    } else if (iconSource() === 'url' && validUrl(imageUrl)) {
       if (box.querySelector('img')?.getAttribute('src') === imageUrl) return;
       const img = document.createElement('img');
       img.className = 'card-icon-img';
@@ -557,10 +582,16 @@
     field('title').value = linkCard?.title ?? '';
     field('description').value = linkCard?.description ?? '';
     field('url').value = linkCard?.url ?? '';
-    field('icon_url').value = linkCard?.image ?? '';
+    // An uploaded icon is a /berkas/<id> address of this portal; any other image is an https URL.
+    const uploaded = linkCard?.image?.match(UPLOAD_PATH);
+    field('icon_url').value = uploaded ? '' : (linkCard?.image ?? '');
+    field('icon_upload').value = uploaded ? `/berkas/${uploaded[1]}` : '';
+    uploadUrl = uploaded ? linkCard.image : '';
+    $('[data-icon-drop-name]', form).textContent = uploaded ? 'Gambar terpasang. Tarik atau klik untuk mengganti' : 'Tarik gambar ke sini atau klik untuk memilih';
     ($(`input[name="icon"][value="${CSS.escape(linkCard?.icon ?? 'link')}"]`, iconGrid) ?? $('input[name="icon"][value="link"]', iconGrid)).checked = true;
+    ($(`input[name="color"][value="${CSS.escape(linkCard?.color ?? 'teal')}"]`, form) ?? $('input[name="color"][value="teal"]', form)).checked = true;
     filterIcons(form, '');
-    setIconSource(linkCard?.image ? 'url' : 'list');
+    setIconSource(uploaded ? 'upload' : linkCard?.image ? 'url' : 'list');
     resetCardForm(card && !linkCard ? card : null);
     cardPreview();
     setTab(tab);
@@ -581,8 +612,9 @@
     cardPreview();
   });
   cardForm.addEventListener('change', () => cardPreview());
-  cardForm.addEventListener('submit', (event) => {
+  cardForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (submit.disabled) return;
     const title = cardField('title').value.trim().replace(/\s+/g, ' ');
     const description = cardField('description').value.trim().replace(/\s+/g, ' ');
     const keterangan = cardField('keterangan').value.trim();
@@ -601,32 +633,25 @@
       color: $('input[name="color"]:checked', cardForm)?.value ?? 'teal',
     };
     const card = editing;
+    // A dynamic form takes the card title; a built-in module form keeps its own page title (server side).
+    // A new form starts without questions, scheduled every day from today, after the last form card.
+    submit.disabled = true;
+    const answer = await send(card ? `/cards/${card.ref}` : '/forms', { ...values, keterangan }, (error) => {
+      Object.entries(error.errors ?? {}).forEach(([name, message]) => setCardError(name, message));
+      const first = ['title', 'description', 'keterangan'].find((name) => error.errors?.[name]);
+      if (first) cardField(first).focus();
+      else apiError(error);
+    });
+    submit.disabled = false;
+    if (!answer) return;
     dialog.close();
-    state.forms ??= {};
     if (card) {
-      Object.assign(card, values);
-      // A dynamic form takes the card title; a built-in module form keeps its own page title.
-      if (card.kind === 'form') state.forms[card.id] = { ...(state.forms[card.id] ?? { questions: [] }), title, description: keterangan };
-      else if (state.forms[card.id]) state.forms[card.id] = { ...state.forms[card.id], description: keterangan };
-      commit();
+      apply(answer);
       focusCard(card.id);
-      showToast('Kartu diperbarui', card.title);
+      showToast('Kartu diperbarui', values.title);
       return;
     }
-    // A new form starts without questions, scheduled every day from today (Edit Isi Form sets both).
-    const newFormId = uid('form');
-    const added = {
-      id: newFormId, section: 'harian', kind: 'form', builtin: false, ...values, image: null, ...formLinks(newFormId), hidden: false,
-      schedule: { type: 'daily', days: [], month_day: 1, year_md: '', dates: [], start: ymd(nowWib().day), end: '', deadline: '', reminder: false },
-      done_today: false, has_data: false,
-    };
-    const formsSection = state.sections.find((section) => section.kind === 'forms');
-    added.section = formsSection?.id ?? 'harian';
-    // New form cards go after the last form card.
-    const lastForm = state.cards.map((item) => item.section).lastIndexOf(added.section);
-    state.cards.splice(lastForm + 1, 0, added);
-    state.forms[added.id] = { title, description: keterangan, questions: [] };
-    commit(added.id);
+    apply(answer, true);
     showToast('Kartu berhasil ditambahkan', 'Atur pertanyaan dan jadwal lewat menu ⋯ > Edit Isi Form.');
   });
 
@@ -643,7 +668,41 @@
       else { target.dataset.last = target.value; newCat.hidden = true; setError('section_id', ''); }
     } else if (target.name === 'icon_source') setIconSource(target.value);
     else if (target.name === 'icon') { setError('icon', ''); preview(); }
+    else if (target.name === 'color') { setError('color', ''); preview(); }
   });
+  /* "Unggah gambar": a chosen or dropped PNG/JPG is uploaded at once; Simpan keeps its address. */
+  const drop = $('[data-icon-drop]', form);
+  const dropName = $('[data-icon-drop-name]', form);
+  const fileInput = $('[data-icon-file]', form);
+  const uploadIcon = async (file) => {
+    setError('icon_upload', '');
+    if (!file) return;
+    if (!/\.(png|jpe?g)$/i.test(file.name)) { setError('icon_upload', 'Pilih gambar PNG atau JPG.'); return; }
+    if (file.size > 2 * 1024 * 1024) { setError('icon_upload', 'Ukuran gambar maksimal 2 MB.'); return; }
+    const data = new FormData();
+    data.append('gambar', file);
+    drop.setAttribute('aria-busy', 'true');
+    dropName.textContent = 'Mengunggah…';
+    try {
+      const answer = await api(`${API}/icon`, data);
+      field('icon_upload').value = answer.path;
+      uploadUrl = answer.url;
+      dropName.textContent = file.name;
+    } catch (error) {
+      setError('icon_upload', error.errors?.gambar ?? error.message);
+      dropName.textContent = uploadUrl ? 'Gambar terpasang. Tarik atau klik untuk mengganti' : 'Tarik gambar ke sini atau klik untuk memilih';
+    } finally {
+      drop.removeAttribute('aria-busy');
+      preview();
+    }
+  };
+  fileInput.addEventListener('change', () => { uploadIcon(fileInput.files[0]); fileInput.value = ''; });
+  drop.addEventListener('dragover', (event) => { event.preventDefault(); drop.classList.add('is-drag'); });
+  drop.addEventListener('dragleave', () => drop.classList.remove('is-drag'));
+  drop.addEventListener('drop', (event) => { event.preventDefault(); drop.classList.remove('is-drag'); uploadIcon(event.dataTransfer.files[0]); });
+  // A file dropped beside the area must not open in the browser tab.
+  ['dragover', 'drop'].forEach((type) => dialog.addEventListener(type, (event) => { if (event.dataTransfer?.types.includes('Files')) event.preventDefault(); }));
+
   openUrl.addEventListener('click', (event) => {
     if (openUrl.getAttribute('aria-disabled') === 'true') { event.preventDefault(); field('url').focus(); }
   });
@@ -653,17 +712,20 @@
     newCat.hidden = select.value !== '__new';
     select.focus();
   });
-  $('[data-newcat-save]', form).addEventListener('click', () => {
+  $('[data-newcat-save]', form).addEventListener('click', async () => {
     const title = field('category_title').value.trim().replace(/\s+/g, ' ').toUpperCase();
     const error = !title ? 'Nama kategori wajib diisi.'
       : title.length > 32 ? 'Nama kategori maksimal 32 karakter.'
         : state.sections.some((section) => section.title.toUpperCase() === title) ? 'Nama kategori sudah dipakai.' : '';
     setError('category_title', error);
     if (error) { field('category_title').focus(); return; }
-    const section = { id: uid('kategori'), title, icon: $('input[name="category_icon"]:checked', form)?.value ?? 'folder-open', kind: 'links', custom: true };
-    state.sections.push(section);
-    commit();
-    fillSections(section.id);
+    const answer = await send('/sections', { title, icon: $('input[name="category_icon"]:checked', form)?.value ?? 'folder-open' }, (failure) => {
+      const message = failure.errors?.category_title ?? failure.errors?.category_icon;
+      if (message) { setError('category_title', message); field('category_title').focus(); } else apiError(failure);
+    });
+    if (!answer) return;
+    apply(answer);
+    fillSections(answer.id);
     showToast('Kategori dibuat', `${title} tampil sebagai bagian baru di dashboard.`);
     field('title').focus();
   });
@@ -679,12 +741,14 @@
     if (!validUrl(field('url').value.trim())) errors.url = 'Gunakan alamat lengkap yang diawali http:// atau https://';
     if (iconSource() === 'list' && !$('input[name="icon"]:checked', iconGrid)) errors.icon = 'Pilih icon dari daftar.';
     if (iconSource() === 'url') {
-      if (!validUrl(field('icon_url').value.trim())) errors.icon_url = 'Isi URL gambar yang diawali http:// atau https://';
+      // Card images must be https (Content-Security-Policy, img-src https:).
+      if (!validUrl(field('icon_url').value.trim()) || !/^https:\/\//i.test(field('icon_url').value.trim())) errors.icon_url = 'Isi URL gambar yang diawali https://';
       else if (imageState === 'error') errors.icon_url = 'Gambar tidak dapat dimuat dari alamat ini. Periksa URL-nya atau pilih icon dari daftar.';
     }
+    if (iconSource() === 'upload' && !field('icon_upload').value) errors.icon_upload = 'Unggah gambar icon dulu.';
     return errors;
   };
-  form.addEventListener('submit', (event) => {
+  form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (submit.disabled) return;
     clearErrors();
@@ -692,38 +756,50 @@
     const names = Object.keys(errors);
     if (names.length) {
       names.forEach((name) => setError(name, errors[name]));
-      const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url'].find((name) => errors[name]);
+      const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url', 'icon_upload'].find((name) => errors[name]);
       if (first === 'section_id' && field('section_id').value === '__new') field('category_title').focus();
       else if (first === 'icon') ($('input[name="icon"]', iconGrid)).focus();
+      else if (first === 'icon_upload') fileInput.focus();
       else field(first).focus();
       return;
     }
     const section = sectionById(field('section_id').value);
     const values = {
+      section_id: section.id,
       title: field('title').value.trim().replace(/\s+/g, ' '),
       description: field('description').value.trim().replace(/\s+/g, ' '),
+      icon_source: iconSource(),
       icon: $('input[name="icon"]:checked', iconGrid)?.value ?? 'link',
-      image: iconSource() === 'url' ? field('icon_url').value.trim() : null,
+      icon_url: { url: field('icon_url').value.trim(), upload: field('icon_upload').value }[iconSource()] ?? '',
+      color: $('input[name="color"]:checked', form)?.value ?? 'teal',
       url: field('url').value.trim(),
     };
     const card = editing;
+    // A changed category puts the card at the end of its new section (server side).
+    submit.disabled = true;
+    const answer = await send(card ? `/cards/${card.ref}` : '/links', values, (error) => {
+      const names = Object.keys(error.errors ?? {});
+      names.forEach((name) => setError(name, error.errors[name]));
+      const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url', 'icon_upload'].find((name) => error.errors?.[name]);
+      if (first === 'icon') $('input[name="icon"]', iconGrid).focus();
+      else if (first === 'icon_upload') fileInput.focus();
+      else if (first) field(first).focus();
+      else apiError(error);
+    });
+    submit.disabled = false;
+    if (!answer) return;
     dialog.close();
     if (card) {
-      Object.assign(card, values);
-      // A changed category puts the card at the end of its new section.
-      if (card.section !== section.id) {
-        state.cards.splice(state.cards.indexOf(card), 1);
-        card.section = section.id;
-        state.cards.push(card);
-      }
-      commit();
+      apply(answer);
       focusCard(card.id);
-      showToast('Tautan diperbarui', card.title);
+      showToast('Tautan diperbarui', values.title);
       return;
     }
-    const added = { id: uid('tautan'), section: section.id, kind: 'link', builtin: false, ...values, color: 'teal', rekap: null, hidden: false };
-    state.cards.push(added);
-    commit(added.id);
-    showToast('Kartu berhasil ditambahkan', `${added.title} tampil di ${section.title}.`);
+    apply(answer, true);
+    showToast('Kartu berhasil ditambahkan', `${values.title} tampil di ${section.title}.`);
   });
+
+  // FR-P4: coming back with the browser's Back button after sending a form shows the page from its cache;
+  // load it again so the progress and statuses include the new report.
+  window.addEventListener('pageshow', (event) => { if (event.persisted) window.location.reload(); });
 })();

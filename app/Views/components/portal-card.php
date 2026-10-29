@@ -2,7 +2,7 @@
 /**
  * Dashboard card. The title holds the card's link, stretched over the whole card (.card-link), so the
  * ⋯ menu and the footer's "Lihat Rekap" link can sit inside the card without nested links.
- * Monitoring Harian cards (builtin/form) get a schedule badge and a footer: "Lihat Rekap" + today's status. Cards that are
+ * Monitoring Harian form cards get a schedule badge and a footer: "Lihat Rekap" + today's status. Cards that are
  * not due today look muted, but their "Lihat Rekap" stays active. $editable adds the ⋯ menu;
  * data-card feeds public/assets/js/dashboard.js.
  */
@@ -17,7 +17,7 @@ $offSchedule = $status !== null && !$status['due'];
 $isNew = ($newCardId ?? null) !== null && $card['id'] === $newCardId;
 $hasMenu = $editable && (!$isLink || !empty($linkMenus));
 $cardData = [
-    'id' => $card['id'], 'kind' => $card['kind'], 'builtin' => $card['builtin'] ?? false, 'title' => $card['title'],
+    'id' => $card['id'], 'kind' => $card['kind'], 'title' => $card['title'],
     'description' => $card['description'], 'icon' => $card['icon'], 'image' => $card['image'], 'url' => $card['url'],
     'rekap' => $rekap, 'section' => $card['section_id'], 'hidden' => $card['hidden'],
 ];
@@ -49,7 +49,7 @@ $cardData = [
     <?php if (!$isLink): ?>
     <div class="card-foot">
         <?php if ($rekap !== null): ?>
-        <a class="card-rekap" href="<?= e($rekap) ?>" aria-label="<?= e('Lihat rekap ' . $card['title']) ?>"><?= card_icon('chart-column', 'size-4') ?>Lihat Rekap</a>
+        <a class="card-rekap" href="<?= e($rekap) ?>" target="_blank" rel="noopener" aria-label="<?= e('Lihat rekap ' . $card['title']) ?>"><?= card_icon('chart-column', 'size-4') ?>Lihat Rekap</a>
         <?php else: ?>
         <span class="card-tip">
             <button type="button" class="card-rekap is-off" aria-disabled="true" data-no-rekap aria-label="<?= e('Lihat rekap ' . $card['title'] . ' (belum ada laporan)') ?>" aria-describedby="tip-<?= e((string) $card['id']) ?>"><?= card_icon('chart-column', 'size-4') ?>Lihat Rekap</button>

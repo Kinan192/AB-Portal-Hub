@@ -5,9 +5,14 @@ namespace App\Core;
 
 final class Env
 {
+    /** @var array<string, string> the values of this request */
+    private static array $values = [];
+
     /**
      * Load KEY=VALUE pairs from a .env file. Variables already set in the real
      * environment take precedence, so server configuration can override the file.
+     * The values are kept for this request only (read them with get()): putenv() would share them across the
+     * threads of Apache on Windows, where PHP clears them when another request ends.
      */
     public static function load(string $file): void
     {
@@ -24,14 +29,22 @@ final class Env
             }
             [$key, $value] = array_pad(explode('=', $line, 2), 2, '');
             $key = trim($key);
-            if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $key) !== 1 || getenv($key) !== false) {
+            if (preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $key) !== 1) {
                 continue;
             }
-            $value = self::parseValue(trim($value));
-            putenv($key . '=' . $value);
+            $real = getenv($key);
+            $value = $real !== false ? $real : self::parseValue(trim($value));
+            self::$values[$key] = $value;
             $_ENV[$key] = $value;
             $_SERVER[$key] = $value;
         }
+    }
+
+    /** A setting: the real environment when set, else the .env file; false when neither has it. */
+    public static function get(string $key): string|false
+    {
+        $real = getenv($key);
+        return $real !== false ? $real : (self::$values[$key] ?? false);
     }
 
     private static function parseValue(string $value): string

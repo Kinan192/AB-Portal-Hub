@@ -9,12 +9,11 @@ if (PHP_SAPI === 'cli-server') {
         return false;
     }
 }
-header('X-Content-Type-Options: nosniff');
-header('Referrer-Policy: same-origin');
-header('X-Frame-Options: SAMEORIGIN');
-header('Cache-Control: no-store');
 try {
     $router = require dirname(__DIR__) . '/bootstrap/app.php';
+    // In a subfolder (http://localhost/abportal/rekap/suhu) the routes see /rekap/suhu.
+    $path = App\Core\Router::withoutBase($path, url_base());
+    App\Core\SecurityHeaders::send();
     App\Core\Auth::startSession();
     require BASE_PATH . '/routes/web.php';
     $router->dispatch($_SERVER['REQUEST_METHOD'] ?? 'GET', $path);

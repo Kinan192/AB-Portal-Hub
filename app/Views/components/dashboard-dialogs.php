@@ -116,6 +116,7 @@ $iconOption = static fn (string $name, string $keywords, string $field, bool $ch
                         <legend>Icon</legend>
                         <div class="dash-seg">
                             <label><input type="radio" class="sr-only" name="icon_source" value="list" checked><span>Pilih dari daftar</span></label>
+                            <label><input type="radio" class="sr-only" name="icon_source" value="upload"><span>Unggah gambar</span></label>
                             <label><input type="radio" class="sr-only" name="icon_source" value="url"><span>URL gambar</span></label>
                         </div>
                         <div data-icon-panel="list">
@@ -128,11 +129,29 @@ $iconOption = static fn (string $name, string $keywords, string $field, bool $ch
                             <p class="dash-help" data-icon-empty hidden>Icon tidak ditemukan.</p>
                             <p class="dash-error" id="link-icon-error" data-error-for="icon" hidden></p>
                         </div>
+                        <div data-icon-panel="upload" hidden>
+                            <label class="dash-drop" for="link-icon-file" data-icon-drop>
+                                <span class="dash-drop__thumb" data-icon-thumb><?= card_icon('upload', 'size-5') ?></span>
+                                <span class="dash-drop__text"><b data-icon-drop-name>Tarik gambar ke sini atau klik untuk memilih</b><span>PNG atau JPG, maks. 2 MB</span></span>
+                                <input id="link-icon-file" class="sr-only" type="file" accept=".png,.jpg,.jpeg,image/png,image/jpeg" data-icon-file aria-describedby="link-icon-upload-error">
+                            </label>
+                            <input type="hidden" name="icon_upload">
+                            <p class="dash-error" id="link-icon-upload-error" data-error-for="icon_upload" role="alert" hidden></p>
+                        </div>
                         <div data-icon-panel="url" hidden>
                             <input id="link-icon-url" class="dash-input" type="url" inputmode="url" name="icon_url" maxlength="500" placeholder="https://.../logo.png" autocomplete="off" aria-label="URL gambar icon" aria-describedby="link-icon-url-help link-icon-url-error">
-                            <p class="dash-help" id="link-icon-url-help">Gambar persegi PNG, SVG, atau JPG. Pratinjau tampil di kartu.</p>
+                            <p class="dash-help" id="link-icon-url-help">Alamat diawali https://. Gambar persegi PNG, SVG, atau JPG. Pratinjau tampil di kartu.</p>
                             <p class="dash-error" id="link-icon-url-error" data-error-for="icon_url" hidden></p>
                         </div>
+                    </fieldset>
+                    <fieldset class="dash-field">
+                        <legend>Warna icon</legend>
+                        <div class="color-grid">
+                            <?php foreach ($cardStyle['colors'] as $tone => $label): ?>
+                            <label class="color-option" title="<?= e($label) ?>"><input type="radio" class="sr-only" name="color" value="<?= e($tone) ?>"<?= $tone === 'teal' ? ' checked' : '' ?>><span class="color-option__dot tone-<?= e($tone) ?>" aria-hidden="true"></span><span class="sr-only"><?= e($label) ?></span></label>
+                            <?php endforeach; ?>
+                        </div>
+                        <p class="dash-error" data-error-for="color" hidden></p>
                     </fieldset>
                 </div>
                 <aside class="dash-preview" aria-label="Pratinjau kartu tautan">

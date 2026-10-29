@@ -1,0 +1,14 @@
+# Used only when the whole project folder sits inside the web root, e.g. XAMPP htdocs\abportal opened as
+# http://localhost/abportal. Every request goes into public/, so .env, app/, storage/ (uploaded files), vendor/
+# and .git are never reachable from the browser. On a server, point the web root at public/ instead (docs/deploy.md).
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)$ public/$1 [L]
+</IfModule>
+
+# Without mod_rewrite nothing in this folder is served.
+<IfModule !mod_rewrite.c>
+    Require all denied
+</IfModule>

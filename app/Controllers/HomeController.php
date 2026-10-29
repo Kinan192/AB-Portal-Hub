@@ -5,55 +5,46 @@ namespace App\Controllers;
 
 use App\Helpers\DashboardData;
 use App\Helpers\Schedule;
+use App\Services\Progress;
 use DateTimeImmutable;
 
 final class HomeController extends Controller
 {
     public function index(): void
     {
-        // Frontend only: sections and cards come from database/dummy/dashboard.php (no database).
-        $data = dummy('dashboard');
-        $dashboard = config('dashboard');
-        $groups = $this->groups($data['sections'], $data['cards']);
-        // Progress = visible Monitoring Harian forms due today, and how many of them are done.
-        $due = [];
-        foreach ($groups as $group) {
-            if ($group['kind'] === 'forms') {
-                $due = array_merge($due, array_filter($group['cards'], static fn (array $card): bool => !$card['hidden'] && $card['status'] !== null && $card['status']['due']));
-            }
+        // Sections, cards and schedules from the database (App\Models\Dashboard); changes go through
+        // the JSON API of DashboardController (public/assets/js/dashboard.js).
+        $data = $this->dashboardData();
+        if ($data === null) {
+            return;
         }
-        $target = count($due);
-        $completed = count(array_filter($due, static fn (array $card): bool => $card['done_today']));
-        $progress = [
-            'completed' => $completed,
-            'target' => $target,
-            'remaining' => $target - $completed,
-            'percentage' => $target > 0 ? (int) round($completed / $target * 100) : 0,
-            'ratio' => $target > 0 ? $completed / $target : 0,
-        ];
+        $now = new DateTimeImmutable('now');
+        $groups = $this->groups($data['sections'], $data['cards'], $now);
+        // Progress (B7, App\Services\Progress): the section counters and the hero ring follow one rule.
+        $counts = Progress::sections($data['sections'], $data['cards'], $now);
         $this->render('home/index', [
             'pageTitle' => 'Portal Monitoring IT',
             'groups' => $groups,
+            'sectionCounts' => $counts,
             // Card menus (forms and links) and the "Tambah" dialog.
             'editable' => true,
             'showDialogs' => true,
             'linkMenus' => true,
-            // Start state of the in-browser dashboard (public/assets/js/dashboard-store.js keeps changes in sessionStorage).
+            // State of the dashboard for public/assets/js/dashboard.js (redrawn from each API answer).
             'clientState' => DashboardData::clientState($data),
-            'iconNames' => DashboardData::iconNames($data),
+            'iconNames' => DashboardData::iconNames($data, ['triangle-alert', 'chevron-right']),
             'pageScripts' => ['js/dashboard-store.js', 'js/dashboard.js'],
             'linkSections' => array_values(array_filter($groups, static fn (array $group): bool => $group['kind'] === 'links')),
             'newCardId' => null,
             'cardStyle' => config('dashboard-cards'),
-            'progress' => $progress,
-            'profile' => $dashboard['profile'],
+            'progress' => Progress::summary($counts),
+            'profile' => current_profile(),
         ], 'main');
     }
 
     /** @return list<array<string, mixed>> sections with their cards, in display order */
-    private function groups(array $sections, array $cards): array
+    private function groups(array $sections, array $cards, DateTimeImmutable $now): array
     {
-        $now = new DateTimeImmutable('now');
         $groups = [];
         foreach ($sections as $section) {
             $groups[$section['id']] = $section + ['cards' => []];
@@ -66,7 +57,6 @@ final class HomeController extends Controller
                 'id' => $card['id'],
                 'section_id' => $card['section'],
                 'kind' => $card['kind'],
-                'builtin' => $card['kind'] === 'builtin' || !empty($card['builtin']),
                 'title' => $card['title'],
                 'description' => $card['description'],
                 'icon' => $card['icon'],
@@ -81,10 +71,11 @@ final class HomeController extends Controller
                 // Badge and footer status of Monitoring Harian cards (link cards have neither).
                 'label' => isset($card['schedule']) ? Schedule::label($card['schedule']) : null,
                 'status' => isset($card['schedule'])
-                    ? Schedule::status($card['schedule'], !empty($card['done_today']), !empty($card['has_data']), $now)
+                    ? Schedule::status($card['schedule'], !empty($card['done_today']), !empty($card['has_data']), $now, $card['period'] ?? null)
                     : null,
             ];
         }
         return array_values($groups);
     }
+
 }

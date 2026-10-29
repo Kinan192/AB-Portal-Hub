@@ -1,14 +1,61 @@
 {
-  "version": "0.0.1",
-  "configurations": [
-    {
-      "name": "dev",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": [
-        "run",
-        "dev"
-      ],
-      "port": 3000
-    }
-  ]
+    "version": "0.0.1",
+    "configurations": [
+        {
+            "name": "dev",
+            "runtimeExecutable": "npm",
+            "runtimeArgs": [
+                "run",
+                "dev"
+            ],
+            "port": 3000
+        },
+        {
+            "name": "test-db",
+            "runtimeExecutable": "php",
+            "runtimeArgs": [
+                "-S",
+                "127.0.0.1:8081",
+                "-t",
+                "C:/xampp/htdocs/AB-Portal/public",
+                "C:/xampp/htdocs/AB-Portal/public/index.php"
+            ],
+            "env": {
+                "DB_DATABASE": "abportal_test"
+            },
+            "port": 8081
+        },
+        {
+            "name": "b4-check",
+            "runtimeExecutable": "C:\\xampp\\php\\php.exe",
+            "runtimeArgs": [
+                "-S",
+                "127.0.0.1:8084",
+                "-t",
+                "C:/xampp/htdocs/AB-Portal/public",
+                "C:/xampp/htdocs/AB-Portal/public/index.php"
+            ],
+            "env": {
+                "DB_DATABASE": "abportal_b4_check",
+                "APP_ENV": "production"
+            },
+            "port": 8084
+        },
+        {
+            "name": "prod-check",
+            "runtimeExecutable": "C:\\xampp\\php\\php.exe",
+            "runtimeArgs": [
+                "-S",
+                "127.0.0.1:8085",
+                "-t",
+                "C:/xampp/htdocs/AB-Portal/public",
+                "C:/xampp/htdocs/AB-Portal/public/index.php"
+            ],
+            "env": {
+                "APP_ENV": "production",
+                "DB_DATABASE": "abportal_db"
+            },
+            "port": 8085
+        }
+    ]
 }

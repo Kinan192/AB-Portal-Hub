@@ -25,6 +25,8 @@
      content and footer all sit in .page-shell so their left and right edges line up. */
   .page-shell { box-sizing: border-box; width: 100%; max-width: 1440px; margin-inline: auto; padding-inline: 1.25rem; }
   @media (width >= 40rem) { .page-shell { padding-inline: 2rem; } }
+  /* "Kembali ke Dashboard" is 44 px high on every layout (the design layout's pages reset box-sizing). */
+  .breadcrumb-shell .module-action { box-sizing: border-box; }
   @media (width >= 64rem) { .page-shell { width: 90%; padding-inline: 0; } }
 
   /* Icons */
@@ -36,6 +38,47 @@
   /* Navbar */
   .portal-navbar { @apply text-slate-700 antialiased; font-family: Inter, Arial, sans-serif; line-height: 1.5; }
   .header-action { @apply inline-flex items-center justify-center gap-1 rounded border border-slate-300 bg-white px-3 py-1.5 text-[11.7px] font-medium text-slate-600 transition-colors hover:bg-slate-50; }
+
+  /* Profile menu (header) */
+  .profile-menu { @apply relative; }
+  .profile-menu__button { @apply inline-flex min-h-9 items-center gap-2 rounded border border-slate-200 bg-slate-50 py-1 pl-1 pr-2 text-[11.7px] font-bold text-slate-800 transition-colors hover:bg-slate-100; }
+  .profile-menu__button[aria-expanded="true"] { @apply border-teal-600 bg-white; }
+  .profile-menu__button[aria-expanded="true"] svg { transform: rotate(180deg); }
+  .profile-menu__avatar { @apply flex size-7 items-center justify-center rounded bg-teal-600 text-[10.8px] font-bold text-white; }
+  .profile-menu__name { @apply max-w-40 truncate; }
+  .profile-menu__list { @apply absolute right-0 top-full z-50 mt-1.5 w-52 rounded-lg border border-slate-200 bg-white p-1 shadow-lg; }
+  .profile-menu__list[hidden] { display: none; }
+  .profile-menu__list a, .profile-menu__list button { @apply flex min-h-11 w-full items-center gap-2.5 rounded px-3 text-left text-[13px] font-medium text-slate-700 hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none; }
+  .profile-menu__list form { @apply mt-1 border-t border-slate-100 pt-1; }
+  .profile-menu__list .is-danger { @apply text-red-700 hover:bg-red-50 focus-visible:bg-red-50; }
+  /* Notification bell (header): "Perlu perhatian" of the last days, newest first. */
+  .notif-menu { @apply relative; }
+  .notif-menu__button { @apply relative inline-flex size-9 items-center justify-center rounded border border-slate-200 bg-slate-50 text-slate-700 transition-colors hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-teal-700; }
+  .notif-menu__button[aria-expanded="true"] { @apply border-teal-600 bg-white; }
+  .notif-menu__badge { @apply absolute -right-1.5 -top-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-red-600 px-1 text-[10.5px] font-bold leading-none text-white; }
+  .notif-menu__panel { @apply absolute right-0 top-full z-50 mt-1.5 w-[22rem] overflow-hidden rounded-lg border border-slate-200 bg-white shadow-lg; }
+  .notif-menu__panel[hidden] { display: none; }
+  .notif-menu__head { @apply flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-2.5 text-[13px] text-slate-900; }
+  .notif-menu__head > div { @apply grid; }
+  .notif-menu__head span { @apply text-[11.7px] text-slate-500; }
+  .notif-menu__seen-all { @apply min-h-9 rounded px-2 text-[12px] font-semibold text-teal-700 hover:bg-teal-50 focus-visible:outline-2 focus-visible:outline-teal-700; }
+  .notif-menu__seen-all[hidden] { display: none; }
+  .notif-menu__badge[hidden] { display: none; }
+  /* Unseen: a teal dot before the form name; seen: faded. */
+  .notif-menu__list a:not(.is-read) .notif-menu__form::before { content: ""; display: inline-block; width: 7px; height: 7px; margin: 0 6px 1px 0; border-radius: 999px; background: #0d9488; }
+  .notif-menu__list a.is-read { opacity: .55; }
+  .notif-menu__list { @apply m-0 max-h-[60vh] list-none overflow-y-auto p-1; }
+  .notif-menu__list a { @apply grid gap-0.5 rounded px-3 py-2.5 text-left hover:bg-slate-100 focus-visible:bg-slate-100 focus-visible:outline-none; }
+  .notif-menu__form { @apply text-[13px] font-semibold text-slate-900; }
+  .notif-menu__meta { @apply text-[11.7px] text-slate-500; }
+  .notif-menu__reason { @apply text-[12px] text-red-700; }
+  .notif-menu__empty { @apply m-0 px-4 py-6 text-center text-[13px] text-slate-500; }
+  .notif-menu__all { @apply flex min-h-11 items-center justify-center gap-1 border-t border-slate-100 text-[13px] font-semibold text-teal-700 hover:bg-teal-50 focus-visible:bg-teal-50 focus-visible:outline-none; }
+  /* Phones: the menus hang under the whole (sticky) header instead of their button. */
+  @media (max-width: 639px) {
+    .profile-menu, .notif-menu { position: static; }
+    .profile-menu__list, .notif-menu__panel { left: 16px; right: 16px; width: auto; margin-top: 0; }
+  }
 
   /* Breadcrumb */
   .rsab-crumbs { font-size: 13px !important; color: var(--color-rs-muted) !important; gap: 6px !important; row-gap: 4px !important; flex-wrap: wrap; display: flex; align-items: center; }

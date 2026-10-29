@@ -3,13 +3,21 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Audit;
 use App\Core\Auth;
 use App\Core\Database;
+use App\Core\Flash;
+use App\Models\User;
+use App\Services\LoginThrottle;
 use Throwable;
 
+/**
+ * Login and logout (PRD SEC-1 to SEC-4, SEC-12). The CSRF token is checked by App\Core\VerifyCsrf
+ * before these actions run. Unknown username and wrong password give the same message.
+ */
 final class AuthController extends Controller
 {
-    private const DEV_BYPASS_LOG = '/storage/logs/auth-dev-bypass.log';
+    private const WRONG = 'Username atau password salah.';
 
     public function showLogin(): void
     {
@@ -17,99 +25,84 @@ final class AuthController extends Controller
             redirect('/', 302);
             return;
         }
-        $this->renderLogin();
+        $flash = Flash::pull();
+        $this->renderLogin('', $flash !== null && $flash['variant'] === 'error' ? $flash['description'] : null, $flash !== null && $flash['variant'] !== 'error' ? $flash : null);
     }
 
     public function login(): void
     {
         $username = trim((string) ($_POST['username'] ?? ''));
         $password = (string) ($_POST['password'] ?? '');
-        if (!Auth::verifyCsrf($_POST['_token'] ?? null)) {
-            http_response_code(419);
-            $this->renderLogin($username, 'Sesi formulir sudah kedaluwarsa. Silakan coba lagi.');
-            return;
-        }
         if ($username === '' || $password === '') {
             http_response_code(422);
             $this->renderLogin($username, 'Username dan password wajib diisi.');
             return;
         }
-        if (Auth::devBypassEnabled()) {
-            $user = $this->devBypassUser($username);
-        } else {
-            try {
-                $user = $this->verifyAdmin($username, $password);
-            } catch (Throwable $exception) {
-                error_log((string) $exception);
-                http_response_code(503);
-                $this->renderLogin($username, 'Login belum dapat diproses. Periksa koneksi database.');
-                return;
-            }
-        }
-        if ($user === null) {
+        if (mb_strlen($username) > 100 || strlen($password) > 1024) {
             http_response_code(422);
-            $this->renderLogin($username, 'Username atau password salah.');
+            $this->renderLogin(mb_substr($username, 0, 100), self::WRONG);
             return;
         }
-        Auth::login($user);
+        $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+        try {
+            $pdo = Database::connection();
+            $throttle = new LoginThrottle($pdo);
+            $wait = $throttle->lockedFor($username, $ip, time());
+            if ($wait > 0) {
+                Audit::tryLog('login_locked', 'user', null, ['username' => $username]);
+                http_response_code(429);
+                header('Retry-After: ' . $wait);
+                $this->renderLogin($username, 'Terlalu banyak percobaan. Coba lagi dalam ' . max(1, (int) ceil($wait / 60)) . ' menit.');
+                return;
+            }
+            $users = new User($pdo);
+            $account = $users->findByUsername($username);
+            // A dummy hash keeps the timing of unknown usernames close to that of real ones.
+            $hash = $account['password_hash'] ?? '$2y$12$qOFZUH0LWWA8zl1IkMtSB.rHs7dp./m6ZqaorQk5W1.3v7mMILbBy';
+            $valid = password_verify($password, $hash) && $account !== null && (int) $account['is_active'] === 1;
+            $throttle->record($username, $ip, $valid);
+            if (!$valid) {
+                Audit::tryLog('login_failed', 'user', $account !== null ? (int) $account['id'] : null, ['username' => $username]);
+                http_response_code(422);
+                $this->renderLogin($username, self::WRONG);
+                return;
+            }
+            $users->recordLogin((int) $account['id'], User::needsRehash($account['password_hash']) ? User::hash($password) : null);
+        } catch (Throwable $exception) {
+            error_log((string) $exception);
+            http_response_code(503);
+            $this->renderLogin($username, 'Login belum dapat diproses. Periksa koneksi database.');
+            return;
+        }
+
+        Auth::login([
+            'id' => (int) $account['id'],
+            'name' => (string) $account['name'],
+            'username' => (string) $account['username'],
+            'email' => (string) $account['email'],
+            'session_version' => (int) $account['session_version'],
+        ]);
+        Audit::tryLog('login', 'user', (int) $account['id']);
         redirect(Auth::pullIntended('/'), 302);
     }
 
     public function logout(): void
     {
-        if (Auth::verifyCsrf($_POST['_token'] ?? null)) {
-            Auth::logout();
+        $user = Auth::user();
+        if ($user !== null) {
+            Audit::tryLog('logout', 'user', $user['id']);
         }
+        Auth::logout();
         redirect('/login', 302);
     }
 
-    /**
-     * TODO(auth): HAPUS/NONAKTIFKAN sebelum dipakai di server RS.
-     * Development mode only (see Auth::devBypassEnabled()): any non-empty username and
-     * password signs in as a dummy admin. Each use is logged without the password.
-     */
-    private function devBypassUser(string $username): array
-    {
-        $entry = [
-            'time' => date('c'),
-            'event' => 'dev_bypass_login',
-            'username' => mb_strcut($username, 0, 200),
-            'ip' => $_SERVER['REMOTE_ADDR'] ?? null,
-            'user_agent' => mb_strcut((string) ($_SERVER['HTTP_USER_AGENT'] ?? ''), 0, 255),
-        ];
-        $line = json_encode($entry, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE);
-        file_put_contents(BASE_PATH . self::DEV_BYPASS_LOG, $line . PHP_EOL, FILE_APPEND | LOCK_EX);
-
-        return ['id' => null, 'name' => 'Admin (mode pengembangan)', 'email' => $username, 'dev_bypass' => true];
-    }
-
-    /**
-     * The real check: the Username field is matched against users.email (the schema has no
-     * username column). Unknown email and wrong password give the same result.
-     * TODO(auth): limit failed attempts per username and IP (PRD SEC-3) and log
-     * login / login_failed to audit_logs (SEC-12).
-     */
-    private function verifyAdmin(string $email, string $password): ?array
-    {
-        $pdo = Database::connection();
-        $statement = $pdo->prepare('SELECT id, name, email, password_hash FROM users WHERE email = ? AND role = ? AND is_active = 1 LIMIT 1');
-        $statement->execute([$email, 'admin']);
-        $user = $statement->fetch();
-        if ($user === false || !password_verify($password, $user['password_hash'])) {
-            return null;
-        }
-        $pdo->prepare('UPDATE users SET last_login_at = NOW() WHERE id = ?')->execute([$user['id']]);
-
-        return ['id' => (int) $user['id'], 'name' => $user['name'], 'email' => $user['email']];
-    }
-
-    private function renderLogin(string $username = '', ?string $error = null): void
+    private function renderLogin(string $username = '', ?string $error = null, ?array $notice = null): void
     {
         $this->render('auth/login', [
-            'pageTitle' => 'Sign In',
+            'pageTitle' => 'Masuk',
             'username' => $username,
             'error' => $error,
-            'devBypass' => Auth::devBypassEnabled(),
+            'notice' => $notice,
         ], 'auth');
     }
 }

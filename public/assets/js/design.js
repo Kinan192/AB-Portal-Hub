@@ -39,7 +39,7 @@
     toastTimer = window.setTimeout(() => toast.classList.remove('is-show'), 4500);
   };
   $('[data-toast-close]')?.addEventListener('click', () => toast.classList.remove('is-show'));
-  if (toast?.dataset.flashTitle) showToast(toast.dataset.flashTitle, toast.dataset.flashDesc ?? '');
+  if (toast?.dataset.flashTitle) showToast(toast.dataset.flashTitle, toast.dataset.flashDesc ?? '', toast.dataset.flashVariant ?? 'success');
 
   const notAvailable = (label) => showToast('Belum Tersedia', `${label ? `"${label}" ` : 'Fitur ini '}belum tersedia pada prototype ini.`, 'info');
 
@@ -123,27 +123,6 @@
     input.form?.addEventListener('rs:reset', update);
   });
 
-  /* Temperature: live status from the configured bands */
-  const suhuInput = $('#suhuInput');
-  const suhuBadge = $('#suhuStatusBadge');
-  if (suhuInput && suhuBadge) {
-    const BANDS = [
-      { test: (t) => t >= 27, tone: 'text-error', icon: 'circle-alert', text: 'Bahaya / Overheat — segera periksa unit pendingin' },
-      { test: (t) => t > 24 || t < 18, tone: 'text-amber-700', icon: 'triangle-alert', text: 'Peringatan — suhu di luar batas optimal' },
-      { test: () => true, tone: 'text-tertiary', icon: 'circle-check', text: 'Optimal & Sesuai Regulasi Server Data Center' },
-    ];
-    const update = () => {
-      const value = Number.parseFloat(String(suhuInput.value).replace(',', '.'));
-      const band = Number.isNaN(value) ? BANDS[2] : BANDS.find((b) => b.test(Math.round(value * 10) / 10));
-      suhuBadge.classList.remove('text-error', 'text-amber-700', 'text-tertiary');
-      suhuBadge.classList.add(band.tone);
-      suhuBadge.querySelector('.rs-ic').outerHTML = iconHtml(band.icon).replace('class="rs-ic"', 'class="rs-ic text-[18px]"');
-      $('[data-suhu-status]', suhuBadge).textContent = band.text;
-    };
-    suhuInput.addEventListener('input', update);
-    suhuInput.form?.addEventListener('rs:reset', update);
-  }
-
   /* Character counter */
   $$('[data-char-count]').forEach((field) => {
     const output = document.getElementById(field.dataset.charCount);
@@ -177,17 +156,20 @@
   $$('[data-password-form]').forEach((form) => {
     const confirm = form.elements.namedItem('confirmPassword');
     const error = document.getElementById('confirmError');
+    // Quick checks before sending; the server checks every rule again (POST /password).
     form.addEventListener('submit', (event) => {
-      event.preventDefault();
       const empty = $$('input[type="password"], input[type="text"]', form).find((input) => input.value === '');
       const mismatch = form.elements.namedItem('newPassword').value !== confirm.value;
+      if (!empty && !mismatch) {
+        $$('button[type="submit"]', form).forEach((button) => { button.disabled = true; });
+        return;
+      }
+      event.preventDefault();
       error.hidden = !mismatch || Boolean(empty);
       confirm.setAttribute('aria-invalid', String(!error.hidden));
       $('[data-error-text]', error).textContent = 'Konfirmasi password tidak sama dengan password baru.';
       if (empty) { empty.focus(); showToast('Lengkapi semua kolom', 'Semua kolom password wajib diisi.', 'error'); return; }
-      if (mismatch) { confirm.focus(); return; }
-      form.reset();
-      showToast('Password berhasil diperbarui', 'Perubahan masih simulasi; autentikasi belum terhubung.');
+      confirm.focus();
     });
   });
 
