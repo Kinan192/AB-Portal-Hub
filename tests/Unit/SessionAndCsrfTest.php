@@ -74,4 +74,11 @@ final class SessionAndCsrfTest extends TestCase
         self::assertStringNotContainsString('unsafe-inline', SecurityHeaders::CSP);
         self::assertStringNotContainsString('unsafe-eval', SecurityHeaders::CSP);
     }
+
+    public function testHttpsAndHttpSessionsUseDifferentCookies(): void
+    {
+        // An http:// page may not replace a Secure cookie: a shared name breaks login over http:// after https://.
+        self::assertSame('__Secure-abportal_session', Auth::cookieName(true));
+        self::assertSame('abportal_session', Auth::cookieName(false));
+    }
 }

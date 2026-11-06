@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Database;
+use App\Models\AssetAttention;
 use App\Models\AttentionList;
 use App\Services\Attention;
 use PDOException;
@@ -18,7 +19,7 @@ final class AttentionController extends Controller
     private const PER_PAGE = 25;
 
     /**
-     * POST /perlu-perhatian/dilihat {ids: [entry id, …]} or {all: true}: the signed-in account has seen these
+     * POST /perlu-perhatian/dilihat {ids: [entry id, …], services: [ticket id, …]} or {all: true}: the signed-in account has seen these
      * reports (a click in the header bell, or "Tandai semua dilihat"). Answers the bell's new unread count.
      */
     public function markSeen(): void
@@ -32,12 +33,16 @@ final class AttentionController extends Controller
         }
         try {
             $list = new AttentionList(Database::connection());
+            $services = new AssetAttention(Database::connection());
             if (($input['all'] ?? false) === true) {
                 $list->markAllRead($userId, Attention::DAYS);
+                $services->markAllRead($userId);
             } else {
                 $list->markRead($userId, array_slice(is_array($input['ids'] ?? null) ? $input['ids'] : [], 0, 100));
+                // Aset IT services waiting for spare parts: {services: [ticket id, …]}
+                $services->markRead($userId, array_slice(is_array($input['services'] ?? null) ? $input['services'] : [], 0, 100));
             }
-            $unread = $list->recent($userId, Attention::DAYS, 1)['unread'];
+            $unread = Attention::unread($userId);
         } catch (PDOException $exception) {
             error_log('Tandai dilihat: ' . $exception->getMessage());
             json_response(['message' => 'Status dilihat tidak tersimpan.'], 500);
@@ -87,6 +92,8 @@ final class AttentionController extends Controller
             'filterError' => $error,
             'forms' => $forms,
             'rows' => array_map([Attention::class, 'item'], $result['rows']),
+            // Aset IT services waiting for spare parts, as long as they wait (not filtered by form or date).
+            'services' => array_map([Attention::class, 'serviceItem'], Attention::waiting($userId)),
             'from' => $from,
             'countText' => $result['total'] > 0 ? 'Menampilkan ' . ($from + 1) . '–' . ($from + count($result['rows'])) . ' dari ' . $result['total'] . ' laporan' : '0 laporan',
             'page' => $page,

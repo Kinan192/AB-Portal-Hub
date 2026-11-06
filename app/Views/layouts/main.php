@@ -19,11 +19,15 @@ $modulePage = !isset($groups) && empty($portalPage);
     <?php foreach ($pageScripts ?? [] as $script): ?>
     <script src="<?= e(asset($script)) ?>?v=<?= e(filemtime(BASE_PATH . '/public/assets/' . $script)) ?>" defer></script>
     <?php endforeach; ?>
+    <?php // $pageStyles: extra stylesheets after app.css (Aset IT); $bodyData: data-* attributes of <body>. ?>
+    <?php foreach ($pageStyles ?? [] as $style): ?>
+    <link rel="stylesheet" href="<?= e(asset_v($style)) ?>">
+    <?php endforeach; ?>
 </head>
-<body class="flex min-h-screen flex-col<?= $modulePage ? ' module-page' : ' portal-page' ?>">
+<body class="flex min-h-screen flex-col<?= $modulePage ? ' module-page' : ' portal-page' ?><?= e(isset($bodyClass) ? ' ' . $bodyClass : '') ?>"<?= attrs($bodyData ?? []) ?>>
     <a href="#main-content" class="fixed left-4 top-4 z-50 -translate-y-24 rounded-lg bg-teal-800 px-4 py-3 text-sm text-white focus:translate-y-0">Langsung ke konten</a>
     <?php require __DIR__ . '/header.php'; ?>
-    <?php if (!empty($breadcrumbs) || !empty($backToDashboard)): ?>
+    <?php if (!empty($backToDashboard)): ?>
     <div class="breadcrumb-shell page-shell py-5<?= !empty($backToDashboard) ? ' is-sticky' : '' ?>">
         <?php // $breadcrumbWidth: a page with a narrow centred column lines the row up with it (breadcrumb-fill, breadcrumb-editor). ?>
         <div class="<?= e($breadcrumbWidth ?? '') ?>">

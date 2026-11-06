@@ -318,6 +318,28 @@
   .rs-input input:hover { border-color: #aebbb8; }
   .rs-input input:focus { outline: none; border-color: var(--color-rs-teal-600); box-shadow: 0 0 0 3px rgba(19, 133, 113, .15); }
   .rs-input input[aria-invalid="true"] { border-color: var(--color-rs-err) !important; box-shadow: 0 0 0 3px rgba(180, 35, 24, .1) !important; }
+  .rs-input select, .rs-input textarea {
+    width: 100%; min-height: 42px; padding: 9px 12px; border: 1px solid #cdd6d4; border-radius: var(--radius-rs);
+    font: inherit; font-size: 14px; color: var(--color-rs-ink); background: #fff; transition: border-color .15s, box-shadow .15s;
+  }
+  .rs-input textarea { resize: vertical; line-height: 1.5; }
+  .rs-input select:focus, .rs-input textarea:focus { outline: none; border-color: var(--color-rs-teal-600); box-shadow: 0 0 0 3px rgba(19, 133, 113, .15); }
+  .rs-input select[aria-invalid="true"], .rs-input textarea[aria-invalid="true"] { border-color: var(--color-rs-err) !important; }
+  /* Pengaturan Email */
+  .rs-subhead { margin: 4px 0 -6px; font-size: 12px; font-weight: 600; letter-spacing: .05em; text-transform: uppercase; color: var(--color-rs-muted); }
+  .rs-subhead:not(:first-of-type) { margin-top: 10px; padding-top: 16px; border-top: 1px solid var(--color-rs-line-2); }
+  .rs-field-row { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 600px) { .rs-field-row { grid-template-columns: minmax(0, 1fr); } }
+  .rs-check { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; color: var(--color-rs-ink-2); margin-top: -8px; cursor: pointer; }
+  .rs-check input { width: 16px; height: 16px; accent-color: var(--color-rs-teal-700); }
+  .rs-stack { display: flex; flex-direction: column; gap: 20px; min-width: 0; }
+  .rs-steps { margin: 0; padding-left: 20px; list-style: decimal; display: flex; flex-direction: column; gap: 8px; font-size: 13.5px; color: var(--color-rs-ink-2); line-height: 1.55; }
+  .rs-steps code, .rs-help code { font-family: ui-monospace, Menlo, monospace; font-size: 12px; background: var(--color-rs-line-2); padding: 1px 5px; border-radius: 4px; }
+  .rs-mail-test { display: flex; flex-direction: column; align-items: flex-start; gap: 8px; padding-top: 14px; border-top: 1px solid var(--color-rs-line-2); }
+  .rs-mail-test .rs-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .rs-pill--muted { background: var(--color-rs-line-2); color: var(--color-rs-ink-2); }
+  .rs-pill--warn { background: #fdf3e1; color: #9a5b00; }
+  .rs-pill--muted i, .rs-pill--warn i { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
   .rs-input__toggle { position: absolute; right: 4px; width: 36px; height: 34px; border: 0; border-radius: 6px; display: grid; place-items: center; font-size: 17px; }
   .rs-help { font-size: 12.5px; color: var(--color-rs-muted); margin: 0; }
   .rs-error { font-size: 12.5px; color: var(--color-rs-err); margin: 0; display: flex; align-items: center; gap: 6px; }

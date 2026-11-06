@@ -21,9 +21,7 @@ final class RequireLogin
             json_response(['message' => 'Sesi berakhir. Muat ulang halaman lalu masuk kembali.'], 401);
             return false;
         }
-        if ($method === 'GET') {
-            Auth::rememberIntended($path . (($_SERVER['QUERY_STRING'] ?? '') !== '' ? '?' . $_SERVER['QUERY_STRING'] : ''));
-        }
+        // After signing in, everyone starts on the Form dashboard (AuthController::login), not the page asked for here.
         redirect('/login', 302);
         return false;
     }

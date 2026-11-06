@@ -115,7 +115,9 @@
       const toggle = $(`[name="${CSS.escape(input.name)}"][data-other-toggle]`, el);
       if (toggle) {
         const text = $(`[name="${CSS.escape(`${input.name}-other`)}"]`, el);
+        // The write-in box shows only while "Lainnya" is picked.
         text.disabled = !toggle.checked;
+        text.hidden = !toggle.checked;
         if (toggle.checked && input === toggle) text.focus();
       }
     }
@@ -153,7 +155,7 @@
       $$('.gf-card.is-invalid', el).forEach(clearError);
       $$('[data-file-name]', el).forEach((out) => { out.hidden = true; });
       $$('.fd-star.is-on', el).forEach((star) => star.classList.remove('is-on'));
-      $$('.gf-option-other', el).forEach((text) => { text.disabled = true; });
+      $$('.gf-option-other', el).forEach((text) => { text.disabled = true; text.hidden = true; });
       sync();
       dirty = false;
     }, 0);
@@ -250,7 +252,7 @@
       const other = q.other ? values.find((v) => !known.includes(v)) : undefined;
       $$(`[name="${CSS.escape(name(q))}"]`, el).forEach((input) => { input.checked = input.value === '__other' ? other !== undefined : values.includes(input.value); });
       const text = el.elements.namedItem(`${name(q)}-other`);
-      if (text) { text.value = other ?? ''; text.disabled = other === undefined; }
+      if (text) { text.value = other ?? ''; text.disabled = other === undefined; text.hidden = other === undefined; }
       const stars = cardOf(q)?.querySelector('[data-rating]');
       if (stars) $$('.fd-star', stars).forEach((star, i) => star.classList.toggle('is-on', i < +(values[0] ?? 0)));
     } else if (q.type === 'confirm') {
@@ -317,7 +319,7 @@
       }
       $('[data-fill-success-rekap]', dialog).href = answer.rekap_url ?? responsesUrl;
       dialog.showModal();
-      $('[data-fill-success-rekap]', dialog).focus();
+      $('[data-fill-success-home]', dialog).focus();
     } catch (error) {
       if (error.status === 409 && error.data?.entry_no) {
         showToast('Sudah terkirim', `Form ini sudah tersimpan sebagai ${error.data.entry_no}.`, 'info');

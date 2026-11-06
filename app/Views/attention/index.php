@@ -2,7 +2,8 @@
 /**
  * "Perlu perhatian" (AttentionController): every report with an answer marked red, newest first, as a sheet
  * (fr-* styles of the recap pages, resources/css/form-dinamis.css). Filters are a plain GET form.
- * @var array $filters  @var ?string $filterError  @var array<string, string> $forms  @var list<array> $rows
+ * Above it, the Aset IT services waiting for spare parts ($services, Attention::serviceItem()).
+ * @var array $filters  @var ?string $filterError  @var array<string, string> $forms  @var list<array> $rows  @var list<array> $services
  */
 ?>
 <main id="main-content" class="fr-page page-shell flex-1 pb-12">
@@ -14,6 +15,32 @@
                 <h1 class="fr-head__title">Perlu perhatian</h1>
             </div>
         </header>
+
+        <?php if ($services !== []): ?>
+        <section class="fr-card" aria-labelledby="fr-svc-title">
+            <div class="fr-card__head">
+                <h2 id="fr-svc-title"><?= card_icon('wrench', 'size-4') ?>Servis menunggu suku cadang</h2>
+                <span class="fr-count"><?= count($services) ?> servis</span>
+            </div>
+            <div class="fr-table-wrap" role="region" aria-label="Servis menunggu suku cadang" tabindex="0">
+                <table class="fr-table">
+                    <thead><tr><th scope="col">Menunggu sejak</th><th scope="col">No. tiket</th><th scope="col">Perangkat</th><th scope="col">Masalah dan catatan</th><th scope="col">Teknisi / vendor</th><th scope="col"><span class="sr-only">Buka</span></th></tr></thead>
+                    <tbody>
+                    <?php foreach ($services as $svc): ?>
+                        <tr<?= $svc['read'] ? ' class="fr-row--read"' : '' ?>>
+                            <td class="fr-nowrap"><?= e($svc['when']) ?></td>
+                            <td class="fr-nowrap"><?= e($svc['entry_no']) ?></td>
+                            <td><b><?= e($svc['device']) ?></b></td>
+                            <td><span class="fr-value fr-attention"><?= e(implode("\n", $svc['reasons'])) ?></span></td>
+                            <td><?= e($svc['technician']) ?></td>
+                            <td class="fr-nowrap"><a class="dash-btn dash-btn--ghost dash-btn--sm" href="<?= e($svc['url']) ?>" aria-label="<?= e('Buka ' . $svc['entry_no']) ?>">Buka<?= card_icon('chevron-right', 'size-4') ?></a></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        <?php endif; ?>
 
         <section class="fr-card" aria-labelledby="fr-table-title">
             <div class="fr-card__head">

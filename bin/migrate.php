@@ -3,7 +3,8 @@ declare(strict_types=1);
 
 // Versioned database changes (database/migrations/, see App\Core\Migrator).
 // Usage:
-//   php bin/migrate.php            apply every pending migration (one new batch)
+//   php bin/migrate.php            apply every pending migration (one new batch); on a new install it
+//                                  also creates the database if missing and runs the seeds
 //   php bin/migrate.php status     list applied and pending migrations
 //   php bin/migrate.php down       undo the last batch (asks to type YA; --yes skips the question)
 //   php bin/migrate.php seed       run database/seeds/*.php (each seed skips tables that already hold data)
@@ -25,15 +26,47 @@ $report = static function (string $line): void {
 };
 
 try {
-    $pdo = Database::connection();
+    try {
+        $pdo = Database::connection();
+    } catch (PDOException $missing) {
+        // A fresh install: `migrate` creates the database named in DB_DATABASE (utf8mb4), then
+        // carries on. Other commands, and any other connection error, stop here as before.
+        if ($command !== 'up' || (int) ($missing->errorInfo[1] ?? 0) !== 1049 || !preg_match('/^[A-Za-z0-9_]{1,64}$/', $database)) {
+            throw $missing;
+        }
+        $server = Database::connect(['database' => ''] + config('database'));
+        $server->exec("CREATE DATABASE IF NOT EXISTS `{$database}` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci");
+        echo "Database {$database} belum ada, sudah dibuat." . PHP_EOL;
+        $pdo = Database::connection();
+    }
     $migrator = new Migrator($pdo, BASE_PATH . '/database/migrations');
     $migrator->prepare();
+    $runSeeds = static function () use ($pdo): void {
+        $seeds = glob(BASE_PATH . '/database/seeds/*.php') ?: [];
+        sort($seeds, SORT_STRING);
+        if ($seeds === []) {
+            echo 'Tidak ada seed.' . PHP_EOL;
+            return;
+        }
+        foreach ($seeds as $seed) {
+            echo '  Seed ' . basename($seed) . PHP_EOL;
+            (require $seed)($pdo);
+        }
+    };
 
     switch ($command) {
         case 'up':
             echo "Migrasi database {$database}" . PHP_EOL;
+            // A database with no migration yet is a new install: fill the starting dashboard
+            // right after, so one command is enough. Existing databases are never re-seeded here.
+            $fresh = $migrator->applied() === [];
             $count = $migrator->up($report);
             echo $count === 0 ? 'Tidak ada migrasi baru.' . PHP_EOL : "Selesai: {$count} migrasi diterapkan." . PHP_EOL;
+            if ($fresh && $count > 0) {
+                echo 'Database baru: mengisi data awal' . PHP_EOL;
+                $runSeeds();
+                echo 'Langkah berikutnya: buat akun admin dengan php bin/create-admin.php' . PHP_EOL;
+            }
             break;
 
         case 'status':
@@ -66,16 +99,7 @@ try {
             break;
 
         case 'seed':
-            $seeds = glob(BASE_PATH . '/database/seeds/*.php') ?: [];
-            sort($seeds, SORT_STRING);
-            if ($seeds === []) {
-                echo 'Tidak ada seed.' . PHP_EOL;
-                break;
-            }
-            foreach ($seeds as $seed) {
-                echo '  Seed ' . basename($seed) . PHP_EOL;
-                (require $seed)($pdo);
-            }
+            $runSeeds();
             break;
 
         default:

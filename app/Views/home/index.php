@@ -16,28 +16,6 @@
         </div>
     </section>
 
-<<<<<<< HEAD
-=======
-    <?php if ($exceptions !== []): ?>
-    <section class="dash-attention" aria-labelledby="attention-title">
-        <h2 id="attention-title" class="dash-attention__title"><?= card_icon('triangle-alert', 'size-3.5') ?>Perlu perhatian</h2>
-        <ul class="dash-attention__list">
-            <?php foreach ($exceptions as $item): ?>
-            <li>
-                <a class="dash-attention__item" href="<?= e($item['url']) ?>">
-                    <span class="dash-attention__module"><?= e($item['module']) ?></span>
-                    <span class="dash-attention__no"><?= e($item['entry_no']) ?></span>
-                    <span class="dash-attention__when"><?= e($item['when']) ?></span>
-                    <span class="dash-attention__chip dash-attention__chip--<?= e($item['tone']) ?>"><?= e($item['status']) ?></span>
-                    <?= card_icon('chevron-right', 'size-4 dash-attention__go') ?>
-                </a>
-            </li>
-            <?php endforeach; ?>
-        </ul>
-    </section>
-    <?php endif; ?>
-
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     <div id="dashboard-sections" class="space-y-5">
     <?php foreach ($groups as $index => $group):
         $sectionId = 'section-' . e((string) ($group['id'] ?? $group['slug']));
@@ -48,10 +26,7 @@
         // Counter of the section: the same numbers the hero ring adds up (App\Services\Progress).
         $dueCount = $sectionCounts[$group['id']]['due'] ?? 0;
         $doneCount = $sectionCounts[$group['id']]['done'] ?? 0;
-<<<<<<< HEAD
         // "Jadwal Hari Ini" lists what is still to do: due today and not yet filled today ("Semua Form" shows the rest).
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
         if ($isForms) {
             $group['cards'] = array_values(array_filter($group['cards'], static fn (array $card): bool => $card['hidden'] || ($isDue($card) && !$card['done_today'])));
         }
@@ -101,9 +76,16 @@
         <?php endif; ?>
         <?php elseif ($group['cards'] === []): ?>
         <div class="section-empty">
+            <?php if ($editable && $showDialogs): // The empty box opens "Tambah" on this section's tab. ?>
+            <button type="button" class="section-empty__add"<?= $isForms ? ' data-open-add' : ' data-open-add-link="' . e((string) $group['id']) . '"' ?> aria-haspopup="dialog">
+                <?= card_icon($isForms ? 'clipboard-list' : 'link', 'size-6') ?>
+                <b><?= $isForms ? 'Belum ada form di bagian ini' : 'Belum ada tautan di bagian ini' ?></b>
+                <span><?= $isForms ? 'Klik untuk membuat form.' : 'Klik untuk menambah tautan.' ?></span>
+            </button>
+            <?php else: ?>
             <?= card_icon($isForms ? 'clipboard-list' : 'link', 'size-6 text-slate-400') ?>
             <b><?= $isForms ? 'Belum ada form di bagian ini' : 'Belum ada tautan di bagian ini' ?></b>
-            <span><?= $isForms ? 'Buat form monitoring pertama untuk mulai mencatat.' : 'Tambahkan tautan lewat tombol + Tambah, tab Kategori & Tautan.' ?></span>
+            <?php endif; ?>
             <?php if ($editable && $group['custom']): ?>
             <button type="button" class="section-textbtn section-textbtn--danger" data-delete-section="<?= e((string) $group['id']) ?>"><?= card_icon('trash-2', 'size-3.5') ?>Hapus kategori ini</button>
             <?php endif; ?>

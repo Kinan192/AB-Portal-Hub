@@ -112,10 +112,12 @@ final class RecapExportTest extends TestCase
         self::assertStringContainsString('AC &lt;mati&gt;', $body);
         self::assertStringContainsString('Diketahui oleh,<br>Kepala Instalasi IT', $body);
         self::assertStringContainsString('Admin IT', $body);
+        // The empty row to sign in sits between the titles and the names, and has a height mPDF keeps.
+        self::assertMatchesRegularExpression('/Kepala Instalasi IT<\/td><\/tr><tr><td class="sign-space">/', $body);
+        self::assertStringContainsString('.sign td.sign-space { height: 22mm; }', $parts['css']);
         self::assertSame(1, $parts['rows']);
     }
 
-<<<<<<< HEAD
     public function testPdfSignatureUsesTheFormTexts(): void
     {
         $sign = ['left_title' => 'Disusun oleh,', 'left_role' => 'Staf IT', 'left_name' => '', 'right_title' => 'Mengetahui,', 'right_role' => 'Manajer <IT>', 'right_name' => 'dr. Rina'];
@@ -127,8 +129,6 @@ final class RecapExportTest extends TestCase
         self::assertStringNotContainsString('Kepala Instalasi IT', $body);
     }
 
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     public function testClearDeskPdfGroupsBySessionWithSubtotals(): void
     {
         $row = static fn (string $session, bool $ok): array => ['cells' => [$session], 'group' => $session, 'group_title' => 'Sesi ' . $session, 'ok' => $ok];

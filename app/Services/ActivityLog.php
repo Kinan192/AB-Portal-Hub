@@ -31,31 +31,29 @@ final class ActivityLog
         'move' => 'Dipindah', 'hide' => 'Disembunyikan', 'show' => 'Ditampilkan', 'duplicate' => 'Diduplikat',
         'login' => 'Masuk', 'logout' => 'Keluar', 'login_failed' => 'Gagal masuk', 'login_locked' => 'Login dikunci',
         'password_change' => 'Ganti password', 'password_change_failed' => 'Ganti password gagal',
+        'mail_test' => 'Tes email', 'mail_test_failed' => 'Tes email gagal',
     ];
+    /** Fields of the "Pengaturan Email" page (the password is only ever named, never shown). */
+    private const MAIL_FIELDS = ['host' => 'Server SMTP', 'port' => 'Port', 'encryption' => 'Keamanan', 'username' => 'Username',
+        'password' => 'Password', 'from_address' => 'Email pengirim', 'from_name' => 'Nama pengirim', 'alert_to' => 'Penerima pengingat'];
 
     /** Objects of the filter; the former Suhu/CCTV/Clear Desk modules only name old rows. */
     public const ENTITIES = [
         'form_entry' => 'Laporan form', 'form' => 'Edit Isi Form', 'dashboard_card' => 'Kartu dashboard',
-        'dashboard_section' => 'Bagian dashboard', 'rekap' => 'Ekspor rekap', 'user' => 'Akun admin',
+        'dashboard_section' => 'Bagian dashboard', 'rekap' => 'Ekspor rekap', 'user' => 'Akun admin', 'asset' => 'Aset IT', 'mail_settings' => 'Pengaturan email',
     ];
     private const OLD_ENTITIES = ['temperature_entry' => 'Suhu server', 'cctv_entry' => 'CCTV', 'cleardesk_session' => 'Clear Desk'];
 
-    private const TONES = ['delete' => 'warn', 'login_failed' => 'bad', 'login_locked' => 'bad', 'password_change_failed' => 'bad', 'export' => 'ok'];
+    private const TONES = ['mail_test_failed' => 'bad', 'mail_test' => 'ok', 'delete' => 'warn', 'login_failed' => 'bad', 'login_locked' => 'bad', 'password_change_failed' => 'bad', 'export' => 'ok'];
     private const FORMATS = ['xlsx' => 'Excel', 'pdf' => 'PDF', 'cetak' => 'Cetak'];
     private const MODULES = ['rekap-suhu' => 'Suhu server', 'rekap-cctv' => 'CCTV', 'rekap-cleardesk' => 'Clear Desk'];
     /** Labels of dashboard, editor and account fields; module fields come from their controllers. */
     private const LABELS = [
-<<<<<<< HEAD
         'title' => 'Judul', 'url' => 'Alamat', 'icon' => 'Ikon', 'icon_attachment_id' => 'Ikon (unggahan)', 'icon_url' => 'Ikon (alamat)', 'image_url' => 'Ikon (gambar)',
         'section' => 'Bagian', 'section_id' => 'Bagian', 'badge' => 'Label', 'description' => 'Keterangan', 'questions' => 'Pertanyaan',
         'schedule' => 'Jadwal', 'color' => 'Warna', 'kind' => 'Jenis', 'workstation' => 'Workstation', 'berkas' => 'Bukti',
         'left_title' => 'TTD kiri: judul', 'left_role' => 'TTD kiri: jabatan', 'left_name' => 'TTD kiri: nama',
         'right_title' => 'TTD kanan: judul', 'right_role' => 'TTD kanan: jabatan', 'right_name' => 'TTD kanan: nama',
-=======
-        'title' => 'Judul', 'url' => 'Alamat', 'icon' => 'Ikon', 'icon_attachment_id' => 'Ikon (unggahan)', 'icon_url' => 'Ikon (alamat)',
-        'section' => 'Bagian', 'section_id' => 'Bagian', 'badge' => 'Label', 'description' => 'Keterangan', 'questions' => 'Pertanyaan',
-        'schedule' => 'Jadwal', 'color' => 'Warna', 'kind' => 'Jenis', 'workstation' => 'Workstation', 'berkas' => 'Bukti',
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
     ];
 
     /** @return array{from: string, to: string, from_utc: ?string, to_utc: ?string, group: string, actions: list<string>, entity: string, q: string, page: int, error: ?string} */
@@ -129,6 +127,21 @@ final class ActivityLog
             foreach (array_slice($shown, 0, 3, true) as $field => $v) {
                 $lines[] = $label((string) $field) . ': ' . $value($v);
             }
+        }
+        if ($type === 'mail_settings') {
+            $object = 'Pengaturan Email';
+            if (is_array($meta['fields'] ?? null)) {
+                $lines[] = 'Diubah: ' . implode(', ', array_map(static fn ($f): string => self::MAIL_FIELDS[$f] ?? (string) $f, $meta['fields']));
+            }
+            if (is_string($meta['to'] ?? null)) {
+                $lines[] = 'Ke: ' . $value($meta['to']);
+            }
+            if (is_string($meta['reason'] ?? null)) {
+                $lines[] = mb_strimwidth($meta['reason'], 0, 160, '…');
+            }
+        }
+        if ($type === 'asset' && is_string($meta['text'] ?? null)) {
+            $lines[] = mb_strimwidth($meta['text'], 0, 160, '…');
         }
         if (isset($meta['url']) && is_string($meta['url'])) {
             $lines[] = 'Alamat: ' . $value($meta['url']);

@@ -90,9 +90,11 @@
         + `<button type="button" class="dash-btn dash-btn--ghost dash-btn--sm" data-filter="all">${icon('list-checks', 'size-4')}Lihat Semua Form</button></div>`
         + (cards.length ? `<div class="card-grid--forms grid grid-cols-1 gap-3.5">${cards.map((card) => cardHtml(card, now)).join('')}</div>` : '');
     } else if (!cards.length) {
-      body = `<div class="section-empty">${icon(isForms ? 'clipboard-list' : 'link', 'size-6 text-slate-400')}`
+      // The empty box opens "Tambah" on this section's tab (links: this category already chosen).
+      body = '<div class="section-empty">'
+        + `<button type="button" class="section-empty__add" ${isForms ? 'data-open-add' : `data-open-add-link="${esc(section.id)}"`} aria-haspopup="dialog">${icon(isForms ? 'clipboard-list' : 'link', 'size-6')}`
         + `<b>${isForms ? 'Belum ada form di bagian ini' : 'Belum ada tautan di bagian ini'}</b>`
-        + `<span>${isForms ? 'Buat form monitoring pertama untuk mulai mencatat.' : 'Tambahkan tautan lewat tombol + Tambah, tab Kategori &amp; Tautan.'}</span>`
+        + `<span>${isForms ? 'Klik untuk membuat form.' : 'Klik untuk menambah tautan.'}</span></button>`
         + (section.custom ? `<button type="button" class="section-textbtn section-textbtn--danger" data-delete-section="${esc(section.id)}">${icon('trash-2', 'size-3.5')}Hapus kategori ini</button>` : '')
         + '</div>';
     } else {
@@ -570,13 +572,14 @@
 
   let editing = null; // the card being edited, or null when adding
   /* mode: no card = "Tambah" (both tabs) · link card = "Edit Tautan" · form card = "Edit Kartu" */
-  const openAdd = (card = null) => {
+  // start (adding only): { tab: 'link', section } opens "Kategori & Tautan" with that category chosen.
+  const openAdd = (card = null, start = {}) => {
     editing = card;
-    const tab = card ? (card.kind === 'link' ? 'link' : 'form') : 'form';
+    const tab = card ? (card.kind === 'link' ? 'link' : 'form') : (start.tab ?? 'form');
     const linkCard = card?.kind === 'link' ? card : null;
     form.reset();
     clearErrors();
-    fillSections(linkCard?.section ?? null);
+    fillSections(linkCard?.section ?? start.section ?? null);
     $('[data-dialog-title]', dialog).textContent = card ? (linkCard ? 'Edit Tautan' : 'Edit Kartu') : 'Tambah';
     $('[data-add-tabs]', dialog).hidden = Boolean(card);
     field('title').value = linkCard?.title ?? '';
@@ -601,7 +604,11 @@
     showChosenIcon(form);
     showChosenIcon(cardForm);
   };
-  document.addEventListener('click', (event) => { if (event.target.closest('[data-open-add]')) openAdd(); });
+  document.addEventListener('click', (event) => {
+    if (event.target.closest('[data-open-add]')) openAdd();
+    const emptyLinks = event.target.closest('[data-open-add-link]');
+    if (emptyLinks) openAdd(null, { tab: 'link', section: emptyLinks.dataset.openAddLink });
+  });
   const openLinkEdit = (card) => openAdd(card);
   const openCardEdit = (card) => openAdd(card);
   dialog.addEventListener('close', () => { editing = null; });
@@ -770,12 +777,8 @@
       description: field('description').value.trim().replace(/\s+/g, ' '),
       icon_source: iconSource(),
       icon: $('input[name="icon"]:checked', iconGrid)?.value ?? 'link',
-<<<<<<< HEAD
       icon_url: { url: field('icon_url').value.trim(), upload: field('icon_upload').value }[iconSource()] ?? '',
       color: $('input[name="color"]:checked', form)?.value ?? 'teal',
-=======
-      icon_url: iconSource() === 'url' ? field('icon_url').value.trim() : '',
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
       url: field('url').value.trim(),
     };
     const card = editing;
@@ -784,14 +787,9 @@
     const answer = await send(card ? `/cards/${card.ref}` : '/links', values, (error) => {
       const names = Object.keys(error.errors ?? {});
       names.forEach((name) => setError(name, error.errors[name]));
-<<<<<<< HEAD
       const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url', 'icon_upload'].find((name) => error.errors?.[name]);
       if (first === 'icon') $('input[name="icon"]', iconGrid).focus();
       else if (first === 'icon_upload') fileInput.focus();
-=======
-      const first = ['section_id', 'title', 'description', 'url', 'icon', 'icon_url'].find((name) => error.errors?.[name]);
-      if (first === 'icon') $('input[name="icon"]', iconGrid).focus();
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
       else if (first) field(first).focus();
       else apiError(error);
     });

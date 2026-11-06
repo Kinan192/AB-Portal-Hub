@@ -12,7 +12,6 @@
             <time id="portal-clock" class="inline-flex items-center rounded border border-slate-200 bg-slate-100/90 px-3 py-1.5 text-[11.7px] font-medium text-slate-600" datetime="<?= e(date(DATE_ATOM)) ?>">
                 <span data-clock-text><?= e(date('d/m/Y H:i:s')) ?> WIB</span>
             </time>
-<<<<<<< HEAD
             <?php if (\App\Core\Auth::check()): $bell = \App\Services\Attention::notifications(); ?>
             <div class="notif-menu" data-notif-menu>
                 <button type="button" class="notif-menu__button" aria-expanded="false" aria-controls="notif-panel" data-notif-toggle
@@ -31,7 +30,8 @@
                     <?php else: ?>
                     <ul class="notif-menu__list">
                         <?php foreach ($bell['items'] as $item): ?>
-                        <li><a href="<?= e($item['url']) ?>" data-notif-id="<?= (int) $item['id'] ?>"<?= $item['read'] ? ' class="is-read"' : '' ?>>
+                        <?php $isService = ($item['kind'] ?? '') === 'service'; // Aset IT service waiting for spare parts ?>
+                        <li><a href="<?= e($item['url']) ?>" <?= $isService ? 'data-notif-svc="' . e($item['id']) . '"' : 'data-notif-id="' . (int) $item['id'] . '"' ?><?= $item['read'] ? ' class="is-read"' : '' ?>>
                             <span class="notif-menu__form"><?= e($item['form']) ?></span>
                             <span class="notif-menu__meta"><?= e($item['entry_no']) ?> · <?= e($item['when']) ?></span>
                             <?php if ($item['reasons'] !== []): ?><span class="notif-menu__reason"><?= e(implode('; ', $item['reasons'])) ?></span><?php endif; ?>
@@ -43,23 +43,35 @@
                 </div>
             </div>
             <?php endif; ?>
-=======
-            <span class="inline-flex items-center gap-1.5 rounded border border-emerald-200 bg-emerald-50 px-2.5 py-1.5 text-[11.7px] font-semibold text-emerald-800" title="Status halaman portal, bukan status layanan eksternal">
-                <span class="size-2 rounded-full bg-emerald-500" aria-hidden="true"></span>Portal aktif
-            </span>
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
-            <div class="profile-menu" data-profile-menu>
-                <button type="button" class="profile-menu__button" aria-haspopup="menu" aria-expanded="false" aria-controls="profile-menu-list" data-profile-toggle>
-                    <span class="profile-menu__avatar"><?= e($profile['initials'] ?? 'IT') ?></span>
-                    <span class="profile-menu__name"><?= e($profile['name'] ?? 'Admin') ?></span>
-                    <?= icon('chevron-down', 'size-3.5') ?>
-                </button>
-                <div class="profile-menu__list" id="profile-menu-list" role="menu" hidden>
-                    <a role="menuitem" href="<?= e(url('/password')) ?>"><?= icon('lock', 'size-4') ?>Ubah password</a>
-                    <a role="menuitem" href="<?= e(url('/riwayat-aktivitas')) ?>"><?= icon('history', 'size-4') ?>Riwayat aktivitas</a>
-                    <form method="post" action="<?= e(url('/logout')) ?>"><?= csrf_field() ?><button type="submit" role="menuitem" class="is-danger"><?= icon('logout', 'size-4') ?>Logout</button></form>
-                </div>
-            </div>
+            <?php if (\App\Core\Auth::check()): ?>
+            <button type="button" class="side-menu__open" aria-haspopup="dialog" aria-controls="side-menu" aria-label="Buka menu" data-side-menu-open><?= card_icon('menu', 'size-5') ?></button>
+            <?php endif; ?>
         </div>
     </div>
 </header>
+<?php if (\App\Core\Auth::check()):
+    // Side menu (hamburger): the signed-in account, the portal's pages (the page shown is marked) and Logout.
+    $navPath = \App\Services\NavMenu::currentPath();
+    $navItem = static fn (string $path, string $iconName, string $label): string => '<a class="side-menu__link' . ($navPath === $path ? ' is-current' : '') . '" href="' . e(url($path)) . '"' . ($navPath === $path ? ' aria-current="page"' : '') . '>' . card_icon($iconName, 'size-4') . '<span>' . e($label) . '</span></a>';
+?>
+<dialog id="side-menu" class="side-menu" aria-label="Menu portal">
+    <div class="side-menu__head">
+        <a href="<?= e(url('/')) ?>" class="side-menu__brand">RS AWAL BROS</a>
+        <button type="button" class="side-menu__close" aria-label="Tutup menu" data-side-menu-close><?= card_icon('x', 'size-5') ?></button>
+    </div>
+    <div class="side-menu__account">
+        <span class="side-menu__avatar" aria-hidden="true"><?= e($profile['initials']) ?></span>
+        <span class="side-menu__who"><b><?= e($profile['name']) ?></b><?php if ($profile['username'] !== ''): ?><small><?= e('@' . $profile['username']) ?></small><?php endif; ?></span>
+    </div>
+    <nav class="side-menu__nav" aria-label="Halaman portal">
+        <?= $navItem('/', 'layout-dashboard', 'Portal Monitoring Terpadu') ?>
+        <?php $onAset = $navPath === '/aset' || str_starts_with($navPath, '/aset/'); // Aset IT: one link to its menu page, marked on every Aset page. ?>
+        <a class="side-menu__link<?= $onAset ? ' is-current' : '' ?>" href="<?= e(url('/aset')) ?>"<?= $navPath === '/aset' ? ' aria-current="page"' : '' ?>><?= card_icon('hard-drive', 'size-4') ?><span>Aset IT</span></a>
+        <?= $navItem('/perlu-perhatian', 'triangle-alert', 'Perlu perhatian') ?>
+        <?= $navItem('/riwayat-aktivitas', 'history', 'Riwayat aktivitas') ?>
+        <?= $navItem('/pengaturan-email', 'mail', 'Pengaturan Email') ?>
+        <?= $navItem('/password', 'lock', 'Ubah password') ?>
+    </nav>
+    <form class="side-menu__foot" method="post" action="<?= e(url('/logout')) ?>"><?= csrf_field() ?><button type="submit" class="side-menu__logout"><?= card_icon('log-out', 'size-4') ?>Logout</button></form>
+</dialog>
+<?php endif; ?>

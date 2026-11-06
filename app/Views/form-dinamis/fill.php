@@ -20,8 +20,8 @@
         <h2 id="fill-success-title" class="dash-dialog__title">Laporan Berhasil Terkirim!</h2>
         <p id="fill-success-text" class="dash-text" data-fill-success-text></p>
         <div class="dash-dialog__actions">
-            <a class="dash-btn dash-btn--ghost" href="<?= e(url('/')) ?>">Kembali ke Dashboard</a>
-            <a class="dash-btn dash-btn--primary" data-fill-success-rekap href="#" target="_blank" rel="noopener"><?= card_icon('table-2', 'size-4') ?>Lihat Rekap</a>
+            <a class="dash-btn dash-btn--ghost" data-fill-success-rekap href="#" target="_blank" rel="noopener"><?= card_icon('table-2', 'size-4') ?>Lihat Rekap</a>
+            <a class="dash-btn dash-btn--primary" data-fill-success-home href="<?= e(url('/')) ?>">Kembali ke Dashboard</a>
         </div>
     </div>
 </dialog>

@@ -12,6 +12,8 @@
 /storage/logs/*
 /storage/sessions/*
 /storage/app/*
+# Encryption key of secrets stored in the database (App\Services\Secret)
+/storage/keys/
 !/storage/logs/.gitkeep
 !/storage/sessions/.gitkeep
 !/storage/app/.gitkeep

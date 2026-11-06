@@ -1,9 +1,8 @@
 <?php
 /**
  * Design-system layout (account pages): navbar with live clock,
- * optional breadcrumb bar, page content and footer. Styles: css/design.css, script: js/design.js.
- * Optional view data: $page, $bodyClass, $documentClass, $htmlClass,
- * $crumbbar (breadcrumb data shown in the white bar under the navbar), $footer, $modal.
+ * optional "Kembali ke Dashboard" row, page content and footer. Styles: css/design.css, script: js/design.js.
+ * Optional view data: $page, $bodyClass, $documentClass, $htmlClass, $backToDashboard, $footer, $modal.
  */
 ?>
 <!doctype html>
@@ -25,12 +24,10 @@
     <div class="<?= e(cx('rs-body', $bodyClass ?? '')) ?>" data-page="<?= e($page ?? '') ?>">
         <a href="#main-content" class="fixed left-4 top-4 z-[90] -translate-y-24 rounded-lg bg-rs-teal-700 px-4 py-3 text-sm text-white focus:translate-y-0">Langsung ke konten</a>
         <?php require __DIR__ . '/header.php'; ?>
-        <?php if (!empty($breadcrumbs) || !empty($backToDashboard)): ?>
+        <?php if (!empty($backToDashboard)): ?>
         <div class="breadcrumb-shell page-shell py-5">
             <?php require BASE_PATH . '/app/Views/components/breadcrumbs.php'; ?>
         </div>
-        <?php elseif (!empty($crumbbar)): ?>
-        <div class="rsab-crumbbar"><div class="page-shell"><?= partial('breadcrumb', $crumbbar) ?></div></div>
         <?php endif; ?>
         <?= $content ?>
         <?= partial('design-footer', $footer ?? []) ?>

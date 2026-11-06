@@ -2,10 +2,8 @@
 declare(strict_types=1);
 
 use App\Controllers\AccountController;
-<<<<<<< HEAD
+use App\Controllers\AssetController;
 use App\Controllers\AttentionController;
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 use App\Controllers\AuditController;
 use App\Controllers\AuthController;
 use App\Controllers\DashboardController;
@@ -13,6 +11,7 @@ use App\Controllers\DynamicFormController;
 use App\Controllers\FileController;
 use App\Controllers\FormEditorController;
 use App\Controllers\HomeController;
+use App\Controllers\MailSettingsController;
 use App\Core\RequireLogin;
 use App\Core\VerifyCsrf;
 
@@ -23,11 +22,10 @@ $dynamicForm = new DynamicFormController();
 $auth = new AuthController();
 $account = new AccountController();
 $audit = new AuditController();
-<<<<<<< HEAD
 $attention = new AttentionController();
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 $files = new FileController();
+$asset = new AssetController();
+$mailSettings = new MailSettingsController();
 
 // Every POST (public ones included) must carry the session's CSRF token.
 $router->middleware(new VerifyCsrf(), always: true);
@@ -39,13 +37,14 @@ $router->post('/login', [$auth, 'login'], public: true);
 $router->post('/logout', [$auth, 'logout']);
 $router->get('/password', [$account, 'password']);
 $router->post('/password', [$account, 'updatePassword']);
+// SMTP account of the Aset IT reminder emails (side menu "Pengaturan Email").
+$router->get('/pengaturan-email', [$mailSettings, 'show']);
+$router->post('/pengaturan-email', [$mailSettings, 'save']);
+$router->post('/pengaturan-email/tes', [$mailSettings, 'test']);
 // Change log, read only (B9, PRD SEC-12): no route changes audit_logs.
 $router->get('/riwayat-aktivitas', [$audit, 'index']);
-<<<<<<< HEAD
 $router->get('/perlu-perhatian', [$attention, 'index']);
 $router->post('/perlu-perhatian/dilihat', [$attention, 'markSeen']);
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 
 $router->get('/', [$home, 'index']);
 // Dashboard JSON API (public/assets/js/dashboard.js): fetch() POSTs with the X-CSRF-Token header.
@@ -53,10 +52,7 @@ $router->post('/dashboard/sections', [$dashboard, 'createSection']);
 $router->post('/dashboard/sections/{id}/delete', [$dashboard, 'deleteSection']);
 $router->post('/dashboard/forms', [$dashboard, 'createForm']);
 $router->post('/dashboard/links', [$dashboard, 'createLink']);
-<<<<<<< HEAD
 $router->post('/dashboard/icon', [$dashboard, 'uploadIcon']);
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 $router->post('/dashboard/cards/{id}', [$dashboard, 'updateCard']);
 $router->post('/dashboard/cards/{id}/hide', [$dashboard, 'hide']);
 $router->post('/dashboard/cards/{id}/show', [$dashboard, 'show']);
@@ -79,10 +75,24 @@ $router->get('/form-dinamis/respons', [$dynamicForm, 'responses']);
 $router->get('/form-dinamis/respons/data', [$dynamicForm, 'data']);
 // Exports of the recap pages (B8, PRD §9): ?format=xlsx|pdf|cetak plus the filters of the page.
 $router->get('/form-dinamis/respons/ekspor', [$dynamicForm, 'export']);
-<<<<<<< HEAD
 $router->post('/form-dinamis/tanda-tangan', [$dynamicForm, 'saveSignature']);
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
+
+// Aset IT (IT Asset Management): menu, forms, recap; records as JSON and the operations of one submit.
+$router->get('/aset', [$asset, 'index']);
+$router->get('/aset/registrasi', [$asset, 'registrasi']);
+$router->get('/aset/penempatan', [$asset, 'penempatan']);
+$router->get('/aset/lacak', [$asset, 'lacak']);
+$router->get('/aset/servis', [$asset, 'servis']);
+$router->get('/aset/disposal', [$asset, 'disposal']);
+$router->get('/aset/rekap', [$asset, 'rekap']);
+$router->get('/aset/rekap-perangkat', [$asset, 'rekapPerangkat']);
+$router->get('/aset/rekap-perpindahan', [$asset, 'rekapPerpindahan']);
+$router->get('/aset/rekap-servis', [$asset, 'rekapServis']);
+$router->get('/aset/rekap-disposal', [$asset, 'rekapDisposal']);
+$router->get('/aset/data', [$asset, 'data']);
+$router->post('/aset/perintah', [$asset, 'command']);
+$router->post('/aset/diagnosa', [$asset, 'diagnose']);
+$router->post('/aset/berkas', [$asset, 'upload']);
 
 // Uploaded files of the reports (only for a signed-in session).
 $router->get('/berkas/{id}', [$files, 'show']);

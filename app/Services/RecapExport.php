@@ -302,7 +302,7 @@ final class RecapExport
             table.data td.num { text-align: right; } .group td { background-color: #f1f5f9; font-weight: bold; } .subtotal td { font-size: 8pt; color: #374151; background-color: #f8fafc; }
             .empty { padding: 6mm; text-align: center; color: #6b7280; border: 0.2mm solid #cbd5e1; }
             .sign { width: 100%; margin-top: 10mm; page-break-inside: avoid; } .sign td { width: 50%; vertical-align: top; text-align: center; }
-            .sign-space { height: 18mm; } .sign-name { font-weight: bold; }';
+            .sign td.sign-space { height: 22mm; } .sign-name { font-weight: bold; }';
         $header = '<table width="100%" class="head"><tr>'
             . '<td width="70mm">' . $logo . '</td>'
             . '<td><div class="org">' . e($config['hospital'] . ' — ' . $config['unit']) . '</div>'
@@ -370,22 +370,19 @@ final class RecapExport
         if ($count === 0) {
             $body[count($body) - 1] = '<div class="empty">Tidak ada data untuk filter ini.</div>';
         }
-<<<<<<< HEAD
         // Texts set on the recap page ("Tanda tangan"); an empty left name is the exporting account, an empty right
         // name a line to sign on.
         $sign = ($report['signature'] ?? []) + ReportSignature::defaults();
         $head = static fn (string $title, string $role): string => e($title) . ($role !== '' ? '<br>' . e($role) : '');
         $leftName = $sign['left_name'] !== '' ? $sign['left_name'] : ($author !== '' ? $author : 'Admin');
-        $body[] = '<table class="sign"><tr>'
-            . '<td>' . $head($sign['left_title'], $sign['left_role']) . '<div class="sign-space"></div><div class="sign-name">' . e($leftName) . '</div><div>' . e($date) . '</div></td>'
-            . '<td>' . $head($sign['right_title'], $sign['right_role']) . '<div class="sign-space"></div><div class="sign-name">' . ($sign['right_name'] !== '' ? e($sign['right_name']) : '(______________________________)') . '</div></td>'
-=======
-        $name = $config['head_of_it_name'];
-        $body[] = '<table class="sign"><tr>'
-            . '<td>Dibuat oleh,<div class="sign-space"></div><div class="sign-name">' . e($author !== '' ? $author : 'Admin') . '</div><div>' . e($date) . '</div></td>'
-            . '<td>Diketahui oleh,<br>Kepala Instalasi IT<div class="sign-space"></div><div class="sign-name">' . ($name !== '' ? e($name) : '(______________________________)') . '</div></td>'
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
-            . '</tr></table>';
+        // Three rows: titles, an empty row to sign in (mPDF ignores the height of an empty div in a cell, but keeps a
+        // row's height), then the names.
+        $body[] = '<table class="sign">'
+            . '<tr><td>' . $head($sign['left_title'], $sign['left_role']) . '</td><td>' . $head($sign['right_title'], $sign['right_role']) . '</td></tr>'
+            . '<tr><td class="sign-space">&nbsp;</td><td class="sign-space">&nbsp;</td></tr>'
+            . '<tr><td><div class="sign-name">' . e($leftName) . '</div><div>' . e($date) . '</div></td>'
+            . '<td><div class="sign-name">' . ($sign['right_name'] !== '' ? e($sign['right_name']) : '(______________________________)') . '</div></td></tr>'
+            . '</table>';
         return ['css' => $css, 'header' => $header, 'footer' => $footer, 'body' => $body, 'rows' => $count];
     }
 

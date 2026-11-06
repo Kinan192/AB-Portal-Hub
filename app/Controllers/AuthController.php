@@ -83,7 +83,8 @@ final class AuthController extends Controller
             'session_version' => (int) $account['session_version'],
         ]);
         Audit::tryLog('login', 'user', (int) $account['id']);
-        redirect(Auth::pullIntended('/'), 302);
+        // Every sign-in lands on the Form dashboard, whichever page sent the visitor to /login.
+        redirect('/', 302);
     }
 
     public function logout(): void

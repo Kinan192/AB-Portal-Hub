@@ -20,19 +20,8 @@ Buka http://127.0.0.1:8080. Dashboard membaca data dari MySQL/MariaDB, jadi data
 
 Salin seluruh folder project ke `C:\xampp\htdocs\<nama-folder>`, mis. `C:\xampp\htdocs\abportal`, nyalakan Apache dan MySQL di XAMPP Control Panel, lalu buka http://localhost/abportal. Portal mengenali foldernya sendiri: semua tautan, aset, form, dan ekspor memakai awalan `/abportal`, tanpa perlu mengisi `APP_URL`. File `.htaccess` di root project meneruskan setiap permintaan ke `public/`, sehingga `.env`, `app/`, `storage/` (berkas unggahan), `vendor/`, dan `.git` tidak bisa dibuka dari browser (mis. `/abportal/.env` menjawab 404). Bila `mod_rewrite` Apache mati, folder itu tidak disajikan sama sekali. Untuk server rumah sakit tetap arahkan web root ke `public/` ([docs/deploy.md](docs/deploy.md)).
 
-<<<<<<< HEAD
 Folder kerja utama di mesin pengembangan ini adalah `C:\xampp\htdocs\AB-Portal` (dibuka di http://localhost/AB-Portal); commit dan perubahan dilakukan di folder itu. `npm run build` hanya perlu setelah mengubah CSS di `resources/css/`.
 
-=======
-Tanpa menyalin: buat junction `htdocs\abportal` yang menunjuk ke folder project (sudah dibuat di mesin pengembangan ini), sehingga perubahan kode langsung terlihat di http://localhost/abportal:
-
-```powershell
-New-Item -ItemType Junction -Path C:\xampp\htdocs\abportal -Target C:\Users\ASUS\AB-Portal-Hub
-```
-
-Hapus junction dengan `cmd /c rmdir C:\xampp\htdocs\abportal` (hanya tautannya yang hilang, isi project tetap). `npm run build` hanya perlu setelah mengubah CSS di `resources/css/`.
-
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 ## Form dan rekap
 
 Semua form adalah form dinamis: enam form monitoring (Hardware Server IT, Kesesuaian User, Suhu Server, CCTV, Clear Desk, Antrian Online) sudah tersedia dari `database/forms/monitoring.php`, form lain dibuat lewat **+ Tambah**. Semuanya diubah dengan cara yang sama di Edit Isi Form. Pertanyaan, jadwal, dan laporan tersimpan di database (`forms`, `form_versions`, `form_schedules`, `form_entries`).
@@ -51,16 +40,10 @@ Migrasi `2026_11_06_0011_monitoring_forms.php` menambahkan kembali keenam form m
 Semua angka di dashboard dihitung dari laporan yang tersimpan (`app/Services/Progress.php`), dengan aturan yang sama di server dan di browser (`public/assets/js/dashboard.js` menghitung ulang setelah kartu diubah).
 
 - **Kapan form dihitung**: kartunya ada di bagian Monitoring Harian, tidak disembunyikan, dan jadwalnya jatuh tempo hari ini (WIB): harian; mingguan pada hari terpilih; bulanan pada tanggal itu (tanggal 29–31 jatuh ke hari terakhir bulan yang lebih pendek) atau hari terakhir bulan; tahunan pada tanggal itu (29 Februari hanya di tahun kabisat); tanggal tertentu; selalu di antara tanggal mulai dan berakhir bila diisi.
-<<<<<<< HEAD
 - **Tidak wajib diisi** (pola jadwal di tab Jadwal, migrasi `2026_11_08_0013`): form tidak pernah jatuh tempo, jadi tidak masuk Jadwal Hari Ini, progres, maupun "Belum Diisi"; kartunya ada di Semua Form dengan label "Tidak wajib" dan status "Kapan saja" (atau Selesai bila sudah diisi hari ini).
 - **Kapan form selesai**: ada laporan bertanggal hari ini (WIB). Form yang sudah selesai hilang dari tab **Jadwal Hari Ini** (yang tersisa hanya yang belum diisi) dan tetap ada di **Semua Form**; bila semua sudah diisi, tab itu menampilkan "Semua form hari ini sudah diisi".
 - **Panel progres** = jumlah penghitung bagian ("6 dari 7 form dijadwalkan hari ini · 5 selesai" → panel 5/6), jadi keduanya selalu sama. Status di kartu: Selesai, Batas 14:00, Belum Diisi (lewat batas dengan pengingat), Hari ini, Berikutnya: 2 Nov, Tidak terjadwal, atau Belum ada data. **Lihat Rekap** aktif setelah ada laporan.
 - **Perlu perhatian** (FR-P6): laporan yang memilih opsi bertanda merah. Lonceng di header (semua halaman) menampilkan jumlah dan delapan laporan terbaru dari **7 hari terakhir** (`app/Services/Attention.php`, `Attention::DAYS`); laporan yang lebih lama hilang dari notifikasi. Angka di lonceng hanya menghitung yang **belum dilihat** akun itu (tabel `attention_reads`, migrasi `2026_11_09_0014`): klik di lonceng, membuka detailnya di rekap, atau **Tandai semua dilihat** membuat item pudar dan angkanya berkurang. **Lihat semua data** membuka `/perlu-perhatian` di tab baru (`AttentionController`): semua laporan tanpa batas waktu, filter form dan tanggal, jawaban yang ditandai merah, dan tombol Buka ke detail laporan di halaman rekapnya (`?buka=<id>`).
-=======
-- **Kapan form selesai**: ada laporan bertanggal hari ini (WIB).
-- **Panel progres** = jumlah penghitung bagian ("6 dari 7 form dijadwalkan hari ini · 5 selesai" → panel 5/6), jadi keduanya selalu sama. Status di kartu: Selesai, Batas 14:00, Belum Diisi (lewat batas dengan pengingat), Hari ini, Berikutnya: 2 Nov, Tidak terjadwal, atau Belum ada data. **Lihat Rekap** aktif setelah ada laporan.
-- **Perlu perhatian** (FR-P6): lima laporan terbaru yang memilih opsi bertanda merah, terbaru dulu. Setiap baris membuka detail laporan di halaman rekapnya (`?buka=<id>`). Bagian ini tidak tampil bila kosong.
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 - Kembali ke dashboard dengan tombol Back browser setelah mengirim form memuat ulang halaman, sehingga progres langsung memakai laporan baru (FR-P4).
 - B7 tidak memakai migrasi; tidak ada data yang berubah.
 
@@ -71,15 +54,48 @@ Setiap halaman rekap punya tombol **Ekspor Excel (.xlsx)**, **Ekspor PDF**, dan 
 - **Excel** (`app/Services/RecapExport.php`, OpenSpout): sheet **Data** dengan semua baris, baris judul dibekukan, filter otomatis, dan lebar kolom menyesuaikan isi. Angka tetap angka, waktu berupa tanggal Excel `dd/mm/yyyy hh:mm` (WIB). Sheet **Ringkasan**: rumah sakit, form, periode, filter yang dipakai (mis. "Laporan: Perlu perhatian"), waktu dibuat, jumlah baris, dan empat statistik rekap.
 - **PDF** (mPDF): A4 lanskap, margin 15 mm, huruf IBM Plex Sans 9 pt yang ditanam (`resources/fonts`). Setiap halaman: logo, "RS Awal Bros Botania — Instalasi Teknologi Informasi", judul rekap, periode, dan filter; kaki "Dicetak 28 Okt 2026, 07:28 WIB · Halaman X dari Y" dan ID laporan. Isi: blok statistik, lalu tabel dengan judul kolom di setiap halaman; status sebagai teks. Di akhir: "Dibuat oleh," nama admin dan tanggal, serta "Diketahui oleh, Kepala Instalasi IT" dengan nama dari `REPORT_HEAD_OF_IT_NAME` (kosong = garis untuk tanda tangan); blok ini tidak terpotong antarhalaman.
 - **Cetak**: PDF yang sama dibuka di tab baru dan langsung memanggil dialog cetak browser.
-<<<<<<< HEAD
 - **Tanda tangan** (tombol di samping Ekspor Excel): judul, jabatan, dan nama sisi kiri ("Dibuat oleh") dan kanan ("Diketahui oleh") di bawah tabel PDF dan Cetak, disimpan per form (`forms.report_signature_json`, migrasi `2026_11_07_0012`, `app/Services/ReportSignature.php`). Nama kiri kosong = nama akun yang mengekspor; nama kanan kosong = garis untuk tanda tangan. Setiap perubahan tercatat di Riwayat aktivitas.
-=======
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 - **Nama file**: `<modul>_<YYYYMMDD>-<YYYYMMDD>_<YYYYMMDDHHmm>`, mis. `rekap-cek-server_20261001-20261031_202611011015.xlsx` (periode filter, lalu waktu dibuat dalam WIB). Tanpa filter periode dipakai tanggal laporan pertama dan terakhir.
 - **Batas** (FR-E12, `config/report.php`): Excel 50.000 baris, PDF dan Cetak 2.000 baris. Di atas batas tombolnya nonaktif dengan pesan "Maksimal 2.000 baris untuk PDF. Persempit filter."; server juga menolak dengan pesan yang sama. Tombol nonaktif bila tidak ada data atau filter tidak valid.
 - **Catatan aktivitas** (FR-E13): setiap ekspor ditulis ke `audit_logs` (`action = export`, `entity_type = rekap`) dengan modul, format, filter, jumlah baris, ID laporan, dan nama file. ID laporan (mis. `RPT-1EEF2C6406`) tercetak di kaki PDF, sehingga salinan kertas bisa dicocokkan dengan catatan ini.
 - Ekspor Excel memerlukan ekstensi PHP `zip`; bila tidak aktif (mis. PHP 8.5 WinGet untuk `npm run dev`) halaman menampilkan "Ekspor Excel memerlukan ekstensi PHP zip…", sedangkan PDF dan Cetak tetap berjalan. File sementara dibuat di `storage/app/tmp` (tidak di-commit).
 - B8 tidak memakai migrasi; tidak ada data yang berubah. Paket baru: `openspout/openspout` dan `mpdf/mpdf` (`composer install`).
+
+## Aset IT (IT Asset Management)
+
+Menu samping › **Aset IT**, atau `/aset`: siklus perangkat keras dari desain `Portal_Web_RS_Awal_Bros_Botania/ASET-IT-README.md`. Halaman: `/aset` (menu kartu), `/aset/registrasi` (`?code=`, `?edit=<ID>`), `/aset/penempatan`, `/aset/lacak` (`?id=`), `/aset/servis`, `/aset/disposal` (`?barcode=`), `/aset/rekap` (KPI, grafik, tabel, ekspor CSV).
+
+- Tampilan dan formulir memakai skrip desain di `public/assets/aset/` (alamat halaman `aset-*.html` diganti ke rute portal; tombol "Pulihkan data contoh" dibuang). `aset-store.js` tidak lagi memakai localStorage: data dibaca dari `GET /aset/data`, dan setiap kirim formulir mengirim daftar operasinya ke `POST /aset/perintah` (dengan token CSRF).
+- Server memeriksa ulang semua aturan di `app/Services/AssetLedger.php` dan menyimpan dalam satu transaksi (`app/Models/AssetRepository.php`, `app/Controllers/AssetController.php`): barcode unik; format IP/MAC; IP, MAC, dan serial tidak boleh sama dengan perangkat aktif lain; satu servis aktif dan satu disposal aktif per perangkat; disposal tidak bisa diajukan saat servis berjalan; servis aktif → **Dalam Servis**, selesai → status pilihan teknisi; disposal ditolak → status sebelumnya; dilaksanakan → **Disposed** (tidak pernah dihapus). Petugas dan waktu dicatat dari akun yang login dan jam server. Aturan yang dilanggar dijawab 422 dengan pesannya.
+- **Format barcode** (sama di `aset-store.js` `CODE_FORMATS` dan `AssetLedger::CODE_FORMAT`): label RS `ITEM-` + 8 angka, atau ID portal `AB-BTN-<kategori>-0001`. QR label berisi link (`https://…/asset-inventaris/history/ITEM-00049895`, atau potongannya `ASSET-INVENTARIS/HISTORY/ITEM-…`) dibaca sebagai bagian terakhirnya. Kode lain, atau yang terpotong, ditolak dengan pesan "tidak lengkap" / "tidak dikenali" (juga oleh server). Kode benar yang belum terdaftar memunculkan **Daftarkan perangkat ini** → `registrasi?code=…&dari=<form>`; ID terisi dan dikunci, dan layar selesai punya tautan kembali ke form asal.
+- **Rekap per bagian** (tombol Lihat Rekap di tiap kartu menu Aset IT): `/aset/rekap-perangkat` (grafik + daftar perangkat), `/aset/rekap-perpindahan`, `/aset/rekap-servis`, `/aset/rekap-disposal`; `/aset/rekap` tetap rekap global.
+- **Perangkat tanpa barcode** (mis. remot laser, aksesori kecil): di Registrasi pilih "Tidak ada barcode"; kotak barcode disembunyikan dan sistem memberi ID `AB-BTN-<kategori>-NNNN` berikutnya (contoh `AB-BTN-OTH-0001` untuk Lainnya). ID final dipilih server (`AssetLedger::register` dengan `autoId`), jadi dua admin yang mendaftar bersamaan tidak bisa mendapat ID sama.
+- **Pilihan "Lainnya"**: di semua formulir Aset IT, setiap daftar pilihan yang berisi "Lainnya" (mis. Sistem Operasi, Alasan Perpindahan, Alasan Disposal) memunculkan kotak "Tulis jawaban lainnya" saat Lainnya dipilih. Yang ditulis itulah yang disimpan (`GF.radio` / `GF.select` / `GF.val`). Di Form Dinamis, kotak Lainnya juga baru muncul setelah dipilih.
+- **Nama yang belum ada di daftar**:
+  - **Departemen / Unit Kerja** (di Penempatan, Lacak, dan Registrasi) adalah kolom ketik dengan saran, bukan pilihan tetap. Unit baru cukup diketik, lalu ikut muncul sebagai saran berikutnya dan di filter rekap (`AS.deptNames()`).
+  - **Perangkat di luar kategori**: pilih **Lainnya**, lalu isi **Jenis Perangkat** (wajib, mis. Remote Laser, Proyektor), disimpan di `spec.kind`.
+    - Jenis ini tampil sebagai "Lainnya: Proyektor" di Lacak, tabel, dan CSV, serta ikut pencarian dan saran berikutnya.
+    - Server menolak perangkat Lainnya tanpa jenis. Perangkat Lainnya lama diminta mengisi jenisnya saat Edit data.
+- **Lokasi = Departemen / Unit Kerja + Ruangan.** Gedung dan Lantai tidak ditanyakan lagi di Penempatan maupun di pembaruan lokasi (Lacak), dan filter Gedung di rekap juga dihapus. Data lama yang masih punya Gedung/Lantai tetap tersimpan dan ditampilkan dalam kurung. Lokasi dianggap sama bila unit dan ruangannya sama (`AssetLedger::sameLoc`).
+- **Departemen** (pemilik/pengguna perangkat) ditanyakan di Registrasi, wajib, dengan saran daftar departemen RS; terpisah dari lokasi penempatan. Kolom `asset_devices.department` (migrasi `2026_11_13_0018`). Perangkat lama kosong sampai diedit; saat Edit, kolom ini wajib diisi. Tampil di Lacak, layar selesai, tabel dan CSV Daftar Perangkat, serta ikut pencarian.
+- **Berkas modul** (`POST /aset/berkas`, PDF/JPG/PNG maks. 10 MB, disimpan sebagai lampiran `owner_type = asset` di `storage/app/private`, dibuka lewat `/berkas/{id}` untuk yang login): **Berita Acara / Dokumen Servis**, **Invoice Pembelian** di Registrasi (maks. 5; saat Edit bisa ditambah atau dilepas; kolom `asset_devices.invoices_json`, migrasi `2026_11_11_0016`), dan dokumen Disposal. Berkas diunggah saat formulir dikirim; daftar dokumen hanya menerima id berkas aset yang benar-benar ada (`AssetLedger::attach()`).
+- **Status servis Ditolak** (mis. klaim garansi ditolak): wajib alasan dan berita acara; seperti Selesai, servis ditutup dan teknisi memilih status perangkat (bawaan Rusak). Menutup servis dengan perangkat **Rusak** (Selesai atau Ditolak) wajib berita acara (foto/PDF), dicek juga di server (`AssetLedger::needReport()`). Rekap Servis punya kolom Dokumen.
+- **Notifikasi**: servis berstatus **Menunggu Suku Cadang** masuk lonceng "Perlu perhatian" dan halaman `/perlu-perhatian` (kartu "Servis menunggu suku cadang") selama masih menunggu, tanpa batas 7 hari. Klik membuka form Servis perangkatnya. Status dilihat per akun disimpan di `asset_attention_reads` (migrasi `2026_11_12_0017`, per servis dan saat mulai menunggu, jadi bila menunggu lagi muncul sebagai baru). Kode: `App\Models\AssetAttention`, `Attention::serviceItem()`.
+- **Tenggat Vendor & pengingat email**: formulir Servis (laporan baru dan pembaruan) punya kolom opsional **Tenggat Vendor**, yaitu batas waktu pengerjaan yang diberikan ke vendor / teknisi. Tanggal ini tidak boleh sebelum tanggal laporan, bisa diubah atau dihapus selama servis berjalan, dan setiap perubahan tercatat di progres. Disimpan di `asset_services.data_json` (`dueDate`). Tampil di Lacak, Rekap Servis (kolom dan CSV), dan "Servis yang sedang berjalan": tenggat yang lewat, hari ini, atau ≤ 3 hari lagi ditandai dan didahulukan.
+  - **Email H-1**: `php bin/service-alerts.php` mengirim satu email berisi semua servis terbuka yang tenggatnya **besok**. Servis yang tenggatnya hari ini atau sudah lewat juga ikut kalau pengingatnya belum sempat terkirim. Setiap servis + tenggat hanya diemail sekali (tabel `asset_service_alerts`, migrasi `2026_11_14_0019`); kalau tenggat diubah, ada pengingat baru. Opsi `--dry-run` (hanya menampilkan) dan `--test` (kirim email tes). Kode: `App\Services\ServiceDueAlert`, `App\Services\Mailer` (PHPMailer 6, MIT).
+  - **Pengaturan** di portal, menu samping **Pengaturan Email** (`/pengaturan-email`, `MailSettingsController`):
+    - Isinya server SMTP, port, keamanan (TLS/SSL), username, password, email dan nama pengirim, serta **email penerima**. Kalau penerima kosong, email dikirim ke semua akun portal yang aktif.
+    - Tombol **Kirim Email Tes** mengirim email tes dengan pengaturan yang sudah disimpan.
+    - Untuk Gmail, pakai **App Password**, bukan password biasa.
+    - Pengaturan disimpan di tabel `app_settings` (migrasi `2026_11_15_0020`, `App\Services\MailSettings`).
+    - Password **dienkripsi** (AES-256-GCM, `App\Services\Secret`). Kuncinya file `storage/keys/secret.key`, dibuat otomatis, tidak masuk database maupun git, dan tidak pernah dikirim balik ke halaman.
+    - Kalau database dipulihkan di komputer lain tanpa file kunci itu, isi ulang password di halaman ini.
+    - Perubahan pengaturan dan hasil tes tercatat di Riwayat aktivitas, tanpa isi password.
+  - **Jadwal** (Windows Task Scheduler, setiap jam 07:00–21:00, aman dijalankan berulang):
+    `schtasks /Create /TN "AB-Portal Pengingat Tenggat Vendor" /TR "\"C:\xampp\php\php.exe\" \"C:\xampp\htdocs\AB-Portal\bin\service-alerts.php\"" /SC DAILY /ST 07:00 /RI 60 /DU 14:00 /F`. Email hanya terkirim saat komputer server menyala.
+- **Riwayat Servis / Disposal / Perpindahan** (rekap) hanya menampilkan riwayat, tanpa kolom Aksi. Di atas tabel ada filter seperti rekap form: Cari, Bulan, Dari/Sampai tanggal (Bulan dan rentang tanggal saling menggantikan), Status (servis dan disposal), dan Per halaman 25/50/100 dengan halaman. Export CSV mengikuti filter.
+- **Ubah Status** dari Lacak (kotak "Sedang diservis"): Dalam Proses, Menunggu Suku Cadang, Selesai — perangkat berfungsi, Ditolak / Rusak (tidak bisa diperbaiki atau klaim garansi ditolak; servis Ditolak, perangkat Rusak, wajib berita acara); dengan catatan, tanggal, dan unggah berita acara (`AU.serviceStatus()`). Scan dari HP: kamera memakai `BarcodeDetector` (Chrome/Edge Android), atau ZXing 0.21.3 (MIT) yang disimpan di portal sendiri (`public/assets/aset/vendor/`) untuk iPhone/iPad dan browser lain. Keduanya membaca QR dan barcode label (Code 128). Tanpa `BarcodeDetector` (iPhone/iPad, desktop) pembaca utamanya **zxing-cpp** lewat WebAssembly (`zxing-wasm` 2.2.4, MIT; zxing-cpp Apache-2.0; `vendor/zxing-wasm-reader-2.2.4.js` + `zxing_reader-2.2.4.wasm`, CSP halaman aset menambah `'wasm-unsafe-eval'`), cadangannya ZXing-JS. Tiap frame dibaca utuh, lalu bagian tengah pada resolusi asli (diperbesar, lalu dipertajam). Kamera diminta 4K, fokus kontinu, dan zoom 2× bila didukung: QR label berisi link (45×45 modul), dan kamera iPhone tidak bisa fokus lebih dekat dari ±15–20 cm. Tombol **Foto label** membaca foto dari aplikasi kamera HP (fokus lebih tajam; juga jalan tanpa HTTPS). Di Brave, proteksi fingerprint bisa mengubah gambar kamera; jendela scan mendeteksinya dan meminta Shields dimatikan untuk situs ini. Browser hanya membuka kamera lewat **HTTPS** (atau localhost), jadi dari HP buka `https://<IP komputer>/AB-Portal/`. Kalau dibuka lewat `http://`, jendela scan menampilkan tautan ke versi HTTPS. Sertifikat Apache (`C:\xampp\apache\conf\ssl.crt\server.crt` dan `ssl.key\server.key`, cadangan lama `*.bak-20261103`) dibuat sendiri untuk localhost, 192.168.106.201, dan 192.168.137.1, berlaku sampai Februari 2029. HP akan memperingatkan sertifikat tidak dikenal; pilih Lanjutkan sekali. Jika IP komputer berubah, buat ulang sertifikat dengan IP baru.
+- Tabel `asset_devices`, `asset_moves`, `asset_services`, `asset_disposals`, `asset_activity` (migrasi `2026_11_10_0015`, hanya tabel baru). Setiap perubahan juga masuk Riwayat aktivitas (objek **Aset IT**). Membatalkan: `php bin/migrate.php down` menghapus kelima tabel beserta isinya.
 
 ## Riwayat aktivitas (B9)
 
@@ -152,7 +168,7 @@ Halaman design system mengikuti desain statis di `docs/DESIGN/rs-awal-bros-porta
 
 Route didaftarkan di `routes/web.php`. Alamat lama form bawaan (`/form/suhu`, `/rekap/cctv`, `/forms/…`, `/reports/…`) sudah tidak ada dan menjawab 404. Route API memakai pola `{id}` (angka positif) di `app/Core/Router.php`.
 
-Semua route kecuali `/login` memerlukan sesi login (middleware `app/Core/RequireLogin.php`); pengunjung yang belum login diarahkan ke `/login` dengan HTTP 302, lalu kembali ke halaman yang diminta setelah login. Permintaan JSON tanpa sesi mendapat HTTP 401. File di `public/assets/` tidak diblokir. Kartu Monitoring Harian membuka halaman form-nya dan tombol **Lihat Rekap** membuka riwayatnya (aktif setelah ada laporan di database).
+Semua route kecuali `/login` memerlukan sesi login (middleware `app/Core/RequireLogin.php`); pengunjung yang belum login diarahkan ke `/login` dengan HTTP 302. Setelah login, semua pengguna selalu masuk ke Dashboard Form (`/`), apa pun halaman yang dibuka sebelumnya. Permintaan JSON tanpa sesi mendapat HTTP 401. File di `public/assets/` tidak diblokir. Kartu Monitoring Harian membuka halaman form-nya dan tombol **Lihat Rekap** membuka riwayatnya (aktif setelah ada laporan di database).
 
 Form dan riwayat memakai `resources/css/gform.css` (form bergaya Google Forms) dan `resources/css/form-dinamis.css` (tipe jawaban tambahan dan halaman rekap); editor memakai `resources/css/form-editor.css`. Varian tombol `button-*` dan class `module-action` di `resources/css/module-ui.css` masih dipakai halaman akun, tombol Kembali ke Dashboard, dan dialog design system.
 
@@ -232,10 +248,6 @@ Form dan riwayat memakai `resources/css/gform.css` (form bergaya Google Forms) d
 - Kartu form membuka halaman form-nya; tombol Lihat Rekap pada kartu membuka rekapnya di tab baru. Menu ⋯ pada kartu berisi Lihat Rekap, Edit Isi Form, Edit Kartu, Duplikat, Sembunyikan, dan Hapus.
 - Kartu tautan tanpa alamat menampilkan "Alamat belum diatur" sampai URL diisi lewat menu ⋯ › Edit. URL `http`/`https` yang valid dibuka di tab baru dengan `noopener noreferrer`.
 - Menu profil (nama di kanan header) berisi Ubah password, Riwayat aktivitas, dan Logout (`POST /logout` dengan token CSRF, kembali ke `/login`); bisa dipakai dengan keyboard (panah, Esc). Tidak ada halaman Users. Nama di navbar berasal dari akun yang sedang masuk.
-<<<<<<< HEAD
-=======
-- Badge `Portal aktif` merujuk pada halaman portal, bukan uptime sistem eksternal.
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 - Dialog bisa ditutup menggunakan Escape, tombol tutup, tombol kembali, atau klik di luar dialog. Fokus dikelola oleh elemen `<dialog>` browser.
 - Daftar kategori tanpa menu memiliki empty state; route yang tidak ada mengembalikan 404, kegagalan render mengembalikan 500.
 - Tampilan awal dashboard dirender langsung oleh PHP. Aksi di dashboard dikirim ke server; selama satu aksi berjalan, tombol Simpan dinonaktifkan dan klik aksi lain diabaikan. Bila gagal, toast merah menjelaskan sebabnya (mis. "Sesi berakhir", "Permintaan ditolak") dan tidak ada yang berubah.
@@ -267,19 +279,11 @@ Salin `.env.example` menjadi `.env`. `.env` tidak boleh di-commit.
 | `APP_URL` | Alamat portal tanpa garis miring di akhir, mis. `https://portal-it.rs.local`. Kosong = dikenali otomatis: root situs, atau foldernya bila project ada di dalam `htdocs` (mis. `/abportal`) |
 | `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` | Koneksi MySQL/MariaDB |
 | `PASSWORD_MIN_LENGTH` | Panjang minimal password (bawaan 12, paling kecil 8) |
-<<<<<<< HEAD
 | `BACKUP_DIR`, `BACKUP_COPY_DIR`, `BACKUP_KEEP` | Folder backup (di luar folder project dan di luar `htdocs`; kosong = `AB-Portal-Hub-backups` di sebelah project, yang ikut tersaji Apache bila project ada di `htdocs`), salinan kedua di mesin lain/NAS (NFR-5), jumlah set yang disimpan (bawaan 30) |
 | `BACKUP_ENCRYPTION_KEY` | Kunci AES-256 opsional untuk backup (`php bin/backup.php key`). Simpan salinannya di luar server: tanpa kunci, backup terenkripsi tidak bisa dipulihkan |
 | `MYSQL_BIN_DIR` | Folder `mysqldump` dan `mysql`, mis. `C:\xampp\mysql\bin` (kosong = dari PATH) |
 | `LOG_KEEP_DAYS` | Umur log error harian di `storage/logs` sebelum dihapus oleh backup malam (bawaan 90) |
 | `REPORT_HEAD_OF_IT_NAME` | Nama awal sisi kanan tanda tangan PDF dan Cetak, sebelum diatur lewat tombol Tanda tangan di halaman rekap. Kosong = garis kosong untuk tanda tangan |
-=======
-| `BACKUP_DIR`, `BACKUP_COPY_DIR`, `BACKUP_KEEP` | Folder backup (di luar folder project; kosong = `AB-Portal-Hub-backups` di sebelah project), salinan kedua di mesin lain/NAS (NFR-5), jumlah set yang disimpan (bawaan 30) |
-| `BACKUP_ENCRYPTION_KEY` | Kunci AES-256 opsional untuk backup (`php bin/backup.php key`). Simpan salinannya di luar server: tanpa kunci, backup terenkripsi tidak bisa dipulihkan |
-| `MYSQL_BIN_DIR` | Folder `mysqldump` dan `mysql`, mis. `C:\xampp\mysql\bin` (kosong = dari PATH) |
-| `LOG_KEEP_DAYS` | Umur log error harian di `storage/logs` sebelum dihapus oleh backup malam (bawaan 90) |
-| `REPORT_HEAD_OF_IT_NAME` | Nama di bawah "Diketahui oleh, Kepala Instalasi IT" pada PDF dan Cetak (keputusan Q15). Kosong = garis kosong untuk tanda tangan |
->>>>>>> 899d036f59ce2361fefc2c1a8249a7b80cbc5bb5
 
 Waktu disimpan di database dalam **UTC** (sesi koneksi `+00:00`) dan ditampilkan dalam WIB (`config/app.php`). `DB_TIMEZONE` tidak dipakai lagi.
 
@@ -289,10 +293,12 @@ Prasyarat: PHP 8.2 atau lebih baru dengan `pdo_mysql` dan `mbstring`, serta `fil
 
 1. Salin `.env.example` menjadi `.env`, lalu isi koneksi database.
 2. `composer install` (memasang autoload, OpenSpout dan mPDF untuk ekspor, dan PHPUnit untuk tes; `vendor/` tidak di-commit).
-3. Terapkan migrasi: `php bin/migrate.php` (atau `composer db:migrate`). Perintah lain: `php bin/migrate.php status`, `php bin/migrate.php down` (membatalkan batch terakhir, minta ketik `YA`).
-4. Isi dashboard awal: `php bin/migrate.php seed` (3 bagian, 6 form monitoring, dan 9 kartu tautan; dilewati bila dashboard sudah berisi data, jadi aman dijalankan ulang).
+3. Terapkan migrasi: `php bin/migrate.php` (atau `composer db:migrate`). Pada instalasi baru perintah ini sekaligus membuat database `DB_DATABASE` bila belum ada (utf8mb4), membuat seluruh tabel (29 tabel, migrasi `0001`–`0020`), lalu mengisi dashboard awal (seed). Database yang sudah berjalan hanya menerima migrasi yang belum diterapkan dan tidak di-seed ulang. Perintah lain: `php bin/migrate.php status`, `php bin/migrate.php down` (membatalkan batch terakhir, minta ketik `YA`).
+4. Isi dashboard awal secara manual (hanya bila perlu): `php bin/migrate.php seed` (3 bagian, 6 form monitoring, dan 9 kartu tautan; dilewati bila dashboard sudah berisi data, jadi aman dijalankan ulang).
 5. Periksa koneksi dan daftar tabel: `php bin/db-check.php` (atau `composer db:check`).
 6. Buat akun admin: `php bin/create-admin.php` (atau `composer admin:create`). Skrip menanyakan username, nama tampilan, email, dan password (tersembunyi, diulang). Jalankan ulang dengan username yang sama untuk mengganti password. Portal hanya memakai satu admin: skrip menolak membuat akun kedua. Jalankan dari PowerShell atau CMD; di Git Bash pakai `winpty php bin/create-admin.php`.
+
+Ringkas untuk user baru setelah `git clone`: salin `.env.example` ke `.env` dan isi koneksi database, lalu `composer install`, `php bin/migrate.php`, `php bin/create-admin.php`. Pengaturan SMTP tidak ikut repo (kunci enkripsi `storage/keys/` di-ignore), jadi isi ulang di menu **Pengaturan Email**.
 
 Migrasi ada di `database/migrations/` (`YYYY_MM_DD_NNNN_nama.php`, berisi fungsi `up` dan `down`) dan dicatat di `schema_migrations` dengan nomor batch. `database/schema.sql` adalah skema dasar yang dijalankan oleh migrasi `0001_baseline`; jangan mengimpornya sendiri lagi.
 

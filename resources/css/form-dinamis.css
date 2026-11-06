@@ -10,6 +10,10 @@
    (760 px .gf-page, 980 px .fe-shell, plus the button and its gap), the row takes no height and the form
    starts on the same line as the button. Narrower screens keep the button above the form. */
 .portal-page .breadcrumb-shell.is-sticky { position: sticky; top: var(--header-h, 0px); z-index: 30; background: #f8fafc; }
+/* The stuck row's background spans the whole window, so a wider card scrolling under it (the Aset IT recap header)
+   never shows beside the button; clip-path keeps it to the row's own height. Not on the form pages, whose row
+   sits beside the narrow form (the clip would hide the button there). */
+.portal-page .breadcrumb-shell.is-sticky:not(:has(.breadcrumb-fill, .breadcrumb-editor)) { box-shadow: 0 0 0 100vmax #f8fafc; clip-path: inset(0 -100vmax); }
 @media (max-width: 639px) { .portal-page .breadcrumb-shell.is-sticky { padding-block: 8px; } }
 @media (min-width: 1400px) {
   .portal-page .breadcrumb-shell:has(.breadcrumb-fill) { height: 0; padding-block: 0; background: none; }

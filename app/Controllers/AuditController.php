@@ -44,7 +44,6 @@ final class AuditController extends Controller
             'pageTitle' => 'Riwayat aktivitas',
             'portalPage' => true,
             'backToDashboard' => true,
-            'breadcrumbs' => [['label' => 'Riwayat aktivitas']],
             'filters' => $filters,
             'rows' => array_map(static fn (array $row): array => ActivityLog::row($row), $page['rows']),
             'countText' => $page['total'] > 0 ? 'Menampilkan ' . ($from + 1) . '–' . ($from + count($page['rows'])) . ' dari ' . $page['total'] . ' catatan' : '0 catatan',
